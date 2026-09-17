@@ -1,23 +1,24 @@
 /**
- * Ingesta RV1909 — pipeline USFM → JSON (B9 + portón de validación, GLM E2)
+ * Ingesta USFM → JSON — pipeline genérico con portón de validación (B9 + GLM E2)
  *
- * Fuente: eBible.org — spaRV1909 (Reina-Valera 1909, dominio público)
- * Crudo en: ../../05. Datos/corpus_crudo/rv1909_usfm (fuera del repo de la app)
- * Salida:   data/rv1909/{OSIS}.json + data/rv1909/_manifest.json
+ * Uso: node scripts/ingesta.mjs <edicion>   (rv1909 | web)
  *
- * Portón: valida 66 libros, capítulos por libro, secuencia de versículos y
- * totales ancla. Los versículos vacíos EN LA FUENTE no se rellenan: quedan
- * documentados en manifest.incidentes (regla de no-fabricación).
- * El marcado \w|strong="..." del USFM se conserva en el crudo para la futura
- * capa interlineal; aquí se limpia del texto de lectura.
+ * Fuente: eBible.org — ediciones en dominio público
+ * Crudo:  ../../05. Datos/corpus_crudo/<carpeta>/  (fuera del repo de la app)
+ * Salida: public/data/<salida>/{OSIS}.json + _manifest.json
+ *
+ * Portón: valida 66 libros canónicos (canon protestante, D3), capítulos por
+ * libro, secuencia sin lagunas ni duplicados, libros ancla y total cuando la
+ * edición tiene versificación conocida. Los versículos vacíos EN LA FUENTE no
+ * se rellenan: quedan documentados en manifest.incidentes.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const RAW = path.join(ROOT, '..', '..', '..', '05. Datos', 'corpus_crudo', 'rv1909_usfm');
-const OUT = path.join(ROOT, '..', 'public', 'data', 'rv1909');
+const BASE_CRUDO = path.join(ROOT, '..', '..', '..', '05. Datos', 'corpus_crudo');
+const BASE_OUT = path.join(ROOT, '..', 'public', 'data');
 
 /** Canon protestante: OSIS → [nombre ES, capítulos esperados] */
 const CANON = {
@@ -41,16 +42,46 @@ const CANON = {
 };
 const ORDEN = Object.keys(CANON);
 
-/** Libros ancla: marcadores de versículo esperados (versificación RV1909, linaje TR/KJV = 31.102). */
-const ANCLAS = { GEN: 1533, PSA: 2461, ISA: 1292, JER: 1364, MAT: 1071, MRK: 678, LUK: 1151, JHN: 879, ACT: 1007, ROM: 433, REV: 404 };
-const TOTAL_ESPERADO = 31102;
+/** Ancla estricta NT (estable entre ediciones de linaje TR/ASV) y OT base. */
+const ANCLAS_NT = { MAT: 1071, MRK: 678, LUK: 1151, JHN: 879, ACT: 1007, ROM: 433, REV: 404 };
+const ANCLAS_OT = { GEN: 1533, PSA: 2461, ISA: 1292, JER: 1364 };
+
+const EDICIONES = {
+  rv1909: {
+    obra: 'Reina-Valera 1909',
+    osis_obra: 'RV1909',
+    idioma: 'es',
+    licencia: 'Dominio público',
+    fuente: 'eBible.org — https://ebible.org/Scriptures/spaRV1909_usfm.zip',
+    crudo: 'rv1909_usfm',
+    sufijo: 'spaRV1909.usfm',
+    salida: 'rv1909',
+    totalEsperado: 31102,
+    anclas: { ...ANCLAS_OT, ...ANCLAS_NT },
+  },
+  web: {
+    obra: 'World English Bible',
+    osis_obra: 'WEB',
+    idioma: 'en',
+    licencia: 'Dominio público (el nombre «World English Bible» es marca de M. P. Johnson — ver ficha legal)',
+    fuente: 'eBible.org — https://ebible.org/Scriptures/eng-web_usfm.zip',
+    crudo: 'web_usfm',
+    sufijo: 'eng-web.usfm',
+    salida: 'web',
+    // WEB: versificación verificada con evidencia del crudo (2026-09-17):
+    // ROM 16 termina en v24; la doxología TR 16:25-27 va en nota al pie y
+    // \v 25 queda como marcador vacío → 434 marcadores. PSA 2461 coincide.
+    totalEsperado: 31103,
+    anclas: { ...ANCLAS_OT, ...ANCLAS_NT, ROM: 434 },
+  },
+};
 
 const stripInline = (s) =>
   s
     .replace(/\|strong="[^"]*"/g, '')  // atributos de marcado \w
     .replace(/\|[\w.]+="[^"]*"/g, '')  // otros atributos
-    .replace(/\\[a-zA-Z]+\d*\*/g, '')  // marcadores de cierre (\add*): antes que los de apertura
-    .replace(/\\[a-zA-Z]+\d*/g, '')    // marcadores USFM de apertura
+    .replace(/\\[+a-zA-Z]+\d*\*/g, '') // marcadores de cierre (\add*, \+w*): antes que los de apertura
+    .replace(/\\[+a-zA-Z]+\d*/g, '')   // marcadores USFM de apertura (\v, \+w, …)
     .replace(/\\\*/g, '')
     .replace(/~/g, ' ')
     .replace(/\s+/g, ' ')
@@ -91,34 +122,47 @@ function parseBook(file) {
 }
 
 // ── ejecución ──────────────────────────────────────────────────────────────
+const clave = process.argv[2];
+const ed = EDICIONES[clave];
+if (!ed) {
+  console.error(`Edición desconocida: "${clave}". Opciones: ${Object.keys(EDICIONES).join(', ')}`);
+  process.exit(1);
+}
+
+const RAW = path.join(BASE_CRUDO, ed.crudo);
+const OUT = path.join(BASE_OUT, ed.salida);
 fs.mkdirSync(OUT, { recursive: true });
-const files = fs.readdirSync(RAW).filter((f) => f.endsWith('.usfm'));
-if (files.length !== 66) {
-  console.error(`PORTÓN: se esperaban 66 libros USFM, hay ${files.length}. Abortado.`);
+
+const files = fs.readdirSync(RAW).filter((f) => f.endsWith(ed.sufijo));
+const enCanon = files.filter((f) => {
+  const m = f.match(/^(\d+)-(.+?)\.(?:usfm)$/);
+  const codigo = m ? m[2].replace(new RegExp(ed.sufijo.replace('.usfm', '') + '$'), '') : null;
+  return codigo && CANON[codigo];
+});
+if (enCanon.length !== 66) {
+  console.error(`PORTÓN: se esperaban 66 libros canónicos, hay ${enCanon.length}. Abortado.`);
   process.exit(1);
 }
 
 const manifest = {
-  obra: 'Reina-Valera 1909',
-  osis_obra: 'RV1909',
-  idioma: 'es',
-  licencia: 'Dominio público',
-  fuente: 'eBible.org — https://ebible.org/Scriptures/spaRV1909_usfm.zip',
-  crudo_en: '05. Datos/corpus_crudo/rv1909_usfm',
+  obra: ed.obra,
+  osis_obra: ed.osis_obra,
+  idioma: ed.idioma,
+  licencia: ed.licencia,
+  fuente: ed.fuente,
+  crudo_en: `05. Datos/corpus_crudo/${ed.crudo}`,
   fecha_ingesta: new Date().toISOString().slice(0, 10),
   formato_entrada: 'USFM (con marcado \\w|strong preservado en el crudo)',
+  canon: 'Protestante, 66 libros (D3). Los archivos no canónicos del crudo quedan preservados para la decisión pendiente del canon.',
   total_versos: 0,
   incidentes: [],
   libros: [],
 };
 
 const errores = [];
-for (const f of files) {
-  const m = f.match(/^(.+?)spaRV1909\.usfm$/);
-  if (!m) { errores.push(`Nombre no reconocido: ${f}`); continue; }
-  const osis = m[1].replace(/^\d+-/, '');
+for (const f of enCanon) {
+  const osis = f.match(/^\d+-(.+)\./)[1].replace(new RegExp(ed.sufijo.replace('.usfm', '') + '$'), '');
   const meta = CANON[osis];
-  if (!meta) { errores.push(`Código sin mapeo: ${osis} (${f})`); continue; }
 
   const caps = parseBook(path.join(RAW, f));
   const nCaps = Object.keys(caps).length;
@@ -141,7 +185,6 @@ for (const f of files) {
       if (!nums.includes(i)) errores.push(`${osis}.${c}.${i} falta`);
     }
   }
-  // los vacíos no bloquean: son incidencias de la edición fuente, documentadas
   vacios.forEach((r) => manifest.incidentes.push({ ref: r, tipo: 'verso_vacio_en_fuente' }));
 
   fs.writeFileSync(
@@ -152,21 +195,21 @@ for (const f of files) {
   manifest.libros.push({ osis, nombre: meta[0], caps: nCaps, versos: versos.length, versos_vacios: vacios.length, marcadores: versos.length + vacios.length });
 }
 
-for (const [osis, esperado] of Object.entries(ANCLAS)) {
+for (const [osis, esperado] of Object.entries(ed.anclas)) {
   const libro = manifest.libros.find((l) => l.osis === osis);
   if (!libro) { errores.push(`Ancla faltante: ${osis}`); continue; }
   if (libro.marcadores !== esperado) errores.push(`PORTÓN ${osis}: ${libro.marcadores} marcadores, esperados ${esperado}`);
 }
-if (manifest.total_versos !== TOTAL_ESPERADO) {
-  errores.push(`PORTÓN TOTAL: ${manifest.total_versos} versos (con vacíos), esperados ${TOTAL_ESPERADO}`);
+if (ed.totalEsperado !== null && manifest.total_versos !== ed.totalEsperado) {
+  errores.push(`PORTÓN TOTAL: ${manifest.total_versos} marcadores, esperados ${ed.totalEsperado}`);
 }
 
 manifest.libros.sort((a, b) => ORDEN.indexOf(a.osis) - ORDEN.indexOf(b.osis));
 fs.writeFileSync(path.join(OUT, '_manifest.json'), JSON.stringify(manifest, null, 2));
 
 if (errores.length) {
-  console.error(`✗ PORTÓN DE INGESTA FALLÓ — ${errores.length} incidencias:`);
+  console.error(`✗ PORTÓN DE INGESTA FALLÓ (${ed.osis_obra}) — ${errores.length} incidencias:`);
   errores.slice(0, 30).forEach((e) => console.error('  · ' + e));
   process.exit(1);
 }
-console.log(`✓ RV1909 ingerida y validada: ${manifest.total_versos} versos, 66 libros, ${manifest.incidentes.length} versos vacíos en la fuente (documentados).`);
+console.log(`✓ ${ed.osis_obra} ingerida y validada: ${manifest.total_versos} marcadores de verso, 66 libros, ${manifest.incidentes.length} versos vacíos en la fuente (documentados).`);

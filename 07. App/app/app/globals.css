@@ -149,6 +149,17 @@ body {
   align-items: center;
   gap: 16px;
 }
+.cabecera-sub {
+  border-top: 1px solid var(--line);
+}
+.cabecera-sub-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .marca {
   font-family: var(--serif);
@@ -243,6 +254,32 @@ body {
 }
 
 /* ── lector ── */
+
+.obras-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.obras-tab {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: var(--bg-elev);
+  color: var(--muted);
+  border: none;
+  padding: 9px 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.obras-tab + .obras-tab { border-left: 1px solid var(--line); }
+.obras-tab.activa {
+  background: var(--ink);
+  color: var(--bg);
+}
+.obras-tab:hover:not(.activa) { color: var(--accent-strong); }
 
 .lector-acciones {
   display: flex;

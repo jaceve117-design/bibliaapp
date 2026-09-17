@@ -2,7 +2,14 @@ import Link from "next/link";
 import Tema from "./Tema";
 import { t, type Locale } from "@/lib/i18n";
 
-export default function Cabecera({ locale }: { locale: Locale }) {
+/** Cabecera fija (sticky). `children` se renderiza como segunda fila, también fija. */
+export default function Cabecera({
+  locale,
+  children,
+}: {
+  locale: Locale;
+  children?: React.ReactNode;
+}) {
   const tr = t(locale);
   return (
     <header className="cabecera">
@@ -27,6 +34,7 @@ export default function Cabecera({ locale }: { locale: Locale }) {
           <Tema etiqueta={tr.tema} />
         </div>
       </div>
+      {children ? <div className="cabecera-sub">{children}</div> : null}
     </header>
   );
 }

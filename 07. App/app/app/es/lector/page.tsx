@@ -7,29 +7,51 @@ import { t } from "@/lib/i18n";
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
 type Verso = { c: number; v: number; osis: string; t: string };
 type ObraJson = { osis: string; nombre: string; versos: Verso[] };
+type Manifest = {
+  obra: string;
+  osis_obra: string;
+  licencia: string;
+  fuente: string;
+  fecha_ingesta: string;
+  total_versos: number;
+  incidentes: { ref: string; tipo: string }[];
+  libros: Libro[];
+};
 
+const OBRAS = [
+  { id: "rv1909", etiqueta: "RV1909" },
+  { id: "web", etiqueta: "WEB" },
+];
 const OSIS_INICIAL = "JHN";
 const CAP_INICIAL = 1;
 const cache = new Map<string, ObraJson>();
 
 export default function Lector() {
   const tr = t("es");
-  const [libros, setLibros] = useState<Libro[]>([]);
+  const [obra, setObra] = useState("rv1909");
+  const [manifest, setManifest] = useState<Manifest | null>(null);
   const [osis, setOsis] = useState(OSIS_INICIAL);
   const [cap, setCap] = useState(CAP_INICIAL);
-  const [obra, setObra] = useState<ObraJson | null>(null);
+  const [texto, setTexto] = useState<ObraJson | null>(null);
   const [cargando, setCargando] = useState(true);
   const columna = useRef<HTMLDivElement>(null);
 
-  // manifiesto: lista de libros
+  // obra desde la URL al entrar
   useEffect(() => {
-    fetch("/data/rv1909/_manifest.json")
-      .then((r) => r.json())
-      .then((m) => setLibros(m.libros))
-      .catch(() => setLibros([]));
+    const o = new URLSearchParams(window.location.search).get("obra");
+    if (o && OBRAS.some((x) => x.id === o)) setObra(o);
   }, []);
 
-  // ?ref=JHN.1 — referencia compartible al entrar
+  // manifiesto por obra: lista de libros + datos de atribución
+  useEffect(() => {
+    setManifest(null);
+    fetch(`/data/${obra}/_manifest.json`)
+      .then((r) => r.json())
+      .then(setManifest)
+      .catch(() => setManifest(null));
+  }, [obra]);
+
+  // ?ref=JHN.3 — referencia compartible al entrar
   useEffect(() => {
     const ref = new URLSearchParams(window.location.search).get("ref");
     if (!ref) return;
@@ -40,54 +62,55 @@ export default function Lector() {
     }
   }, []);
 
-  // carga del libro (con caché en memoria)
+  // carga del libro (con caché en memoria por obra)
   useEffect(() => {
     let vivo = true;
-    const enCache = cache.get(osis);
+    const clave = `${obra}:${osis}`;
+    const enCache = cache.get(clave);
     if (enCache) {
-      setObra(enCache);
+      setTexto(enCache);
       setCargando(false);
       return;
     }
     setCargando(true);
-    setObra(null);
-    fetch(`/data/rv1909/${osis}.json`)
+    setTexto(null);
+    fetch(`/data/${obra}/${osis}.json`)
       .then((r) => {
         if (!r.ok) throw new Error(`${r.status}`);
         return r.json();
       })
       .then((json: ObraJson) => {
         if (!vivo) return;
-        cache.set(osis, json);
-        setObra(json);
+        cache.set(clave, json);
+        setTexto(json);
         setCargando(false);
       })
       .catch(() => vivo && setCargando(false));
     return () => {
       vivo = false;
     };
-  }, [osis]);
+  }, [obra, osis]);
 
-  const caps = obra?.versos.length
-    ? Math.max(...obra.versos.map((v) => v.c))
-    : (libros.find((l) => l.osis === osis)?.caps ?? 1);
+  const caps = texto?.versos.length
+    ? Math.max(...texto.versos.map((v) => v.c))
+    : (manifest?.libros.find((l) => l.osis === osis)?.caps ?? 1);
 
-  const versos = obra?.versos.filter((v) => v.c === cap) ?? [];
+  const versos = texto?.versos.filter((v) => v.c === cap) ?? [];
 
   const ir = useCallback(
     (delta: number) => {
       const nueva = cap + delta;
       if (nueva >= 1) setCap(nueva);
       else {
-        const idx = libros.findIndex((l) => l.osis === osis);
-        const previo = libros[idx - 1];
+        const idx = manifest?.libros.findIndex((l) => l.osis === osis) ?? -1;
+        const previo = idx > 0 ? manifest?.libros[idx - 1] : undefined;
         if (previo) {
           setOsis(previo.osis);
           setCap(previo.caps);
         }
       }
     },
-    [cap, osis, libros]
+    [cap, osis, manifest]
   );
 
   const adelante = useCallback(
@@ -95,15 +118,15 @@ export default function Lector() {
       const nueva = cap + delta;
       if (nueva <= caps) setCap(nueva);
       else {
-        const idx = libros.findIndex((l) => l.osis === osis);
-        const proximo = libros[idx + 1];
+        const idx = manifest?.libros.findIndex((l) => l.osis === osis) ?? -1;
+        const proximo = manifest && idx >= 0 ? manifest.libros[idx + 1] : undefined;
         if (proximo) {
           setOsis(proximo.osis);
           setCap(1);
         }
       }
     },
-    [cap, caps, osis, libros]
+    [cap, caps, osis, manifest]
   );
 
   // teclado: flechas cambian de capítulo
@@ -119,67 +142,86 @@ export default function Lector() {
   // URL compartible + scroll al tope al cambiar de capítulo
   useEffect(() => {
     if (cargando) return;
-    window.history.replaceState(null, "", `/es/lector?ref=${osis}.${cap}`);
+    window.history.replaceState(null, "", `/es/lector?obra=${obra}&ref=${osis}.${cap}`);
     columna.current?.scrollIntoView({ block: "start" });
-  }, [osis, cap, cargando]);
+  }, [obra, osis, cap, cargando]);
 
-  const info = libros.find((l) => l.osis === osis);
+  const info = manifest?.libros.find((l) => l.osis === osis);
+  const nVacios = manifest?.incidentes.length ?? 0;
 
   return (
     <>
-      <Cabecera locale="es" />
-      <main>
-        <div className="cabecera" style={{ position: "static", backdropFilter: "none", background: "transparent", borderBottom: "none" }}>
-          <div className="cabecera-inner" style={{ maxWidth: 720, paddingBlock: 18 }}>
-            <select
-              className="sel"
-              aria-label={tr.libro}
-              value={osis}
-              onChange={(e) => {
-                setOsis(e.target.value);
-                setCap(1);
-              }}
-            >
-              {libros.map((l) => (
-                <option key={l.osis} value={l.osis}>
-                  {l.nombre}
-                </option>
-              ))}
-            </select>
-            <select
-              className="sel"
-              aria-label={tr.capitulo}
-              value={cap}
-              onChange={(e) => setCap(Number(e.target.value))}
-            >
-              {Array.from({ length: caps }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-            <div className="lector-acciones">
-              <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
-                ←
+      <Cabecera locale="es">
+        <div className="cabecera-sub-inner">
+          <div className="obras-toggle" role="tablist" aria-label="Obra">
+            {OBRAS.map((o) => (
+              <button
+                key={o.id}
+                role="tab"
+                aria-selected={obra === o.id}
+                className={`obras-tab${obra === o.id ? " activa" : ""}`}
+                onClick={() => setObra(o.id)}
+              >
+                {o.etiqueta}
               </button>
-              <button className="icono-btn" onClick={() => adelante(1)} aria-label={tr.siguiente} title={tr.siguiente}>
-                →
-              </button>
-            </div>
+            ))}
+          </div>
+          <select
+            className="sel"
+            aria-label={tr.libro}
+            value={osis}
+            onChange={(e) => {
+              setOsis(e.target.value);
+              setCap(1);
+            }}
+          >
+            {(manifest?.libros ?? []).map((l) => (
+              <option key={l.osis} value={l.osis}>
+                {l.nombre}
+              </option>
+            ))}
+          </select>
+          <select
+            className="sel"
+            aria-label={tr.capitulo}
+            value={cap}
+            onChange={(e) => setCap(Number(e.target.value))}
+          >
+            {Array.from({ length: caps }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+          <div className="lector-acciones">
+            <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
+              ←
+            </button>
+            <button className="icono-btn" onClick={() => adelante(1)} aria-label={tr.siguiente} title={tr.siguiente}>
+              →
+            </button>
           </div>
         </div>
+      </Cabecera>
 
+      <main>
         <div className="lector-columna" ref={columna}>
           <div className="lector-titulo">
             <h1 className="serif-display">
-              {info?.nombre ?? obra?.nombre ?? "…"} {cap}
+              {info?.nombre ?? texto?.nombre ?? "…"} {cap}
             </h1>
             <span className="ref-osis">
-              {osis}.{cap} · RV1909
+              {osis}.{cap} · {manifest?.osis_obra ?? ""}
             </span>
           </div>
 
-          <div className="avisos">{tr.avisoObra}</div>
+          {nVacios > 0 && (
+            <div className="avisos">
+              Edición de trabajo: {nVacios} marcadores de verso quedaron vacíos en la edición fuente
+              (versificación propia o versos en nota) y están documentados en el manifiesto de
+              ingesta. No se rellenaron de memoria.
+            </div>
+          )}
 
           {cargando ? (
             <p style={{ color: "var(--muted)" }}>…</p>
@@ -196,16 +238,23 @@ export default function Lector() {
 
           <div className="atribucion-obra">
             <span>
-              <b>{tr.pieFuente}</b>
+              <b>{manifest?.obra}</b>
             </span>
-            <span>{tr.pieOrigen}</span>
-            <span>OSIS {osis}.{cap}</span>
+            <span>{manifest?.licencia}</span>
+            <span>{manifest?.fuente}</span>
+            <span>
+              Ingesta validada: {manifest?.total_versos.toLocaleString("es")} versos ·{" "}
+              {manifest?.fecha_ingesta}
+            </span>
+            <span>
+              OSIS {osis}.{cap}
+            </span>
           </div>
         </div>
       </main>
       <footer className="pie">
         <div className="pie-inner">
-          <span>{tr.pieIngesta}</span>
+          <span>{manifest?.obra}</span>
           <span>{tr.pieOrigen}</span>
         </div>
       </footer>
