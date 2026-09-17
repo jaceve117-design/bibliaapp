@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selector de Ideas — Postura de Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F3F4F1; --surface:#FFFFFF; --surface-2:#EAECE8; --surface-3:#E1E4DF;
+  --ink:#1B1D22; --ink-2:#4A5060; --ink-3:#787F8D;
+  --rule:#D8DBD6; --rule-strong:#BFC4BE;
+  --lapis:#2F4C8F; --lapis-soft:#E4E9F4;
+  --libre:#2A6A57; --libre-bg:#E2EEE9;
+  --cond:#8A6520; --cond-bg:#F2EBD9;
+  --pago:#973630; --pago-bg:#F5E3E1;
+  --shadow:0 1px 2px rgba(27,29,34,.05), 0 10px 28px -18px rgba(27,29,34,.35);
+  --shadow-up:0 -1px 2px rgba(27,29,34,.04), 0 -10px 28px -20px rgba(27,29,34,.3);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1114; --surface:#171A1F; --surface-2:#1E2228; --surface-3:#262B32;
+    --ink:#E7E9E6; --ink-2:#A6ADB8; --ink-3:#7D8593;
+    --rule:#282D34; --rule-strong:#3A4048;
+    --lapis:#8AA5E6; --lapis-soft:#1C2433;
+    --libre:#68B698; --libre-bg:#182B25;
+    --cond:#CFA95A; --cond-bg:#2B2517;
+    --pago:#DE8078; --pago-bg:#2E1B1A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.85);
+    --shadow-up:0 -1px 2px rgba(0,0,0,.4), 0 -10px 28px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1114; --surface:#171A1F; --surface-2:#1E2228; --surface-3:#262B32;
+  --ink:#E7E9E6; --ink-2:#A6ADB8; --ink-3:#7D8593;
+  --rule:#282D34; --rule-strong:#3A4048;
+  --lapis:#8AA5E6; --lapis-soft:#1C2433;
+  --libre:#68B698; --libre-bg:#182B25;
+  --cond:#CFA95A; --cond-bg:#2B2517;
+  --pago:#DE8078; --pago-bg:#2E1B1A;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.85);
+  --shadow-up:0 -1px 2px rgba(0,0,0,.4), 0 -10px 28px -20px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px 180px}
+
+/* masthead */
+.mast{padding:60px 0 32px;border-bottom:1.5px solid var(--rule-strong);display:grid;gap:20px}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;letter-spacing:-.018em;margin:0;text-wrap:balance}
+h1 em{font-style:italic;color:var(--lapis)}
+.deck{font-family:Newsreader,Georgia,serif;font-size:1.13rem;line-height:1.55;color:var(--ink-2);max-width:66ch;margin:0}
+.howto{
+  background:var(--surface);border:1px solid var(--rule);border-left:2.5px solid var(--lapis);
+  border-radius:0 3px 3px 0;padding:16px 20px;box-shadow:var(--shadow);max-width:70ch;
+}
+.howto p{margin:0;font-size:15px;color:var(--ink-2)}
+.howto p + p{margin-top:8px}
+.howto b{color:var(--ink);font-weight:600}
+
+/* layout */
+.cols{display:grid;grid-template-columns:216px minmax(0,1fr);gap:52px;margin-top:44px;align-items:start}
+nav{position:sticky;top:24px;display:flex;flex-direction:column;gap:2px}
+nav a{
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.02em;
+  color:var(--ink-3);text-decoration:none;padding:6px 0 6px 12px;
+  border-left:2px solid var(--rule);transition:color .15s,border-color .15s;
+  display:flex;justify-content:space-between;gap:8px;align-items:baseline;
+}
+nav a:hover,nav a:focus-visible{color:var(--lapis);border-left-color:var(--lapis)}
+nav a .cnt{color:var(--lapis);font-variant-numeric:tabular-nums;font-weight:500}
+
+/* groups */
+.group{margin-bottom:52px;scroll-margin-top:20px}
+.ghead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:6px}
+h2{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:1.72rem;letter-spacing:-.012em;margin:0;text-wrap:balance}
+.gsub{color:var(--ink-2);font-size:15px;max-width:68ch;margin:6px 0 16px}
+.bulk{display:flex;gap:6px}
+.bulk button{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--rule-strong);color:var(--ink-3);
+  padding:4px 10px;border-radius:2px;cursor:pointer;transition:all .15s;
+}
+.bulk button:hover{border-color:var(--lapis);color:var(--lapis)}
+
+/* item */
+.items{display:flex;flex-direction:column;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.item{
+  background:var(--surface);display:grid;grid-template-columns:30px minmax(0,1fr);
+  gap:14px;padding:16px 20px;cursor:pointer;transition:background .13s;
+  position:relative;
+}
+.item:hover{background:var(--surface-2)}
+.item.on{background:var(--lapis-soft)}
+.item.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--lapis)}
+.box{
+  width:18px;height:18px;margin-top:3px;border:1.5px solid var(--rule-strong);border-radius:3px;
+  background:var(--surface);display:grid;place-items:center;transition:all .13s;flex-shrink:0;
+}
+.item.on .box{background:var(--lapis);border-color:var(--lapis)}
+.box svg{width:11px;height:11px;stroke:var(--surface);stroke-width:3;fill:none;opacity:0;transition:opacity .13s}
+.item.on .box svg{opacity:1}
+.item:focus-visible{outline:2px solid var(--lapis);outline-offset:-2px}
+.ttl{font-weight:600;letter-spacing:-.005em;line-height:1.4;margin-bottom:3px}
+.why{font-size:14.5px;color:var(--ink-2);line-height:1.5;max-width:70ch}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{
+  font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  padding:2.5px 7px;border-radius:2px;
+}
+.t-new{background:var(--libre-bg);color:var(--libre)}
+.t-dis{background:var(--pago-bg);color:var(--pago)}
+.t-dec{background:var(--cond-bg);color:var(--cond)}
+.t-id{background:var(--surface-3);color:var(--ink-3)}
+
+/* steps */
+.step{grid-template-columns:30px 34px minmax(0,1fr)}
+.stepn{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--lapis);
+  padding-top:4px;font-variant-numeric:tabular-nums;
+}
+.gate{background:var(--cond-bg) !important;}
+.gate.on{background:var(--lapis-soft) !important}
+.gate .ttl::after{content:" ⟡";color:var(--cond)}
+
+/* footer bar */
+.bar{
+  position:fixed;left:0;right:0;bottom:0;background:var(--surface);
+  border-top:1.5px solid var(--rule-strong);box-shadow:var(--shadow-up);z-index:20;
+}
+.barin{
+  max-width:1240px;margin:0 auto;padding:14px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+}
+.stats{display:flex;gap:26px;flex-wrap:wrap;align-items:baseline}
+.stat{display:flex;flex-direction:column;gap:1px}
+.stat .n{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .n.acc{color:var(--lapis)}
+.stat .l{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{
+  font-family:"Source Sans 3",sans-serif;font-size:14.5px;font-weight:600;letter-spacing:-.005em;
+  padding:10px 20px;border-radius:3px;border:1px solid transparent;cursor:pointer;transition:all .15s;
+}
+.btn-p{background:var(--lapis);color:#fff;border-color:var(--lapis)}
+.btn-p:hover{filter:brightness(1.1)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.btn-s{background:transparent;color:var(--ink-2);border-color:var(--rule-strong)}
+.btn-s:hover{border-color:var(--lapis);color:var(--lapis)}
+.btn:focus-visible{outline:2px solid var(--lapis);outline-offset:2px}
+.saved{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;color:var(--ink-3)}
+
+/* toast */
+.toast{
+  position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--ink);color:var(--ground);padding:11px 20px;border-radius:3px;
+  font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:30;
+  box-shadow:var(--shadow);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}html{scroll-behavior:auto}}
+@media (max-width:920px){
+  .cols{grid-template-columns:minmax(0,1fr);gap:0}
+  nav{position:static;flex-direction:row;flex-wrap:wrap;gap:6px;margin-bottom:34px}
+  nav a{border-left:none;border-bottom:2px solid var(--rule);padding:4px 10px 5px 0}
+  .wrap{padding:0 18px 200px}
+  .step{grid-template-columns:30px minmax(0,1fr)}
+  .stepn{display:none}
+  .barin{padding:12px 18px}
+  .stats{gap:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">Postura de Claude · Selector de ideas · Proyecto 20</div>
+  <h1>Elige qué entra en la <em>metodología</em></h1>
+  <p class="deck">Mi postura, desglosada en ideas puntuales y pasos ejecutables, después de leer las cuatro investigaciones. Nada de esto está decidido: son propuestas para que elijas una por una.</p>
+  <div class="howto">
+    <p><b>Cómo funciona.</b> Marca las ideas que quieres conservar. Tu selección se guarda sola en este navegador, así que puedes cerrar y volver.</p>
+    <p>Al terminar, pulsa <b>Descargar selección</b> y obtendrás el archivo <b>Ideas finalistas de Posturas de Claude.md</b> listo para mover a esta misma carpeta.</p>
+    <p>Las ideas marcadas <span class="tag t-dec" style="display:inline-block">Ya es decisión</span> vienen activadas: ya están en la bitácora. Desmárcalas solo si quieres revertirlas. Las marcadas <span class="tag t-dis" style="display:inline-block">Discrepa</span> contradicen el plan vigente — son las que de verdad hay que pensar.</p>
+  </div>
+</header>
+
+<div class="cols">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+</div>
+
+<div class="bar">
+  <div class="barin">
+    <div class="stats">
+      <div class="stat"><span class="n acc" id="sTot">0</span><span class="l">Elegidas</span></div>
+      <div class="stat"><span class="n" id="sIde">0</span><span class="l">Ideas</span></div>
+      <div class="stat"><span class="n" id="sPas">0</span><span class="l">Pasos</span></div>
+      <div class="stat"><span class="n" id="sDis">0</span><span class="l">Discrepancias</span></div>
+    </div>
+    <div class="acts">
+      <span class="saved" id="saved"></span>
+      <button class="btn btn-s" id="bReset">Limpiar todo</button>
+      <button class="btn btn-s" id="bCopy">Copiar al portapapeles</button>
+      <button class="btn btn-p" id="bDl">Descargar selección</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = [
+{
+  id:"A", t:"Estrategia de producto",
+  sub:"Dónde está el valor real y qué construimos primero. Aquí están mis tres discrepancias más fuertes con el plan que yo mismo escribí.",
+  items:[
+    {id:"A1", tag:"dis", t:"La traducción al español es el producto, no la Fase 4",
+     w:"RV1909, Matthew Henry, Easton y Strong's existen gratis en diez apps. Nadie cambia de app por tenerlos otra vez con mejor tipografía. Lo único que no existe en ningún lado es el acervo clásico completo en español bien traducido. El lector, el interlineal y la búsqueda son el envase. Cuando haya que elegir entre pulir una función y avanzar la traducción, gana la traducción."},
+    {id:"A2", tag:"dis", t:"Corte vertical de un solo libro antes de cualquier ingesta masiva",
+     w:"Romanos o Juan completo de punta a punta: texto ES y EN, griego con morfología, tres comentarios traducidos de verdad, diccionario enlazado, notas y subrayados funcionando, ficha legal cerrada de cada fuente. Atraviesa las nueve fases en pequeño y responde la única pregunta que importa: ¿la traducción sale lo bastante buena? Si no sale, lo sabes en semanas y con un libro."},
+    {id:"A3", tag:"dis", t:"MVP de seis fuentes, no de ocho bloques",
+     w:"RV1909, World English Bible, STEPBible-Data, Easton's, Matthew Henry y el Treasury of Scripture Knowledge. Nada más. La ISBE son nueve mil entradas con OCR sucio de 1915: es magnífica y puede esperar a la v2."},
+    {id:"A4", tag:"dis", t:"Aplazar el módulo general del Mar Muerto",
+     w:"Legalmente solo podemos enlazar y curar fichas: las imágenes son de la IAA, las transcripciones críticas de Oxford y Brill, la traducción española de Trotta. Es mucho trabajo editorial para entregar ficha más enlace. En la versión 1 es posicionamiento, no función."},
+    {id:"A5", tag:"new", t:"Conservar solo el ángulo Qumrán ↔ texto masorético",
+     w:"Mostrar dónde un testigo de Qumrán difiere del texto masorético, anclado al versículo concreto. Eso sí es contenido real, ninguna app popular lo ofrece, y se puede hacer con datos en dominio público. Es un módulo estrecho y honesto en vez de una promesa grande y vacía."},
+    {id:"A6", tag:"new", t:"Etiquetar siempre autor, tradición y fecha en cada obra",
+     w:"Principio editorial que aportó ChatGPT y que yo elevaría a decisión formal. Presentar cinco siglos de exégesis reformada como una sola voz es históricamente falso y el lector serio lo nota. Etiquetar no diluye la postura protestante: la hace honesta."},
+    {id:"A7", tag:"new", t:"Mantener a Clarke y a los padres pese al curado protestante",
+     w:"El corpus libre es fuertemente reformado y puritano —Gill, Henry, Spurgeon, Calvino— así que D3 encaja sola. Pero Adam Clarke es wesleyano-arminiano y la patrística es anterior a la división. Quien estudia en serio necesita ver dónde la tradición no está de acuerdo consigo misma."},
+    {id:"A8", tag:"new", t:"Estado de revisión de cada traducción visible al lector",
+     w:"Decir «traducción revisada parcialmente» en la ficha de la obra es más honesto y genera más confianza que fingir uniformidad. Convierte una debilidad en una señal de rigor."}
+  ]
+},
+{
+  id:"B", t:"Calidad editorial y traducción",
+  sub:"El riesgo real no es legal, es que la traducción suene mal o resbale en un término doctrinal. Esto es el mecanismo de confianza del producto.",
+  items:[
+    {id:"B1", tag:"new", t:"Glosario teológico maestro antes del primer párrafo traducido",
+     w:"Justificación, propiciación, expiación, pacto, redención, santificación, elección. Traducción fija y justificada para cada término técnico, ES↔EN, decidida antes de empezar. Cambiar un término a mitad del corpus obliga a rehacer todo lo anterior."},
+    {id:"B2", tag:"new", t:"Revisión humana del 100% de lo doctrinalmente sensible",
+     w:"No muestreo. El muestreo sirve para prosa narrativa; no sirve para un párrafo donde Calvino define la imputación. El público de este producto lleva siglos discutiendo sobre estas palabras exactas y detecta un desliz de inmediato."},
+    {id:"B3", tag:"new", t:"El original siempre visible a un clic",
+     w:"Trazabilidad como función de interfaz, no como metadato. Cada párrafo traducido conserva enlace directo a su original en inglés. Es lo que permite al lector verificar en vez de confiar a ciegas."},
+    {id:"B4", tag:"new", t:"Memoria de traducción para coherencia entre volúmenes",
+     w:"Sin ella, Matthew Henry cambia de vocabulario entre Génesis y Apocalipsis y se nota. La memoria de traducción es lo que hace que veintitrés volúmenes suenen a un solo traductor."},
+    {id:"B5", tag:"new", t:"Guía de estilo: transliteración, nombres propios y citas internas",
+     w:"Cómo se transliteran hebreo y griego, qué forma toman los nombres propios, y —lo más delicado— qué pasa cuando un comentario del siglo XVIII cita un versículo con su propia traducción que no coincide con la nuestra."},
+    {id:"B6", tag:"new", t:"Canal para que el lector reporte errores de traducción",
+     w:"Convierte a los usuarios en el control de calidad que no podemos pagar, y comunica que sabemos que la traducción es perfectible. En este público, eso genera confianza en lugar de restarla."},
+    {id:"B7", tag:"new", t:"Orden de traducción: Easton primero, después Matthew Henry",
+     w:"Easton son unas cuatro mil entradas cortas y autónomas: perfecto para calibrar el pipeline, el glosario y el coste real por palabra con riesgo bajo. Matthew Henry es prosa larga y doctrinalmente densa: va después, cuando el método ya está probado."}
+  ]
+},
+{
+  id:"C", t:"Blindaje legal",
+  sub:"Se resuelve con disciplina, no con incertidumbre. Es trabajo, pero es el trabajo que evita que el proyecto muera de golpe.",
+  items:[
+    {id:"C1", tag:"dec", t:"La fase legal va completa antes del primer byte descargado",
+     w:"Ficha aprobada por obra antes de ingerir. Es la regla dura que ya está en la bitácora y la que más tentación da de saltarse cuando hay prisa."},
+    {id:"C2", tag:"dec", t:"Ficha por obra con las doce preguntas contractuales",
+     w:"¿Podemos almacenar, indexar, generar embeddings, servir completo, permitir offline, monetizar, modificar formato, traducir? ¿Qué avisos mostrar, qué límites hay, qué pasa al cancelar, cubre iOS y Android, es mundial o por jurisdicción? Plantilla de ChatGPT, adoptada íntegra."},
+    {id:"C3", tag:"dis", t:"Decidir esta semana la licencia de nuestras propias traducciones",
+     w:"D2 nos convierte en autores: una traducción nueva de una obra en dominio público es obra derivada con derechos propios, y son nuestros. Probablemente el activo más valioso que genere el proyecto. Ninguna de las cuatro investigaciones lo mencionó. Decidirlo después de traducir es decidirlo tarde."},
+    {id:"C4", tag:"dis", t:"Decidir esta semana el modelo de sostenimiento",
+     w:"Y con un matiz que no es obvio: elegir no comercial abre material CC BY-NC hoy vedado —mapas históricos de David Rumsey, metadatos de papirología— y convierte la privacidad del lector en posicionamiento coherente con el rechazo a la telemetría FUMS. No comercial no es solo renunciar a ingresos: cambia el corpus disponible."},
+    {id:"C5", tag:"new", t:"Regla del traductor: el dominio público lo determina la traducción",
+     w:"La Institución de Calvino traducida por Battles tiene derechos de Eerdmans aunque Calvino lleve cinco siglos muerto. Campo obligatorio en la ficha: traductor y año de su muerte, no solo los del autor. Hallazgo de GLM."},
+    {id:"C6", tag:"new", t:"No ingerir desde CCEL sin resolver los derechos de su marcado",
+     w:"La CCEL reclama propiedad sobre su codificación ThML aunque el texto sea dominio público. Por obra: buscar otra fuente sin marcado propietario, pedir autorización expresa, o rehacer el marcado desde el escaneo. Yo la había dado por ingestable: estaba mal."},
+    {id:"C7", tag:"new", t:"La licencia del repositorio nunca se hereda al contenido",
+     w:"Un repositorio puede ser MIT y su contenido no serlo. wldeh/bible-api es MIT y advierte expresamente que cada versión bíblica puede tener restricciones adicionales. Dos campos separados en la ficha."},
+    {id:"C8", tag:"new", t:"Analizar jurisdicción de España y América Latina, no solo EE.UU.",
+     w:"Las cuatro investigaciones razonan con derecho estadounidense: umbral de 1929, renovación, fair use. Aquí el criterio es vida del autor más setenta años, y da resultados distintos obra por obra."},
+    {id:"C9", tag:"dec", t:"Revisión por abogado de propiedad intelectual antes de publicar",
+     w:"Recomendación explícita de ChatGPT que suscribo. No sustituye la disciplina de las fichas: la valida."},
+    {id:"C10", tag:"new", t:"Cada módulo del catálogo SWORD necesita su propia ficha",
+     w:"CrossWire declara explícitamente que sus módulos tienen derechos distintos entre sí y que muchos no son redistribuibles. Estar en el catálogo SWORD no significa ser libre."}
+  ]
+},
+{
+  id:"D", t:"Arquitectura",
+  sub:"Decisiones técnicas que condicionan todo lo demás. Casi todas ya están en la bitácora como D9 a D15: aquí puedes reafirmarlas o revertirlas.",
+  items:[
+    {id:"D1", tag:"dec", t:"OSIS como referencia canónica universal",
+     w:"Formato John.3.16, estándar real y establecido. Sustituye el ref_canonical que yo había inventado. Entrada del usuario normalizada con bible-passage-reference-parser, que ya resuelve «San Juan 3:16-17», «Jn 3, 16» y «1Jn 1.9» en español e inglés. Hallazgo de Gemini."},
+    {id:"D2", tag:"dec", t:"USFM 3 como formato de ingesta primario",
+     w:"Es el estándar de las Sociedades Bíblicas y todos los corpus serios lo exportan. OSIS como respaldo, ZefaniaXML solo como último recurso. Hallazgo de GLM."},
+    {id:"D3", tag:"dec", t:"SQLite sobre WebAssembly más IndexedDB en web, SQLite nativo en móvil",
+     w:"Esquemas e índices compartidos entre las dos plataformas. Permite búsqueda de texto completo del lado del cliente, que un service worker no da. Hallazgo de Gemini."},
+    {id:"D4", tag:"dec", t:"Sincronización por CRDT, diseñada ahora e implementada después",
+     w:"UUID generado en el cliente y marca de tiempo UTC de alta resolución. Si el esquema de anotaciones no nace pensado para esto, migrarlo más tarde cuesta los cuadernos de los usuarios."},
+    {id:"D5", tag:"dec", t:"No embeber software GPL en la aplicación",
+     w:"Del ecosistema SWORD usamos el catálogo como lista de compras y el formato de datos para extraer una vez. No enlazamos libsword ni sus envoltorios. Gemini proponía lo contrario; GLM tenía razón."},
+    {id:"D6", tag:"new", t:"El corpus CC BY-SA debe ser separable desde el modelo de datos",
+     w:"El copyleft se hereda a lo que traduzcamos. Si traducimos material de unfoldingWord o Sefaria, nuestra traducción nace obligada a ShareAlike. La Fase 4 no puede mezclar fuentes de distinto copyleft en un mismo volumen."},
+    {id:"D7", tag:"new", t:"Soporte de obras restringidas desde el esquema, no como parche",
+     w:"Obras que no se cachean offline y no entran al índice semántico. Si algún día llega una traducción licenciada, el sistema ya sabe tratarla distinto sin rediseñar nada."},
+    {id:"D8", tag:"dec", t:"Toda respuesta generada por IA cita su fuente o no se emite",
+     w:"source_id y passage_id obligatorios. Nunca atribuir a una fuente lo que produjo el modelo. En este dominio, una cita inventada es un daño reputacional del que no se vuelve."},
+    {id:"D9", tag:"dec", t:"Nunca APIs de terceros en tiempo de ejecución",
+     w:"Las APIs públicas sirven solo como medio de descarga inicial del corpus. Es lo que hace posible el offline real y lo que nos independiza de los términos cambiantes de un proveedor."},
+    {id:"D10", tag:"dec", t:"Si entra una traducción con derechos, es por contrato directo",
+     w:"Nunca vía API.Bible: su caché caduca a los 30 días, exige telemetría FUMS y prohíbe procesar el texto con modelos de lenguaje. Las tres condiciones son incompatibles con el offline, con la lectura anónima y con la búsqueda semántica."}
+  ]
+},
+{
+  id:"E", t:"Pasos a seguir",
+  sub:"Mi propuesta de orden de ejecución. Los pasos marcados con ⟡ son puertas: no se pasa de ahí sin una decisión explícita tuya.",
+  steps:true,
+  items:[
+    {id:"E1", tag:"dec", t:"Definir nombre, dominio y disponibilidad en tiendas",
+     w:"Bloquea marca, diseño y despliegue. Es lo primero porque todo lo demás cuelga de ahí."},
+    {id:"E2", tag:"dis", gate:true, t:"PUERTA · Decidir licencia de nuestras traducciones y modelo de sostenimiento",
+     w:"Las dos condicionan el contenido disponible y la Fase de traducción. No se avanza a la ingesta sin esto resuelto."},
+    {id:"E3", tag:"new", t:"Plantilla de ficha legal y las seis fichas del MVP",
+     w:"RV1909, WEB, STEPBible, Easton, Matthew Henry y TSK. Seis fichas completas con licencia archivada literal, no parafraseada."},
+    {id:"E4", tag:"new", t:"Esquema de datos con OSIS y el modelo de anotaciones",
+     w:"work, edition, node, link, lemma, license. Anotación con UUID de cliente, osis_reference, version_id, offsets, color, contenido y marca de tiempo."},
+    {id:"E5", tag:"new", t:"Glosario teológico maestro, versión 1",
+     w:"Antes de traducir nada. Se ampliará durante el piloto, pero los términos núcleo se fijan ahora."},
+    {id:"E6", tag:"new", t:"Pipeline de ingesta USFM y carga de RV1909 más WEB",
+     w:"Con validación automática: conteo de 31.101 versículos, detección de lagunas, reporte y reversión."},
+    {id:"E7", tag:"new", t:"Elegir el libro piloto e ingerir su capa STEPBible",
+     w:"Morfología, léxicos e interlineal alineado palabra a palabra, solo para ese libro."},
+    {id:"E8", tag:"new", t:"Traducir las entradas de Easton referenciadas en el libro piloto",
+     w:"Primer contacto real con el pipeline de traducción, con volumen acotado y riesgo bajo."},
+    {id:"E9", tag:"new", t:"Traducir el comentario de Matthew Henry sobre el libro piloto",
+     w:"La prueba de fuego: prosa larga, densa y doctrinalmente cargada."},
+    {id:"E10", tag:"new", t:"Construir el lector completo, solo para ese libro",
+     w:"Paralelo, interlineal, diccionario contextual, notas y subrayados. Todo funcionando, sobre un corpus mínimo."},
+    {id:"E11", tag:"new", t:"Revisión editorial humana del piloto completo",
+     w:"Con el glosario en la mano y un revisor con formación teológica. Aquí se descubre lo que el pipeline no ve."},
+    {id:"E12", tag:"dis", gate:true, t:"PUERTA · Decisión sobre la calidad de la traducción",
+     w:"¿Es lo bastante buena para publicarse con nuestro nombre? Si no lo es, se corrige el método antes de escalar. Escalar una traducción mediocre es el único error irreversible del proyecto."},
+    {id:"E13", tag:"new", t:"Escalar la ingesta al resto del corpus del MVP",
+     w:"Ahora sí, con el método probado y el coste real por palabra ya medido."},
+    {id:"E14", tag:"new", t:"Treasury of Scripture Knowledge y referencias cruzadas",
+     w:"Unas 500.000 referencias que convierten una colección de textos en una red navegable."},
+    {id:"E15", tag:"new", t:"PWA y corpus offline empaquetado",
+     w:"SQLite-WASM más IndexedDB, con el subconjunto de corpus definido y su tamaño objetivo medido."},
+    {id:"E16", tag:"new", t:"Cuentas y sincronización de notas",
+     w:"Con migración sin pérdida de las notas locales creadas en modo anónimo."},
+    {id:"E17", tag:"new", t:"Aplicación móvil con Capacitor",
+     w:"Android primero, iOS después. Mismo build, SQLite nativo para el corpus local."},
+    {id:"E18", tag:"dec", gate:true, t:"PUERTA · Revisión legal final y lanzamiento",
+     w:"Página pública de atribuciones, revisión de abogado, y solo entonces publicar."}
+  ]
+}
+];
+
+const TAGS={new:["t-new","Idea nueva"],dis:["t-dis","Discrepa del plan"],dec:["t-dec","Ya es decisión"]};
+const KEY="sel-postura-claude-v1";
+let sel=new Set();
+
+try{const r=localStorage.getItem(KEY); if(r) sel=new Set(JSON.parse(r));}
+catch(e){}
+if(!sel.size){ DATA.forEach(g=>g.items.forEach(i=>{ if(i.tag==="dec") sel.add(i.id); })); }
+
+const main=document.getElementById("main"), nav=document.getElementById("nav");
+
+DATA.forEach(g=>{
+  const a=document.createElement("a");
+  a.href="#g"+g.id;
+  a.innerHTML='<span>'+g.t+'</span><span class="cnt" data-cnt="'+g.id+'">0</span>';
+  nav.appendChild(a);
+
+  const sec=document.createElement("section");
+  sec.className="group"; sec.id="g"+g.id;
+  let h='<div class="ghead"><h2>'+g.t+'</h2><div class="bulk">'+
+        '<button data-all="'+g.id+'">Todas</button><button data-none="'+g.id+'">Ninguna</button></div></div>'+
+        '<p class="gsub">'+g.sub+'</p><div class="items">';
+  g.items.forEach((i,n)=>{
+    const tg=TAGS[i.tag];
+    h+='<div class="item'+(g.steps?" step":"")+(i.gate?" gate":"")+'" data-id="'+i.id+'" tabindex="0" role="checkbox" aria-checked="false">'+
+       '<div class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 5.5,11 12,3.5"/></svg></div>'+
+       (g.steps?'<div class="stepn">'+String(n+1).padStart(2,"0")+'</div>':'')+
+       '<div><div class="ttl">'+i.t+'</div><div class="why">'+i.w+'</div>'+
+       '<div class="tags"><span class="tag t-id">'+i.id+'</span><span class="tag '+tg[0]+'">'+tg[1]+'</span></div></div></div>';
+  });
+  sec.innerHTML=h+'</div>';
+  main.appendChild(sec);
+});
+
+function find(id){for(const g of DATA)for(const i of g.items)if(i.id===id)return {g,i};}
+
+function render(){
+  document.querySelectorAll(".item").forEach(el=>{
+    const on=sel.has(el.dataset.id);
+    el.classList.toggle("on",on);
+    el.setAttribute("aria-checked",on?"true":"false");
+  });
+  let ide=0,pas=0,dis=0;
+  DATA.forEach(g=>{
+    let c=0;
+    g.items.forEach(i=>{ if(sel.has(i.id)){ c++; g.steps?pas++:ide++; if(i.tag==="dis")dis++; }});
+    document.querySelector('[data-cnt="'+g.id+'"]').textContent=c;
+  });
+  document.getElementById("sTot").textContent=sel.size;
+  document.getElementById("sIde").textContent=ide;
+  document.getElementById("sPas").textContent=pas;
+  document.getElementById("sDis").textContent=dis;
+  document.getElementById("bDl").disabled=sel.size===0;
+  document.getElementById("bCopy").disabled=sel.size===0;
+  try{localStorage.setItem(KEY,JSON.stringify([...sel]));
+      document.getElementById("saved").textContent="Guardado";}catch(e){}
+}
+
+function toggle(id){ sel.has(id)?sel.delete(id):sel.add(id); render(); }
+
+document.addEventListener("click",e=>{
+  const it=e.target.closest(".item"); if(it){toggle(it.dataset.id);return;}
+  const all=e.target.closest("[data-all]");
+  if(all){DATA.find(g=>g.id===all.dataset.all).items.forEach(i=>sel.add(i.id));render();return;}
+  const non=e.target.closest("[data-none]");
+  if(non){DATA.find(g=>g.id===non.dataset.none).items.forEach(i=>sel.delete(i.id));render();}
+});
+document.addEventListener("keydown",e=>{
+  const it=e.target.closest(".item");
+  if(it&&(e.key===" "||e.key==="Enter")){e.preventDefault();toggle(it.dataset.id);}
+});
+
+function md(){
+  const d=new Date(), fecha=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  let ide=0,pas=0,dis=0;
+  DATA.forEach(g=>g.items.forEach(i=>{if(sel.has(i.id)){g.steps?pas++:ide++;if(i.tag==="dis")dis++;}}));
+
+  let o="# Ideas finalistas de Posturas de Claude\n\n";
+  o+="> **Origen:** `01.5.2 - Claude - Conclusion particular.md`, desglosada en ideas seleccionables.\n";
+  o+="> **Seleccionadas por el humano el "+fecha+".**\n";
+  o+="> **Resultado:** "+sel.size+" elementos — "+ide+" ideas y "+pas+" pasos, de los cuales "+dis+" discrepan del plan vigente.\n";
+  o+="> Este documento es una de las mitades de la metodología final del proyecto. Se une con las ideas finalistas de GLM.\n\n---\n\n";
+
+  DATA.forEach(g=>{
+    const ch=g.items.filter(i=>sel.has(i.id));
+    if(!ch.length) return;
+    o+="## "+g.t+"\n\n"+g.sub+"\n\n";
+    ch.forEach((i,n)=>{
+      o+="### "+i.id+" — "+i.t+"\n\n";
+      o+=i.w+"\n\n";
+      o+="`"+TAGS[i.tag][1].toUpperCase()+"`"+(i.gate?" · `PUERTA DE DECISIÓN`":"")+(g.steps?" · `ORDEN "+String(n+1).padStart(2,"0")+"`":"")+"\n\n";
+    });
+    o+="---\n\n";
+  });
+
+  const desc=[];
+  DATA.forEach(g=>g.items.forEach(i=>{if(!sel.has(i.id))desc.push("- `"+i.id+"` "+i.t);}));
+  if(desc.length){
+    o+="## Descartadas\n\nSe registran para que la decisión quede trazable y se pueda revisar más adelante.\n\n"+desc.join("\n")+"\n\n---\n\n";
+  }
+
+  const steps=DATA.find(g=>g.steps).items.filter(i=>sel.has(i.id));
+  if(steps.length){
+    o+="## Secuencia de ejecución resultante\n\n";
+    steps.forEach((i,n)=>{o+=String(n+1).padStart(2,"0")+". "+(i.gate?"**":"")+i.t+(i.gate?"**":"")+"\n";});
+    o+="\n";
+  }
+  o+="\n*Generado desde el selector de ideas de la postura de Claude.*\n";
+  return o;
+}
+
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600);}
+
+document.getElementById("bDl").onclick=()=>{
+  const b=new Blob([md()],{type:"text/markdown;charset=utf-8"});
+  const u=URL.createObjectURL(b), a=document.createElement("a");
+  a.href=u; a.download="Ideas finalistas de Posturas de Claude.md";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(u),1500);
+  toast("Descargado · muévelo a 01. Investigacion");
+};
+document.getElementById("bCopy").onclick=async()=>{
+  try{await navigator.clipboard.writeText(md());toast("Copiado al portapapeles");}
+  catch(e){toast("No se pudo copiar — usa Descargar");}
+};
+document.getElementById("bReset").onclick=()=>{sel.clear();render();toast("Selección limpiada");};
+
+render();
+</script>
+</body>
+</html>

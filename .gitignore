@@ -1,0 +1,14 @@
+# Dependencias y builds
+node_modules/
+.next/
+out/
+dist/
+
+# Corpus crudo (queda en 05. Datos, fuera del repo de la app)
+*.zip
+
+# Entorno y sistema
+.env*
+*.log
+.DS_Store
+Thumbs.db

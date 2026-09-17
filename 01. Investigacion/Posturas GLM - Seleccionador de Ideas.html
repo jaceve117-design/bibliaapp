@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Posturas GLM — Seleccionador de Ideas</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --panel2:#1d2130; --line:#2a2f42;
+    --text:#e8e9ee; --muted:#9aa0b4; --accent:#c9a227; --accent2:#e3b93d;
+    --ok:#4caf7d; --danger:#e0655a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:Georgia,'Times New Roman',serif;
+    line-height:1.55; padding-bottom:120px;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:0 20px;}
+
+  header{
+    border-bottom:1px solid var(--line);
+    padding:48px 0 32px; margin-bottom:8px;
+    background:linear-gradient(180deg,#12141c 0%,var(--bg) 100%);
+  }
+  .kicker{
+    font-family:system-ui,sans-serif; font-size:12px; letter-spacing:.25em;
+    text-transform:uppercase; color:var(--accent); margin-bottom:12px;
+  }
+  h1{font-size:34px; font-weight:600; letter-spacing:-.01em; margin-bottom:10px;}
+  header p{color:var(--muted); max-width:640px; font-size:15px;}
+
+  .instructions{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:18px 22px; margin:24px 0 8px; font-size:14.5px; color:var(--muted);
+    font-family:system-ui,sans-serif;
+  }
+  .instructions strong{color:var(--text);}
+  .instructions ol{margin:8px 0 0 20px;}
+  .instructions li{margin:4px 0;}
+
+  .group{margin-top:36px;}
+  .group-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    border-bottom:2px solid var(--accent); padding-bottom:8px; margin-bottom:16px;
+  }
+  .group-head h2{font-size:21px; font-weight:600;}
+  .group-head .n{
+    font-family:system-ui,sans-serif; font-size:12px; color:var(--muted);
+    letter-spacing:.1em;
+  }
+  button.sel-all{
+    font-family:system-ui,sans-serif; font-size:12px; cursor:pointer;
+    background:none; border:1px solid var(--line); color:var(--muted);
+    border-radius:6px; padding:4px 10px; margin-left:10px; transition:.15s;
+  }
+  button.sel-all:hover{border-color:var(--accent); color:var(--accent2);}
+
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px 16px; margin-bottom:12px; cursor:pointer;
+    transition:border-color .15s, background .15s; position:relative;
+  }
+  .card:hover{border-color:#3a4160;}
+  .card.selected{border-color:var(--accent); background:var(--panel2);}
+  .card.selected::before{
+    content:"✓"; position:absolute; top:14px; right:16px;
+    color:var(--accent); font-size:18px; font-weight:bold;
+  }
+  .card input{position:absolute; opacity:0; pointer-events:none;}
+  .idea-id{
+    font-family:system-ui,sans-serif; font-size:11px; letter-spacing:.15em;
+    color:var(--accent); text-transform:uppercase; margin-bottom:6px;
+  }
+  .card h3{font-size:17px; font-weight:600; margin-bottom:8px; padding-right:28px;}
+  .card .postura{font-size:14.5px; color:#cfd2dd; margin-bottom:10px;}
+  .card .paso{
+    font-size:13.5px; color:var(--muted);
+    border-left:2px solid var(--line); padding-left:12px;
+  }
+  .card .paso strong{color:var(--accent2); font-weight:600;}
+
+  .bar{
+    position:fixed; bottom:0; left:0; right:0; z-index:50;
+    background:rgba(15,17,23,.92); backdrop-filter:blur(10px);
+    border-top:1px solid var(--line); padding:14px 0;
+  }
+  .bar .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px;}
+  .counter{font-family:system-ui,sans-serif; font-size:14px; color:var(--muted);}
+  .counter b{color:var(--text); font-size:18px;}
+  .btn-final{
+    font-family:system-ui,sans-serif; font-size:15px; font-weight:600;
+    background:var(--accent); color:#14161e; border:none; border-radius:8px;
+    padding:12px 26px; cursor:pointer; transition:.15s;
+  }
+  .btn-final:hover{background:var(--accent2);}
+  .btn-final:disabled{opacity:.35; cursor:not-allowed;}
+  .status{
+    font-family:system-ui,sans-serif; font-size:13px; margin-left:12px; color:var(--ok);
+  }
+  .status.err{color:var(--danger);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">Biblioteca Cristiana Digital · Fase 0 · Segunda opinión</div>
+    <h1>Posturas GLM — Seleccionador de Ideas</h1>
+    <p>Mis posturas puntuales tras analizar las cuatro investigaciones (Claude 01.1, GLM 01.2, ChatGPT y Gemini).
+       Marca las que adoptas como metodología; el botón final genera el documento Markdown con tu selección.</p>
+    <div class="instructions">
+      <strong>Cómo usar:</strong>
+      <ol>
+        <li>Haz clic en las tarjetas (o en «marcar grupo») para seleccionar las posturas con las que estás de acuerdo.</li>
+        <li>Cuando termines, pulsa <strong>«Generar Ideas finalistas»</strong>.</li>
+        <li>El navegador te pedirá dónde guardar: elige esta carpeta (<strong>01. Investigacion</strong>) y el archivo se creará como <strong>Ideas finalistas de Posturas de GLM.md</strong>. Si tu navegador no ofrece guardar directo, el archivo baja a Descargas y lo arrastras aquí.</li>
+      </ol>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="ideas"></main>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="counter">Seleccionadas: <b id="count">0</b> / <span id="total">0</span></div>
+    <div>
+      <span class="status" id="status"></span>
+      <button class="btn-final" id="generate" disabled>Generar Ideas finalistas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const GRUPOS = [
+{
+  nombre: "A · Corpus y contenido del MVP",
+  ideas: [
+    {id:"G-A1", t:"Corpus MVP minimalista: 7 obras impecables antes que 60 a medias",
+     p:"El MVP se lanza solo con RV1909, WEB, STEPBible-Data completo (TAHOT/TAGNT/TBESH/TBESG), SBLGNT, Henry+JFB+Barnes, Easton+Nave's+Strong, y TSK. Cada obra entra verificada de principio a fin; una obra mal ingerida es deuda técnica y reputacional.",
+     s:"Fijar esta lista como lista cerrada de Fase 3 y no abrir nuevas obras hasta que las 7 pasen validación completa."},
+    {id:"G-A2", t:"RV1909 solo vía USFM curado de eBible.org, con validación de 31.101 versículos",
+     p:"Los dumps de RV1909 en GitHub son desiguales; la fuente confiable es el USFM de eBible.org.",
+     s:"Descargar spaRV1909 en USFM, parsear a nuestro esquema y bloquear la ingesta si el conteo de versículos no cuadra."},
+    {id:"G-A3", t:"Posponer audio, atlas, himnarios, devocionales y geografía al post-MVP",
+     p:"LibriVox, Pleiades/OpenBible Places e himnarios DP son valiosos pero diluyen el foco. Ganar con el núcleo de estudio impecable.",
+     s:"Moverlos a una fase 'enriquecimiento' después del primer lanzamiento web."},
+    {id:"G-A4", t:"Mar Muerto como módulo de credibilidad, no de estudio",
+     p:"Su valor es diferenciación percibida. Se resuelve con fichas curadas por rollo + enlaces IIIF + atribución literal (IAA / Shai Halevi). Nunca alojar imágenes.",
+     s:"Invertir como máximo 1 semana en el MVP: plantilla de ficha + visor remoto + enlaces por ID estable."},
+    {id:"G-A5", t:"BSB queda CONDICIONADA fuera hasta leer su licencia literal",
+     p:"Una investigación la llama abierta y otra no la verifica. Con la regla del brief (licencia ambigua se escala), la capa EN se sostiene con WEB/KJV/ASV que no tienen ambigüedad.",
+     s:"Tarea de Fase 1: archivar el texto legal completo de berean.bible; decidir entonces."},
+    {id:"G-A6", t:"Segunda ola ordenada: ISBE tras limpieza OCR, luego Clarke, Gill, Calvino, K&D, Vulgata/LXX/TR, Sefaria, Pleiades",
+     p:"El enriquecimiento tiene orden: primero lo que completa el estudio (ISBE, más comentarios), luego lo histórico-contextual.",
+     s:"Definir la segunda ola como backlog priorizado en la bitácora tras el lanzamiento del MVP."},
+    {id:"G-A7", t:"Los ~40 volúmenes de comentarios DP adicionales entran solo cuando el núcleo esté pulido",
+     p:"Maclaren, Simeon, Ellicott, Lange, Bengel, Treasury of David, Biblical Illustrator: identificados y disponibles, pero su ingesta masiva es el tipo de alcance que mata MVPs.",
+     s:"Dejarlos documentados en 01.2 como catálogo listo y no programar su ingesta antes del v1."},
+  ]
+},
+{
+  nombre: "B · Legal y licencias",
+  ideas: [
+    {id:"G-B1", t:"Rights Registry por recurso con licencia literal archivada y fecha de verificación",
+     p:"Sin ficha (titular, licencia citada textualmente, URL, jurisdicción, atribución, verified_at) no hay ingesta. Es la regla dura ya decidida; mi matiz: la ficha se hace SOLO para las obras del MVP, no para todo el universo.",
+     s:"Plantilla de ficha en 02. Legal/ y portón automático en el pipeline de ingesta."},
+    {id:"G-B2", t:"Regla del traductor: el DP se evalúa por la traducción, no solo por el autor",
+     p:"Campos obligatorios: traductor y año de muerte del traductor + verificación de renovación (obras 1923–1929). Caso límite: Institución de Calvino tr. Battles (derechos de Eerdmans).",
+     s:"Añadir los campos a la plantilla de ficha legal como obligatorios."},
+    {id:"G-B3", t:"CCEL como fuente de lectura, no de ingesta masiva",
+     p:"CCEL reclama derechos sobre su marcado ThML aunque el texto sea DP. Mi solución práctica: para cada obra, partir del facsímil o texto plano y rehacer el marcado en nuestro pipeline. Más trabajo por obra, riesgo de raíz eliminado y formato 100% propio.",
+     s:"Regla en Fase 3: prohibido ingerir ThML en bloque; cada obra CCEL pasa por re-marcado propio o autorización expresa."},
+    {id:"G-B4", t:"Separabilidad de corpus CC BY-SA desde el esquema (copyleft heredado)",
+     p:"Si la Fase 4 traduce material ShareAlike (unfoldingWord, Sefaria, algunos datasets OpenBible), la traducción hereda la obligación. No es problema si se sabe; lo es si se descubre tarde.",
+     s:"Flag de copyleft en el modelo de datos día uno y prohibición de mezclar fuentes de distinto copyleft en un mismo volumen traducido."},
+    {id:"G-B5", t:"Conversación exploratoria temprana con SBU por la RVR1960",
+     p:"No para el MVP — pero los plazos de esa negociación son largos y saber precio y condiciones en el mes 2 vale más que descubrirlos en el 12 con usuarios yéndose a YouVersion. Es la versión que el 90% del público hispano espera.",
+     s:"Contacto exploratorio no vinculante con Sociedades Bíblicas Unidas en el mes 1–2, solo para conocer plazos, precios y condiciones de contrato directo (no vía API)."},
+    {id:"G-B6", t:"NVI/Biblica fuera de la hoja de ruta hasta tener tracción real",
+     p:"Biblica no evalúa prototipos: la NVI requiere que ya seas alguien. Es un problema de marca y volumen, no de trámite.",
+     s:"Eliminar la NVI de toda planificación hasta ≥50.000 usuarios activos mensuales."},
+    {id:"G-B7", t:"Traducciones con derechos: contrato directo o nada — nunca vía API.Bible",
+     p:"Las condiciones de API.Bible (caché que caduca a 30 días, telemetría FUMS obligatoria, prohibición de LLM) chocan con el offline obligatorio, la lectura anónima y la Fase 4. Si una traducción entra, es por contrato directo con el titular, en capa separada, sin caché offline y fuera del índice semántico.",
+     s:"Registrar como decisión fija y diseñar el flag 'obra restringida' en el esquema de datos desde ahora."},
+    {id:"G-B8", t:"No LLM sobre textos con derechos — regla extendida a todo el pipeline",
+     p:"API.Bible lo prohíbe explícitamente para su contenido; yo lo elevo a política general: embeddings, resúmenes y traducción asistida solo corren sobre corpus DP o CC.",
+     s:"Regla de cumplimiento en el pipeline: todo job de IA valida la licencia del corpus antes de ejecutarse."},
+    {id:"G-B9", t:"Abogado de PI solo antes del lanzamiento comercial — y con foco en jurisdicción",
+     p:"Las cuatro razonamos con derecho de EUA (umbral 1929, renovación); España y América Latina usan vida+70, con resultados distintos obra por obra. La revisión profesional no es para el arranque, sí para el lanzamiento monetizado.",
+     s:"Presupuestar la revisión legal como hito del lanzamiento comercial, con la tabla de fichas ya completa para acortar el trabajo del abogado."},
+  ]
+},
+{
+  nombre: "C · Arquitectura y datos",
+  ideas: [
+    {id:"G-C1", t:"OSIS como referencia canónica + parser de entrada ES/EN",
+     p:"OSIS (John.3.16) es estándar real y establecido; mejor que una convención propia. Con bible-passage-reference-parser, 'San Juan 3:16-17' y 'Jn 3, 16' se normalizan de un golpe.",
+     s:"Adoptar OSIS como clave de alineación universal de todos los nodos y del anclaje de notas."},
+    {id:"G-C2", t:"USFM 3 como formato de ingesta primario",
+     p:"Es el estándar de las Sociedades Bíblicas y todos los corpus serios lo exportan. OSIS de respaldo; ZefaniaXML solo como último recurso.",
+     s:"Pipeline: USFM → parser propio → esquema node/edition con validación como portón."},
+    {id:"G-C3", t:"Búsqueda semántica con embeddings APLAZADA",
+     p:"Con TSK + Nave's + lemas de Strong, la búsqueda 'por idea' ya funciona sorprendentemente bien sin vectores. pgvector es fácil de añadir después a una BD bien diseñada; hacerlo desde el día uno invita a afinar embeddings en vez de limpiar textos.",
+     s:"PostgreSQL + tsvector (spanish/english) en el MVP; pgvector como mejora posterior con datos de búsqueda reales de usuarios."},
+    {id:"G-C4", t:"Congelar el esquema de anotación ahora; NO comprometer el mecanismo de sync",
+     p:"El esquema sí: (osis_reference, version_id, offset_inicio, offset_fin) + UUID generada en cliente + timestamp UTC de alta resolución. El mecanismo (CRDT u otro) se elige cuando existan datos de uso; con lectura anónima y notas locales no hay sincronización que resolver todavía.",
+     s:"Especificar y congelar el esquema en Fase 2; aplazar la decisión CRDT a la Fase 7 con métricas reales."},
+    {id:"G-C5", t:"Offline: SQLite-WASM + IndexedDB en web, SQLite nativo en móvil",
+     p:"Permite búsqueda de texto completo del lado del cliente y conserva esquemas/índices entre web y móvil. Pero el subconjunto offline se decide con datos de uso, no por decreto.",
+     s:"Arquitectura offline en Fase 2; tamaño y contenido del paquete offline definidos tras el lanzamiento web."},
+    {id:"G-C6", t:"Sin dependencias GPL embebidas: del ecosistema SWORD usamos catálogo y formato, nunca el motor",
+     p:"El catálogo CrossWire es la mejor lista de compras del corpus libre y el formato sirve para extraer una vez. Pero libsword y sus wrappers no entran a la app: el formato interno y la capa offline son propios.",
+     s:"Regla en Fase 3: los módulos SWORD se transforman a nuestro esquema en la ingesta; cero dependencias GPL en 07. App/."},
+    {id:"G-C7", t:"Modelo de datos work/edition/node/link/lemma con la licencia como campo de primera clase",
+     p:"Cada nodo es consultable con su licencia; eso permite filtrar qué se cachea, qué se indexa y qué se exporta sin lógica especial por fuente.",
+     s:"Esquema en Fase 2 con license_id obligatorio en work y flags (restricted, copyleft, permite_embeddings)."},
+  ]
+},
+{
+  nombre: "D · Producto y UX",
+  ideas: [
+    {id:"G-D1", t:"El MVP es una sola experiencia impecable: pasaje → interlineal → léxico → comentario → nota/subrayado",
+     p:"Todo lo demás (manuscritos, geografía, audio, planes de lectura) es post-MVP. El encadenamiento de estudio en español es el hueco que ninguna plataforma gratuita cubre hoy.",
+     s:"Definición de 'hecho' del MVP = ese flujo completo sin fricción en las 7 obras del corpus."},
+    {id:"G-D2", t:"Notas y subrayados 100% locales primero, con exportación/importación desde el día uno",
+     p:"Lectura anónima (D4) ya lo pide. La exportación/importación es el seguro de datos del usuario y elimina la prisa por construir cuentas.",
+     s:"Feature del MVP: exportar notas/subrayados a un archivo portable (JSON/Markdown) y reimportarlos."},
+    {id:"G-D3", t:"Atribución visible por obra en la interfaz",
+     p:"CC BY la exige (STEPBible, SBLGNT) y además genera confianza académica: el usuario ve de dónde sale cada texto.",
+     s:"Panel 'Fuentes' por obra, accesible desde el lector, alimentado por el Rights Registry."},
+    {id:"G-D4", t:"Tipografía de lectura prolongada con hebreo y griego real, y modo claro/oscuro por tokens",
+     p:"La estética elegante y vanguardista (requisito del proyecto) se sostiene en tipografía: soporte real de hebreo, griego politónico y transliteración desde el sistema de tokens, no como parche.",
+     s:"En Fase 5: seleccionar tipografías probadas para hebreo/griego y definir tokens antes de diseñar pantallas."},
+    {id:"G-D5", t:"i18n /es y /en desde el día uno, todo string en catálogo aunque solo exista ES",
+     p:"Retrasar la internacionalización es el error clásico: cuesta 10x después. El ES es principal, pero la arquitectura es bilingüe desde el primer commit.",
+     s:"next-intl con rutas /es /en y catálogo de strings obligatorio desde el andamiaje."},
+  ]
+},
+{
+  nombre: "E · Metodología, fases y ejecución",
+  ideas: [
+    {id:"G-E1", t:"Fase 1 sobre las 7 obras del MVP esta semana — y solo sobre ellas",
+     p:"Hacer fichas de todo el universo es otra forma de alcance infinito. La Fase 1 cubre exactamente el corpus del MVP; el resto de fichas se hace justo antes de ingestar cada obra nueva.",
+     s:"Fichas legales de las 7 obras como primer entregable concreto del proyecto."},
+    {id:"G-E2", t:"Validación automática como PORTÓN de ingesta, no como control final",
+     p:"Conteo de versículos, detección de lagunas, validación de referencias: si falla, la obra no entra a la BD. Es la mitigación del riesgo n.º 1 (calidad de ingesta).",
+     s:"Construir el validador antes que el primer parser (tarea 3.1 ampliada)."},
+    {id:"G-E3", t:"Medir primero el OCR real de una obra 'difícil' antes de comprometer la Fase 3 completa",
+     p:"ISBE, Biblical Illustrator y M'Clintock-Strong tienen OCR deficiente; nadie cuantificó cuánto. La limpieza puede costar más que la traducción.",
+     p2:"",
+     s:"Spike de 2–3 días: ingestar ISBE de prueba, medir % de error y decidir con números."},
+    {id:"G-E4", t:"Estimación honesta: 4–6 meses de MVP con 1 dev + 1 editor parcial; 60% del esfuerzo es limpieza de datos",
+     p:"El roadmap de 90 días de ChatGPT es el doble de optimista. Prometer 4–6 meses es prometer lo descubrible.",
+     s:"Planificar el lanzamiento web con margen y reportar avance por obra validada, no por semana de calendario."},
+    {id:"G-E5", t:"La traducción ES es trabajo editorial con glosario fijo y trazabilidad — nunca procesamiento por lotes",
+     p:"Es el diferenciador del proyecto y también su riesgo reputacional: una mala traducción de Henry destruye la credibilidad. Orden: Easton y Nave (alto uso, entradas cortas) → Henry → resto.",
+     s:"Fase 4 con glosario maestro, memoria de traducción, muestreo con revisión humana y marcado de estado por obra."},
+    {id:"G-E6", t:"Canal de reporte de errores del lector desde el lanzamiento",
+     p:"El mecanismo para que el lector reporte errores de traducción o de texto no es un feature post-MVP: es el sistema de control de calidad distribuido más barato que existe.",
+     s:"Botón 'reportar problema' anclado al pasaje en el MVP, con cola de revisión editorial."},
+    {id:"G-E7", t:"El proyecto avanza por obras validadas, no por pasos administrativos",
+     p:"Mi regla de ejecución: cada semana cierra con N obras con ficha + ingesta validada + atribución visible. La bitácora registra avance real, no actividad.",
+     s:"Métrica semanal del proyecto: obras en estado 'lanzar' y obras en estado 'validada'."},
+  ]
+},
+];
+
+const el = (t, cls, html) => { const d = document.createElement(t); if (cls) d.className = cls; if (html != null) d.innerHTML = html; return d; };
+const main = document.getElementById('ideas');
+let TOTAL = 0;
+
+GRUPOS.forEach((g, gi) => {
+  const sec = el('section', 'group');
+  const head = el('div', 'group-head');
+  head.appendChild(el('h2', null, g.nombre));
+  const right = el('div');
+  right.className = 'n';
+  right.innerHTML = `${g.ideas.length} ideas`;
+  const btn = el('button', 'sel-all', 'marcar grupo');
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const all = g.ideas.every(i => document.getElementById(i.id).checked);
+    g.ideas.forEach(i => { document.getElementById(i.id).checked = !all; });
+    refresh();
+  });
+  right.appendChild(btn);
+  head.appendChild(right);
+  sec.appendChild(head);
+
+  g.ideas.forEach(i => {
+    TOTAL++;
+    const card = el('div', 'card');
+    card.innerHTML = `
+      <input type="checkbox" id="${i.id}">
+      <div class="idea-id">${i.id}</div>
+      <h3>${i.t}</h3>
+      <div class="postura">${i.p}</div>
+      <div class="paso"><strong>Paso a seguir:</strong> ${i.s}</div>`;
+    card.addEventListener('click', () => {
+      const cb = document.getElementById(i.id);
+      cb.checked = !cb.checked;
+      refresh();
+    });
+    sec.appendChild(card);
+  });
+  main.appendChild(sec);
+});
+
+document.getElementById('total').textContent = TOTAL;
+
+function selected() {
+  return GRUPOS.flatMap(g => g.ideas)
+    .filter(i => document.getElementById(i.id).checked)
+    .map(i => ({...i, grupo: GRUPOS.find(g => g.ideas.includes(i)).nombre}));
+}
+
+function refresh() {
+  let n = 0;
+  GRUPOS.flatMap(g => g.ideas).forEach(i => {
+    const cb = document.getElementById(i.id);
+    cb.closest('.card').classList.toggle('selected', cb.checked);
+    if (cb.checked) n++;
+  });
+  document.getElementById('count').textContent = n;
+  document.getElementById('generate').disabled = n === 0;
+}
+
+function buildMarkdown(sel) {
+  const fecha = new Date().toLocaleDateString('es', {year:'numeric', month:'long', day:'numeric'});
+  let md = `# Ideas finalistas de Posturas de GLM\n\n`;
+  md += `> **Selección manual del usuario** · ${fecha}\n`;
+  md += `> Fuente: análisis de GLM (ZCode) sobre las cuatro investigaciones — \`01.1\` (Claude), \`01.2\` (GLM), ChatGPT (PDF) y Gemini (PDF).\n`;
+  md += `> Este documento, junto a su par de Claude, alimenta el **documento final de metodología** del proyecto.\n`;
+  md += `> **Ideas seleccionadas: ${sel.length} de ${TOTAL}.**\n\n`;
+  md += `---\n\n`;
+  let lastGrupo = null;
+  sel.forEach(i => {
+    if (i.grupo !== lastGrupo) {
+      md += `## ${i.grupo}\n\n`;
+      lastGrupo = i.grupo;
+    }
+    md += `### [${i.id}] ${i.t}\n\n`;
+    md += `**Postura:** ${i.p}\n\n`;
+    md += `**Paso a seguir:** ${i.s}\n\n`;
+  });
+  md += `---\n\n*Documento generado por el seleccionador de posturas de GLM. Combinar con "Ideas finalistas de Posturas de Claude" para armar el paso a paso final del proyecto.*\n`;
+  return md;
+}
+
+function setStatus(msg, err) {
+  const s = document.getElementById('status');
+  s.textContent = msg;
+  s.className = err ? 'status err' : 'status';
+  setTimeout(() => { s.textContent = ''; }, 6000);
+}
+
+document.getElementById('generate').addEventListener('click', async () => {
+  const sel = selected();
+  if (!sel.length) return;
+  const md = buildMarkdown(sel);
+  const nombre = 'Ideas finalistas de Posturas de GLM.md';
+  try {
+    if (window.showSaveFilePicker) {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: nombre,
+        types: [{description: 'Markdown', accept: {'text/markdown': ['.md']}}]
+      });
+      const w = await handle.createWritable();
+      await w.write(md);
+      await w.close();
+      setStatus(`✓ Guardado como "${nombre}"`);
+    } else {
+      const blob = new Blob([md], {type: 'text/markdown;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = nombre;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setStatus('✓ Descargado — muévelo a la carpeta 01. Investigacion');
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return; // usuario canceló el diálogo
+    setStatus('Error: ' + e.message, true);
+  }
+});
+
+refresh();
+</script>
+</body>
+</html>
