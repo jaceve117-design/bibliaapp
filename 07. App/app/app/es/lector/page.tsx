@@ -20,6 +20,8 @@ type Manifest = {
 type Palabra = { g: string; t: string; e: string; es?: string; s: string; m: string; lex?: string; tp: string };
 type InterJson = { osis: string; dir: "ltr" | "rtl"; versos: Record<string, Palabra[]> };
 type EntradaLex = { w: string; t: string; m: string; g: string; d: string };
+type IndiceItem = { s: string; n: string; l: string };
+type EntradaDic = { n: string; d: string; r: string[] };
 
 const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
@@ -43,6 +45,10 @@ export default function Lector() {
   const [interData, setInterData] = useState<InterJson | null>(null);
   const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex } | null>(null);
   const [panelRefs, setPanelRefs] = useState<{ verso: Verso; refs: string[]; cargadas: boolean } | null>(null);
+  const [dicPanel, setDicPanel] = useState(false);
+  const [dicIndice, setDicIndice] = useState<IndiceItem[] | null>(null);
+  const [dicQuery, setDicQuery] = useState("");
+  const [dicEntrada, setDicEntrada] = useState<EntradaDic | null>(null);
   const columna = useRef<HTMLDivElement>(null);
   const lexCache = useRef(cacheLex);
 
@@ -199,6 +205,53 @@ export default function Lector() {
       .catch(() => setPanelRefs({ verso: v, refs: [], cargadas: true }));
   };
 
+  // diccionario Easton: índice + definiciones por letra, todo con caché
+  const abrirDic = () => {
+    setDicPanel(true);
+    if (!dicIndice) {
+      fetch("/data/easton/_indice.json")
+        .then((r) => r.json())
+        .then(setDicIndice)
+        .catch(() => setDicIndice([]));
+    }
+  };
+
+  const normalizar = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  const resultadosDic = (() => {
+    if (!dicIndice) return [];
+    const q = normalizar(dicQuery.trim());
+    if (!q) return dicIndice.slice(0, 25);
+    const empiezan: IndiceItem[] = [];
+    const contiene: IndiceItem[] = [];
+    for (const item of dicIndice) {
+      const n = normalizar(item.n);
+      if (n.startsWith(q)) empiezan.push(item);
+      else if (n.includes(q)) contiene.push(item);
+      if (empiezan.length >= 30) break;
+    }
+    return [...empiezan, ...contiene].slice(0, 40);
+  })();
+
+  const abrirEntradaDic = (item: IndiceItem) => {
+    const clave = `dic:${item.l}`;
+    const usar = (data: { entradas: Record<string, EntradaDic> }) =>
+      setDicEntrada(data.entradas[item.s] ?? null);
+    const enCache = cache.get(clave) as { entradas: Record<string, EntradaDic> } | undefined;
+    if (enCache) {
+      usar(enCache);
+      return;
+    }
+    fetch(`/data/easton/${item.l}.json`)
+      .then((r) => r.json())
+      .then((data) => {
+        cache.set(clave, data);
+        usar(data);
+      })
+      .catch(() => setDicEntrada(null));
+  };
+
   // ficha léxica: busca el Strong en TBESG (griego) o TBESH (hebreo)
   const abrirLexico = (p: Palabra) => {
     setLex({ palabra: p });
@@ -293,6 +346,14 @@ export default function Lector() {
             ))}
           </select>
           <div className="lector-acciones">
+            <button
+              className="icono-btn"
+              onClick={abrirDic}
+              aria-label={tr.diccionario}
+              title={tr.diccionario}
+            >
+              ⌕
+            </button>
             <button
               className={`icono-btn${interlineal ? " activo" : ""}`}
               onClick={() => setInterlineal(!interlineal)}
@@ -394,6 +455,71 @@ export default function Lector() {
           </div>
         </div>
       </main>
+
+      {dicPanel && (
+        <div className="lex-panel" role="dialog" aria-label={tr.diccionario}>
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>
+                {tr.diccionario}
+              </span>
+              <button
+                className="icono-btn"
+                onClick={() => {
+                  setDicPanel(false);
+                  setDicEntrada(null);
+                  setDicQuery("");
+                }}
+                aria-label={tr.lexCerrar}
+              >
+                ✕
+              </button>
+            </div>
+            {dicEntrada ? (
+              <>
+                <div className="lex-palabra" style={{ fontSize: 24 }}>
+                  {dicEntrada.n}
+                </div>
+                <div className="lex-def" style={{ marginTop: 10 }}>
+                  {dicEntrada.d}
+                </div>
+                {dicEntrada.r?.length > 0 && (
+                  <div className="lex-meta" style={{ marginTop: 14 }}>
+                    Refs: {dicEntrada.r.slice(0, 12).join(" · ")}
+                  </div>
+                )}
+                <div className="lex-fuente">{tr.fuenteDic}</div>
+                <button
+                  className="btn btn-fantasma"
+                  style={{ marginTop: 14 }}
+                  onClick={() => setDicEntrada(null)}
+                >
+                  ← {tr.volver}
+                </button>
+              </>
+            ) : (
+              <>
+                <input
+                  className="sel"
+                  style={{ width: "100%", marginBottom: 12 }}
+                  placeholder={tr.buscarDic}
+                  value={dicQuery}
+                  onChange={(e) => setDicQuery(e.target.value)}
+                  autoFocus
+                />
+                <div className="refs-lista">
+                  {resultadosDic.map((item) => (
+                    <button key={item.s + item.l} className="ref-item" onClick={() => abrirEntradaDic(item)}>
+                      {item.n}
+                    </button>
+                  ))}
+                </div>
+                <div className="lex-fuente">{tr.fuenteDic}</div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {lex && (
         <div className="lex-panel" role="dialog" aria-label={tr.lexico}>

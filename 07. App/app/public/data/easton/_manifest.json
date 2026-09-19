@@ -1,0 +1,9 @@
+{
+  "obra": "Easton's Bible Dictionary (1897, M.G. Easton)",
+  "licencia": "Dominio público (texto) · agregador neuu-org/bible-dictionary-dataset CC BY 4.0",
+  "fuente": "https://github.com/neuu-org/bible-dictionary-dataset (data/02_sources/easton)",
+  "crudo_en": "05. Datos/corpus_crudo/easton",
+  "fecha_ingesta": "2026-09-19",
+  "total_entradas": 3962,
+  "idioma": "en (traducción ES planificada en Fase 4 — ver ficha legal)"
+}
