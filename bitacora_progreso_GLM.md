@@ -266,3 +266,11 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Aplica también a las **referencias cruzadas** (TSK): cada referencia del panel abre la tarjeta dividida en vez de navegar — coherente con la filosofía D22 (nada te saca de tu lugar).
 - El mini-lector usa la misma obra activa y el mismo caché del lector (cero descargas repetidas). Animación respetuosa de prefers-reduced-motion.
 - Desplegado (`77efc10d`). Commit y push.
+
+### 2026-09-19 · GLM — Barras de comentario ancladas (sticky) con color dinámico y ⓘ (petición del usuario)
+
+- **Reporte del usuario**: al expandir una sección del comentario y hacer scroll, la barra de la sección se perdía; contraerla obligaba a scrollear hasta arriba — incómodo.
+- **Solución**: la barra de cada sección expandida ahora es **sticky**: se clava justo bajo el header fijo y te acompaña mientras lees esa sección; un toque la contrae y vuelves al texto bíblico en el punto exacto (posición: variable `--altura-cabecera`, medida en vivo del header real, que cambia si las filas envuelven en móvil).
+- **Color dinámico de anclaje**: colapsada = barra neutra; expandida = borde y texto dorados; **anclada de verdad (leyendo dentro de ella)** = fondo dorado suave + sombra de barra activa (detectado por listener de scroll comparando el tope de la barra contra el borde inferior del header).
+- **ⓘ a la derecha** de la barra: popover con la explicación («Sección anclada: te acompaña mientras lees… tócala para contraerla y volver al texto bíblico»).
+- La barra colapsada también pasó a full-width (mejor blanco táctil en móvil). Desplegado (`2720c5e9`). Commit y push.

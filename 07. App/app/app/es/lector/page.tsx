@@ -346,6 +346,17 @@ export default function Lector() {
       .catch(() => setPasajeTexto(null));
   }, [pasaje, obra]);
 
+  // altura del header fijo: referencia para las barras de comentario ancladas (sticky)
+  useEffect(() => {
+    const medir = () => {
+      const cab = document.querySelector(".cabecera");
+      if (cab) document.documentElement.style.setProperty("--altura-cabecera", cab.getBoundingClientRect().bottom + "px");
+    };
+    medir();
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
+  }, []);
+
   // ficha léxica: busca el Strong en TBESG (griego) o TBESH (hebreo)
   const abrirLexico = (p: Palabra) => {
     setLex({ palabra: p });
@@ -1025,12 +1036,69 @@ function ComentarioBloque({
   renderFn: (texto: string) => React.ReactNode;
 }) {
   const [abierto, setAbierto] = useState(false);
+  const [anclada, setAnclada] = useState(false);
+  const [infoAbierta, setInfoAbierta] = useState(false);
+  const barraRef = useRef<HTMLDivElement>(null);
+
+  // detección de anclaje: la barra está clavada bajo el header mientras se lee la sección
+  useEffect(() => {
+    if (!abierto) {
+      setAnclada(false);
+      return;
+    }
+    const verificar = () => {
+      const barra = barraRef.current;
+      if (!barra) return;
+      const tope = document.querySelector(".cabecera")?.getBoundingClientRect().bottom ?? 0;
+      const r = barra.getBoundingClientRect();
+      setAnclada(r.top <= tope + 1 && r.bottom > tope + 1);
+    };
+    verificar();
+    window.addEventListener("scroll", verificar, { passive: true });
+    window.addEventListener("resize", verificar);
+    return () => {
+      window.removeEventListener("scroll", verificar);
+      window.removeEventListener("resize", verificar);
+    };
+  }, [abierto]);
+
   return (
     <span className="com-bloque-wrap">
-      <button className="com-toggle" onClick={() => setAbierto(!abierto)}>
-        {abierto ? "▾" : "▸"} {tr.comentarioDe} — <i>{seccion.t}</i> ({seccion.p.length})
-        {seccion.sinTraducir && <b style={{ marginLeft: 6 }}>· {tr.sinTraducir}</b>}
-      </button>
+      <div
+        ref={barraRef}
+        className={`com-toggle${abierto ? " abierto" : ""}${anclada ? " anclada" : ""}`}
+        role="button"
+        tabIndex={0}
+        aria-expanded={abierto}
+        onClick={() => setAbierto(!abierto)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") setAbierto(!abierto);
+        }}
+      >
+        <span className="com-flecha">{abierto ? "▾" : "▸"}</span>
+        <span className="com-etiqueta">
+          {tr.comentarioDe} — <i>{seccion.t}</i> ({seccion.p.length})
+          {seccion.sinTraducir && <b> · {tr.sinTraducir}</b>}
+        </span>
+        <button
+          className="com-info-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            setInfoAbierta(!infoAbierta);
+          }}
+          aria-label={tr.info}
+          title={tr.info}
+        >
+          i
+        </button>
+      </div>
+      {infoAbierta && (
+        <span className="com-info-popo">
+          <b>{tr.ancladaTitulo}</b>
+          <br />
+          {tr.ancladaInfo}
+        </span>
+      )}
       {abierto && (
         <span className="com-bloque">
           <span className="com-titulo">
