@@ -17,6 +17,9 @@ type Manifest = {
   incidentes: { ref: string; tipo: string }[];
   libros: Libro[];
 };
+type Palabra = { g: string; t: string; e: string; es?: string; s: string; m: string; lex?: string; tp: string };
+type InterJson = { osis: string; dir: "ltr" | "rtl"; versos: Record<string, Palabra[]> };
+type EntradaLex = { w: string; t: string; m: string; g: string; d: string };
 
 const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
@@ -24,7 +27,9 @@ const OBRAS = [
 ];
 const OSIS_INICIAL = "JHN";
 const CAP_INICIAL = 1;
-const cache = new Map<string, ObraJson>();
+const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
+const cache = new Map<string, unknown>();
+const cacheLex = new Map<string, { entradas: Record<string, EntradaLex>; indice: Record<string, string[]> }>();
 
 export default function Lector() {
   const tr = t("es");
@@ -34,7 +39,11 @@ export default function Lector() {
   const [cap, setCap] = useState(CAP_INICIAL);
   const [texto, setTexto] = useState<ObraJson | null>(null);
   const [cargando, setCargando] = useState(true);
+  const [interlineal, setInterlineal] = useState(false);
+  const [interData, setInterData] = useState<InterJson | null>(null);
+  const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex } | null>(null);
   const columna = useRef<HTMLDivElement>(null);
+  const lexCache = useRef(cacheLex);
 
   // obra desde la URL al entrar
   useEffect(() => {
@@ -62,11 +71,11 @@ export default function Lector() {
     }
   }, []);
 
-  // carga del libro (con caché en memoria por obra)
+  // carga del texto bíblico (con caché por obra)
   useEffect(() => {
     let vivo = true;
     const clave = `${obra}:${osis}`;
-    const enCache = cache.get(clave);
+    const enCache = cache.get(clave) as ObraJson | undefined;
     if (enCache) {
       setTexto(enCache);
       setCargando(false);
@@ -90,6 +99,29 @@ export default function Lector() {
       vivo = false;
     };
   }, [obra, osis]);
+
+  // carga del interlineal (TAHOT/TAGNT por libro)
+  useEffect(() => {
+    if (!interlineal) {
+      setInterData(null);
+      return;
+    }
+    const clave = `step:${osis}`;
+    const enCache = cache.get(clave) as InterJson | undefined;
+    if (enCache) {
+      setInterData(enCache);
+      return;
+    }
+    setInterData(null);
+    const corpus = NT.has(osis) ? "tagnt" : "tahot";
+    fetch(`/data/stepbible/${corpus}/${osis}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: InterJson | null) => {
+        if (json) cache.set(clave, json);
+        setInterData(json);
+      })
+      .catch(() => setInterData(null));
+  }, [interlineal, osis]);
 
   const caps = texto?.versos.length
     ? Math.max(...texto.versos.map((v) => v.c))
@@ -146,8 +178,54 @@ export default function Lector() {
     columna.current?.scrollIntoView({ block: "start" });
   }, [obra, osis, cap, cargando]);
 
+  // ficha léxica: busca el Strong en TBESG (griego) o TBESH (hebreo)
+  const abrirLexico = (p: Palabra) => {
+    setLex({ palabra: p });
+    const esGriego = p.s.startsWith("G");
+    const archivo = esGriego ? "tbesg" : "tbesh";
+    const cargar = (data: { entradas: Record<string, EntradaLex>; indice: Record<string, string[]> }) => {
+      const intentos = [p.s, p.s.replace(/[A-Za-z]+$/, ""), p.s.replace(/[A-Za-z]+$/, "") + "G", p.s.replace(/[A-Za-z]+$/, "") + "H"];
+      let entrada: EntradaLex | undefined;
+      for (const id of intentos) {
+        if (data.entradas[id]) {
+          entrada = data.entradas[id];
+          break;
+        }
+        const lista = data.indice[id];
+        if (lista?.length) {
+          entrada = data.entradas[lista[0]];
+          break;
+        }
+      }
+      setLex({ palabra: p, entrada });
+    };
+    const enCache = lexCache.current.get(archivo);
+    if (enCache) {
+      cargar(enCache);
+      return;
+    }
+    fetch(`/data/stepbible/${archivo}.json`)
+      .then((r) => r.json())
+      .then((data) => {
+        lexCache.current.set(archivo, data);
+        cargar(data);
+      })
+      .catch(() => setLex({ palabra: p }));
+  };
+
   const info = manifest?.libros.find((l) => l.osis === osis);
   const nVacios = manifest?.incidentes.length ?? 0;
+  const dir = interData?.dir ?? "ltr";
+
+  const limpiarDef = (d: string) =>
+    d
+      .replace(/<BR\s*\/?>/gi, "\n")
+      .replace(/<ref='([^']+)'>/g, "$1 ")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .trim();
 
   return (
     <>
@@ -194,6 +272,15 @@ export default function Lector() {
             ))}
           </select>
           <div className="lector-acciones">
+            <button
+              className={`icono-btn${interlineal ? " activo" : ""}`}
+              onClick={() => setInterlineal(!interlineal)}
+              aria-label={tr.interlineal}
+              title={tr.interlineal}
+              style={interlineal ? { borderColor: "var(--accent)", color: "var(--accent-strong)" } : undefined}
+            >
+              Ω
+            </button>
             <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
               ←
             </button>
@@ -225,6 +312,35 @@ export default function Lector() {
 
           {cargando ? (
             <p style={{ color: "var(--muted)" }}>…</p>
+          ) : interlineal ? (
+            <div className={`interlin${dir === "rtl" ? " rtl" : ""}`}>
+              {versos.map((v) => {
+                const palabras = interData?.versos[`${v.c}.${v.v}`];
+                return (
+                  <div key={v.osis} className="interlin-verso">
+                    <sup className="num">{v.v}</sup>
+                    {palabras?.length ? (
+                      palabras.map((p, i) => (
+                        <button
+                          key={i}
+                          className="palabra"
+                          onClick={() => abrirLexico(p)}
+                          title={`${p.s} · ${p.m}`}
+                        >
+                          <span className="w">{p.g}</span>
+                          <span className="gl">{p.es || p.e}</span>
+                          <span className="st">
+                            {p.s} · {p.m}
+                          </span>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="sin-interlin">{v.t}</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <div className="texto-biblico">
               {versos.map((v) => (
@@ -242,6 +358,9 @@ export default function Lector() {
             </span>
             <span>{manifest?.licencia}</span>
             <span>{manifest?.fuente}</span>
+            {interlineal && <span>
+              <b>Interlineal:</b> STEPBible-Data (TAHOT/TAGNT, CC BY 4.0)
+            </span>}
             <span>
               Ingesta validada: {manifest?.total_versos.toLocaleString("es")} versos ·{" "}
               {manifest?.fecha_ingesta}
@@ -252,6 +371,37 @@ export default function Lector() {
           </div>
         </div>
       </main>
+
+      {lex && (
+        <div className="lex-panel" role="dialog" aria-label={tr.lexico}>
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra">{lex.palabra.g}</span>
+              <button className="icono-btn" onClick={() => setLex(null)} aria-label={tr.lexCerrar}>
+                ✕
+              </button>
+            </div>
+            {lex.entrada ? (
+              <>
+                <div className="lex-meta">
+                  {lex.entrada.t} · {lex.entrada.m} · {lex.palabra.s}
+                </div>
+                <div className="lex-glosa">
+                  <b>{lex.entrada.g}</b>
+                  {lex.palabra.lex && <span> — {lex.palabra.lex}</span>}
+                </div>
+                <div className="lex-def">{limpiarDef(lex.entrada.d)}</div>
+              </>
+            ) : (
+              <div className="lex-meta">Sin entrada léxica para {lex.palabra.s}.</div>
+            )}
+            <div className="lex-fuente">
+              Léxico: TBESG/TBESH — STEPBible-Data (Tyndale House), CC BY 4.0
+            </div>
+          </div>
+        </div>
+      )}
+
       <footer className="pie">
         <div className="pie-inner">
           <span>{manifest?.obra}</span>

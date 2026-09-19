@@ -1,0 +1,101 @@
+{
+  "fuente": "STEPBible-Data — Tyndale House, Cambridge · https://github.com/STEPBible/STEPBible-Data",
+  "licencia": "CC BY 4.0 (atribución obligatoria — ver 02. Legal/Ficha - STEPBible-Data.md)",
+  "fecha_ingesta": "2026-09-19",
+  "crudo_en": "05. Datos/corpus_crudo/stepbible_data",
+  "tagnt": {
+    "palabras": 141720,
+    "refsOk": 141720,
+    "refsAjustadas": 0,
+    "lineasIgnoradas": 95522,
+    "archivosEscritos": 27,
+    "libros": 27,
+    "descripcion": "NT griego amalgamado (NA28/TR/SBLGNT/Byz/WH), glosas EN + ES"
+  },
+  "tahot": {
+    "palabras": 283734,
+    "refsOk": 283634,
+    "refsAjustadas": 100,
+    "lineasIgnoradas": 253759,
+    "archivosEscritos": 39,
+    "libros": 39,
+    "descripcion": "AT hebreo (Westminster Leningrad) con morfología"
+  },
+  "tbesg": {
+    "filas": 11034,
+    "ids": 10689,
+    "simples": 10846
+  },
+  "tbesh": {
+    "filas": 10258,
+    "ids": 8623,
+    "simples": 8181
+  },
+  "porton": {
+    "refs_ok_contra_rv1909": 425354,
+    "refs_no_encontradas": 100,
+    "nota": "Los desajustes son diferencias de versificación (NRSV vs RV1909/KJV) — mapeo formal en tarea 2.2. No bloquean: el interlineal se sirve por coordenada existente."
+  },
+  "incidentes": [
+    {
+      "ref": "NUM.12.16",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-GenDeu.txt"
+    },
+    {
+      "ref": "2SA.20.26",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JosEst.txt"
+    },
+    {
+      "ref": "2CH.33.25",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JosEst.txt"
+    },
+    {
+      "ref": "JOB.35.16",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    },
+    {
+      "ref": "JOB.38.39",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    },
+    {
+      "ref": "JOB.38.40",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    },
+    {
+      "ref": "JOB.38.41",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    },
+    {
+      "ref": "JOB.40.20",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    },
+    {
+      "ref": "JOB.40.21",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    },
+    {
+      "ref": "JOB.40.22",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    },
+    {
+      "ref": "JOB.40.23",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    },
+    {
+      "ref": "JOB.40.24",
+      "tipo": "coordenada_no_encontrada_en_rv1909",
+      "archivo": "TAHOT-JobSng.txt"
+    }
+  ]
+}
