@@ -289,3 +289,19 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`8673d6e7`). Verificado: lector 200, henry-es 200. Commit y push.
 
 **Siguiente:** secciones 4-7 de Juan 1 → capítulo completo en ES; luego paso 6 (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's — fichas legales primero).
+
+### 2026-09-19 · GLM — PUNTO DE RECUPERACIÓN creado (validación integral 27/27 + 15/15 endpoints)
+
+- **Validación integral previa (todo en verde):**
+  - Datos: RV1909 31.102 · WEB 31.103 · Henry 1.189 caps · TAGNT/TAHOT · TSK 386.384 · Easton 3.962 · léxico 22 términos · paridad de claves i18n ES/EN (110 claves).
+  - Correcciones confirmadas en datos: «En el principio» (mayúsculas), JEHOVÁ conservado, WEB Jn 3:16 limpio.
+  - Traducción: henry-es JHN 3/7 secciones, paridad de párrafos ES=EN verificada, estado «sin_revisar» declarado.
+  - Estética/modos del build: modo oscuro y claro, anti-desborde móvil, safe-areas, escala de texto, franja de comentarista, citas (.cita), términos (.termino), split-card, barra anclada sticky, etiqueta 2 líneas, X rojas, animaciones.
+  - PWA: SW v2, manifest standalone + 4 iconos + lang es, iconos 192/512/maskable presentes.
+  - Producción: 15/15 endpoints HTTP 200 (páginas, manifest, sw, iconos, y todos los JSON de datos).
+- **Punto de recuperación creado y subido a GitHub:** tag anotado **`recuperacion-2026-09-19`** (commit `ec24bfc`).
+  - **Restaurar:** `git checkout recuperacion-2026-09-19` → `cd 07. App/app && npm install && npm run build` → `npx wrangler pages deploy out --project-name=bibliaapp --branch=main`.
+  - El tag incluye los JSON derivados (`public/data/`) — la app funciona completa con solo el checkout + install + build. El corpus crudo (fuera de git) se re-descarga de las URLs de sus fichas si algún día hiciera falta (los pipelines lo regeneran todo).
+  - Detalle de restauración anotado en el propio mensaje del tag (visible con `git tag -n99 recuperacion-2026-09-19`).
+
+**Estado al cierre de este punto:** pasos 0, 1, 2, 5 completos · paso 3 en 3/7 secciones de Juan 1 · puertas: D20 superada (método aprobado) · pendientes de usuario: continuarlo es automático (vigilante), decisiones de licencia de traducciones/sostenimiento/nombre cuando el usuario defina.
