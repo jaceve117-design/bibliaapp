@@ -351,3 +351,9 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`eea85879`). Verificado: JN 3.1 15/44 párrafos ES en producción. Commit y push.
 
 **Nota de escala para el usuario**: Juan 3 tiene 72 párrafos y ~89k caracteres de original (el doble de Juan 1). A este ritmo de un turno del vigilante por ~12-16 párrafos, el evangelio de Juan completo (1.060 párrafos restantes ≈ 1,6M caracteres) tomaría del orden de 70-90 turnos de vigilante (≈ 2-3 semanas de ciclos). El pipeline está optimizado: cada turno traduce, valida, fusiona, despliega y registra sin intervención.
+
+### 2026-09-19 · GLM (vigilante) — Juan 3.1 ampliado: párrafos 27/44 (38% del capítulo)
+
+- **Traducidos y fusionados los párrafos 16-27 de la sección 1 de Juan 3** (idx15-26, ~12,7k chars): (b) la exposición de la regeneración —su autor (el Espíritu de gracia, Jn 3:5-8), su naturaleza (espiritual vs carne), su necesidad («Lo que nace de la carne, carne es», con el relato de la caída y la transmisión de la naturaleza corrupta; «No te maravilles»), sus dos comparaciones (el agua que limpia y refresca; el viento que sopla de donde quiere, obra poderosa y misteriosa)— y (2) el discurso sobre la certeza y sublimidad de las verdades evangélicas: la objeción «¿Cómo pueden ser estas cosas?», la reprensión «¿Eres tú maestro en Israel?», «Lo que sabemos hablamos», «Si os he dicho cosas terrenas», y «Nadie subió al cielo sino el Hijo del hombre».
+- **Posición exacta**: JN 3, sección 1, párrafo 27 de 44 (38% del capítulo). Siguiente: idx27-43 (17 párrafos, ~22k chars): «Si no creéis las cosas de la tierra», el bautismo y la purificación, «De dónde, pues, el hombre que no puede resistiros?», Juan y Cristo amigos del esposo, «Es necesario que él crezca y yo mengüe», «El que viene del cielo es sobre todos», y «El que cree en el Hijo tiene vida eterna».
+- Desplegado (`1c10b492`). Verificado: JN 3.1 27/44 párrafos ES en producción. Commit y push.
