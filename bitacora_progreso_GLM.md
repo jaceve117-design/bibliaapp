@@ -274,3 +274,18 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - **Color dinámico de anclaje**: colapsada = barra neutra; expandida = borde y texto dorados; **anclada de verdad (leyendo dentro de ella)** = fondo dorado suave + sombra de barra activa (detectado por listener de scroll comparando el tope de la barra contra el borde inferior del header).
 - **ⓘ a la derecha** de la barra: popover con la explicación («Sección anclada: te acompaña mientras lees… tócala para contraerla y volver al texto bíblico»).
 - La barra colapsada también pasó a full-width (mejor blanco táctil en móvil). Desplegado (`2720c5e9`). Commit y push.
+
+### 2026-09-19 · GLM — Refinamientos de lectura + sección 3 de Juan 1 en ES (3/7)
+
+**Ajustes de la ronda de feedback del usuario:**
+- **Animaciones suaves**: apertura y cierre de secciones de comentario con transición fluida (grid-template-rows + opacity — anima también el cierre); pop-ups y popover de ⓘ con animación de entrada.
+- **Botones de cierre**: las 7 ✕ de los paneles (léxico, referencias, citas, término, info, diccionario, tarjeta de pasaje) ahora son rojas con X blanca, misma forma.
+- **Tarjeta de pasaje simplificada**: eliminados «Leer aquí» y las flechas — solo la ✕ roja. El lector lee el pasaje, lo cierra y vuelve exactamente a su línea secuencial del comentario. La tarjeta es solo lectura; el lector principal no se toca nunca.
+- **Barra de sección en 2 líneas** (reporte con captura: se cortaba feo en móvil): línea 1 «COMENTARIO DE MATTHEW HENRY» en versalitas pequeñas; línea 2 el título de la sección en itálica + conteo de párrafos. Ordenado y legible en cualquier ancho.
+
+**Traducción (3/7 de Juan 1 en ES):**
+- Sección 3 «El testimonio de Juan acerca de Cristo» (16 párrafos, Jn 1:15-18): la preferencia de Juan ante Cristo, protos mou en (eternidad del Hijo), la plenitud de Cristo, gracia sobre gracia (charin anti charitos con sus seis sentidos que Henry despliega), gracia y verdad contra la ley de Moisés, y la declaración del Padre por el Hijo unigénito.
+- Léxico transliterado ampliado a **22 términos** (+5: protos mou en, charin anti charitos, kai charin, egeneto, in pectore).
+- Desplegado (`8673d6e7`). Verificado: lector 200, henry-es 200. Commit y push.
+
+**Siguiente:** secciones 4-7 de Juan 1 → capítulo completo en ES; luego paso 6 (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's — fichas legales primero).

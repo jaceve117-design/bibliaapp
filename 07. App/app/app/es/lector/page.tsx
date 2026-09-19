@@ -505,20 +505,6 @@ export default function Lector() {
     setPanelRefs(null);
   };
 
-  const moverTarjeta = (delta: number) => {
-    setPasaje((prev) => {
-      if (!prev || !manifest) return prev;
-      const idx = manifest.libros.findIndex((l) => l.osis === prev.osis);
-      if (idx < 0) return prev;
-      const libro = manifest.libros[idx];
-      const nueva = prev.c + delta;
-      if (nueva >= 1 && nueva <= libro.caps) return { ...prev, c: nueva };
-      const otro = manifest.libros[idx + delta];
-      if (!otro) return prev;
-      return { osis: otro.osis, c: delta > 0 ? 1 : otro.caps };
-    });
-  };
-
   return (
     <>
       <Cabecera locale="es">
@@ -726,7 +712,7 @@ export default function Lector() {
                 {tr.diccionario}
               </span>
               <button
-                className="icono-btn"
+                className="icono-btn cerrar"
                 onClick={() => {
                   setDicPanel(false);
                   setDicEntrada(null);
@@ -788,7 +774,7 @@ export default function Lector() {
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra">{lex.palabra.g}</span>
-              <button className="icono-btn" onClick={() => setLex(null)} aria-label={tr.lexCerrar}>
+              <button className="icono-btn cerrar" onClick={() => setLex(null)} aria-label={tr.lexCerrar}>
                 ✕
               </button>
             </div>
@@ -820,7 +806,7 @@ export default function Lector() {
               <span className="lex-palabra" style={{ fontSize: 20 }}>
                 {tr.referencias} · {info?.nombre} {panelRefs.verso.c}:{panelRefs.verso.v}
               </span>
-              <button className="icono-btn" onClick={() => setPanelRefs(null)} aria-label={tr.lexCerrar}>
+              <button className="icono-btn cerrar" onClick={() => setPanelRefs(null)} aria-label={tr.lexCerrar}>
                 ✕
               </button>
             </div>
@@ -862,7 +848,7 @@ export default function Lector() {
               <span className="lex-palabra" style={{ fontSize: 20 }}>
                 {panelCita.etiqueta} · {manifest?.osis_obra}
               </span>
-              <button className="icono-btn" onClick={() => setPanelCita(null)} aria-label={tr.lexCerrar}>
+              <button className="icono-btn cerrar" onClick={() => setPanelCita(null)} aria-label={tr.lexCerrar}>
                 ✕
               </button>
             </div>
@@ -900,7 +886,7 @@ export default function Lector() {
               <span className="lex-palabra" style={{ fontSize: 20 }}>
                 {panelTermino.t}
               </span>
-              <button className="icono-btn" onClick={() => setPanelTermino(null)} aria-label={tr.lexCerrar}>
+              <button className="icono-btn cerrar" onClick={() => setPanelTermino(null)} aria-label={tr.lexCerrar}>
                 ✕
               </button>
             </div>
@@ -918,7 +904,7 @@ export default function Lector() {
               <span className="lex-palabra" style={{ fontSize: 20 }}>
                 {tr.info}
               </span>
-              <button className="icono-btn" onClick={() => setPanelInfo(false)} aria-label={tr.lexCerrar}>
+              <button className="icono-btn cerrar" onClick={() => setPanelInfo(false)} aria-label={tr.lexCerrar}>
                 ✕
               </button>
             </div>
@@ -971,25 +957,7 @@ export default function Lector() {
               {manifest?.libros.find((l) => l.osis === pasaje.osis)?.nombre ?? pasaje.osis} {pasaje.c}
             </span>
             <span className="split-acciones">
-              <button className="icono-btn" onClick={() => moverTarjeta(-1)} aria-label={tr.anterior} title={tr.anterior}>
-                ←
-              </button>
-              <button className="icono-btn" onClick={() => moverTarjeta(1)} aria-label={tr.siguiente} title={tr.siguiente}>
-                →
-              </button>
-              <button
-                className="btn btn-fantasma"
-                style={{ padding: "5px 10px", fontSize: 12 }}
-                onClick={() => {
-                  setOsis(pasaje.osis);
-                  setCap(pasaje.c);
-                  setPasaje(null);
-                }}
-                title={tr.leerAqui}
-              >
-                {tr.leerAqui}
-              </button>
-              <button className="icono-btn" onClick={() => setPasaje(null)} aria-label={tr.lexCerrar} title={tr.lexCerrar}>
+              <button className="icono-btn cerrar" onClick={() => setPasaje(null)} aria-label={tr.lexCerrar} title={tr.lexCerrar}>
                 ✕
               </button>
             </span>
@@ -1077,8 +1045,11 @@ function ComentarioBloque({
       >
         <span className="com-flecha">{abierto ? "▾" : "▸"}</span>
         <span className="com-etiqueta">
-          {tr.comentarioDe} — <i>{seccion.t}</i> ({seccion.p.length})
-          {seccion.sinTraducir && <b> · {tr.sinTraducir}</b>}
+          <span className="l1">{tr.comentarioDe}</span>
+          <span className="l2">
+            <i>{seccion.t}</i> ({seccion.p.length})
+            {seccion.sinTraducir && <b> · {tr.sinTraducir}</b>}
+          </span>
         </span>
         <button
           className="com-info-btn"
@@ -1099,8 +1070,8 @@ function ComentarioBloque({
           {tr.ancladaInfo}
         </span>
       )}
-      {abierto && (
-        <span className="com-bloque">
+      <span className={`com-bloque${abierto ? " abierto" : ""}`}>
+        <span className="com-bloque-int">
           <span className="com-titulo">
             {seccion.t}
             {seccion.v ? ` — desde el verso ${seccion.v}` : ""}
@@ -1111,7 +1082,7 @@ function ComentarioBloque({
             </span>
           ))}
         </span>
-      )}
+      </span>
     </span>
   );
 }

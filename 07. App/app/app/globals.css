@@ -127,6 +127,13 @@ body {
   transition: all 0.15s ease;
 }
 .icono-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+/* botón de cierre: rojo con X blanca (misma forma) */
+.icono-btn.cerrar {
+  background: #a63d2f;
+  border-color: #a63d2f;
+  color: #ffffff;
+}
+.icono-btn.cerrar:hover { background: #8a3125; border-color: #8a3125; color: #ffffff; }
 
 .sel {
   font-family: var(--sans);
@@ -575,7 +582,13 @@ body {
   max-height: 58vh;
   overflow: auto;
   padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: panel-entra 0.24s ease;
 }
+@keyframes panel-entra {
+  from { transform: translateY(18px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.com-info-popo { animation: panel-entra 0.2s ease; }
 .lex-panel-inner {
   max-width: 720px;
   margin: 0 auto;
@@ -672,7 +685,13 @@ body {
 }
 .com-toggle:hover { border-color: var(--accent); }
 .com-toggle .com-flecha { flex-shrink: 0; font-size: 10px; }
-.com-toggle .com-etiqueta { flex: 1; min-width: 0; }
+.com-etiqueta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.com-etiqueta .l1 {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted);
+}
+.com-toggle.abierto .com-etiqueta .l1 { color: var(--accent-strong); }
+.com-etiqueta .l2 { font-size: 11.5px; line-height: 1.35; color: var(--ink-soft); }
 .com-toggle .com-etiqueta b { color: var(--muted); font-weight: 700; }
 
 /* expandida: color dinámico + anclaje bajo el header */
@@ -729,13 +748,27 @@ body {
 .com-info-popo b { color: var(--accent-strong); }
 
 .com-bloque {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin: 0 0 0 0;
+  transition: grid-template-rows 0.32s ease, opacity 0.26s ease, margin 0.32s ease;
+}
+.com-bloque.abierto {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-bottom: 14px;
+}
+.com-bloque-int {
   display: block;
+  overflow: hidden;
+  min-height: 0;
   border-left: 3px solid var(--accent);
   background: var(--bg-elev);
   border-radius: 0 8px 8px 0;
-  padding: 12px 16px;
-  margin: 6px 0 14px;
+  padding: 0;
 }
+.com-bloque.abierto .com-bloque-int { padding: 12px 16px; }
 .com-bloque .com-titulo {
   display: block;
   font-family: var(--serif);
