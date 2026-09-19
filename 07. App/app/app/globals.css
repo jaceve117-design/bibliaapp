@@ -47,6 +47,14 @@
 
 html { scroll-behavior: smooth; }
 
+/* Nada se sale del viewport en móvil: el desborde horizontal se recorta
+   y el ancho del documento nunca supera la pantalla. */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -140,14 +148,15 @@ body {
   backdrop-filter: blur(12px);
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top, 0); /* notch en PWA instalada */
 }
 .cabecera-inner {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 14px 24px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 .cabecera-sub {
   border-top: 1px solid var(--line);
@@ -155,10 +164,20 @@ body {
 .cabecera-sub-inner {
   max-width: 720px;
   margin: 0 auto;
-  padding: 10px 24px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap; /* en móvil estrecho los controles bajan de línea en vez de desbordar */
+  row-gap: 8px;
+}
+.cabecera-sub-inner .sel {
+  flex: 1 1 110px;
+  min-width: 0; /* los select se encogen antes que desbordar */
+}
+.cabecera-sub-inner .obras-toggle,
+.cabecera-sub-inner .lector-acciones {
+  flex-shrink: 0;
 }
 
 .marca {
@@ -184,6 +203,7 @@ body {
 .pie {
   border-top: 1px solid var(--line);
   margin-top: 96px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 .pie-inner {
   max-width: 1120px;
@@ -291,7 +311,8 @@ body {
 .lector-columna {
   max-width: 720px;
   margin: 0 auto;
-  padding: clamp(36px, 7vh, 72px) 24px 48px;
+  padding: clamp(36px, 7vh, 72px) 16px 48px;
+  overflow-wrap: break-word;
 }
 
 .lector-titulo {
@@ -304,8 +325,9 @@ body {
   margin-bottom: 34px;
 }
 .lector-titulo h1 {
-  font-size: clamp(30px, 4.5vw, 44px);
+  font-size: clamp(26px, 6vw, 44px);
   font-weight: 600;
+  min-width: 0;
 }
 .lector-titulo .ref-osis {
   font-family: var(--sans);
@@ -423,6 +445,7 @@ body {
   z-index: 60;
   max-height: 58vh;
   overflow: auto;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 .lex-panel-inner {
   max-width: 720px;
@@ -556,6 +579,12 @@ body {
   text-transform: uppercase;
   color: var(--accent-strong);
   margin-bottom: 6px;
+}
+
+@media (max-width: 420px) {
+  .marca { font-size: 18px; }
+  .cabecera-inner .lector-acciones a { display: none; } /* la portada ya tiene su CTA */
+  .hero { padding-top: 56px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

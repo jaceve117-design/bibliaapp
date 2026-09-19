@@ -205,3 +205,14 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
   - Verificado: raíz 200 · /es/lector 200 · manifest 200 · sw.js 200 · datos 200.
   - Redeploys: `cd 07. App/app && npm run build && npx wrangler pages deploy out --project-name=bibliaapp --branch=main`.
 - Pendiente menor: conectar el repo de GitHub al proyecto de Pages para CI automático (hoy el deploy es manual por wrangler); `out/` añadido a .gitignore.
+
+### 2026-09-17 · GLM — Corrección móvil: desborde horizontal eliminado + header fijo compacto
+
+- **Reporte del usuario (captura en móvil):** la fila de controles desbordaba el ancho de la pantalla y arrastraba todo el documento fuera del viewport (había que desplazarse a la derecha para verlos).
+- **Causa:** `.cabecera-sub-inner` sin `flex-wrap` + selects sin encogimiento → fila más ancha que el viewport; el documento entero se desplazaba.
+- **Correcciones (globals.css):**
+  - `html, body { overflow-x: clip; max-width: 100% }` — garantía de que nada pinta fuera del viewport.
+  - Header fijo responsivo: la fila de controles ahora envuelve (`flex-wrap`), los selects encogen (`flex: 1 1 110px; min-width: 0`) y toggle/acciones no se comprimen. En móvil estrecho los controles ocupan dos líneas DENTRO del header fijo — el usuario pidió explícitamente mantener las 2 primeras líneas fijas.
+  - Áreas seguras iOS (`env(safe-area-inset-top/bottom)`) para la PWA instalada (notch y barra gestual), viewportFit: cover ya estaba.
+  - Ajustes ≤420px: marca más compacta, link «Lector» del header oculto (la portada tiene su CTA), paddings reducidos.
+- Verificado en el CSS del build desplegado (overflow-x:clip, flex-wrap, safe-areas OK). Redesplegado a Cloudflare (`2e2c45da`).
