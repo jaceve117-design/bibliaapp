@@ -305,3 +305,11 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
   - Detalle de restauración anotado en el propio mensaje del tag (visible con `git tag -n99 recuperacion-2026-09-19`).
 
 **Estado al cierre de este punto:** pasos 0, 1, 2, 5 completos · paso 3 en 3/7 secciones de Juan 1 · puertas: D20 superada (método aprobado) · pendientes de usuario: continuarlo es automático (vigilante), decisiones de licencia de traducciones/sostenimiento/nombre cuando el usuario defina.
+
+### 2026-09-19 · GLM — Sección 4 de Juan 1 en ES (4/7)
+
+- **Traducida y fusionada la sección 4** «El testimonio de Juan; Juan examinado por los sacerdotes» (16 párrafos, Jn 1:19-28): el sanedrín y su examen, la triple negativa de Juan (no el Cristo, no Elías, no el profeta), «Yo soy la voz» (con la comparación ley/evangelio: truenos y trompeta vs voz humana apacible), «Enderezad el camino del Señor», el bautismo y los prosélitos, «en medio de vosotros está uno a quien no conocéis», Betábara como casa de paso.
+- Léxico transliterado ampliado a **26 términos** (+4: Sy tis ei, Si populus vult decipi…, hoti ouk eimi ego ho Christos, vox et præterea nihil).
+- Desplegado (`bd0d4e94`). Verificado: lector 200, henry-es 200, léxico 200. Commit y push.
+
+**Siguiente:** secciones 5-7 de Juan 1 → capítulo completo en ES (5/7 → 6/7 → 7/7).
