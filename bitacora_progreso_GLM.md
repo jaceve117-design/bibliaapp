@@ -258,3 +258,11 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Verificado en producción: léxico 200, lector 200. Commit y push.
 
 **Siguiente:** traducir las secciones 3-7 de Juan 1 (agregando entradas al léxico transliterado a medida que aparezcan términos) → Juan 1 completo en ES → escalado (paso 6).
+
+### 2026-09-19 · GLM — Pantalla dividida: tarjeta de pasaje (petición del usuario)
+
+- **Reporte del usuario**: al pulsar «Abrir pasaje» se navegaba fuera del comentario y no había forma de volver al texto donde estaba.
+- **Solución implementada (pantalla dividida)**: «Abrir pasaje» ya no navega la lectura principal — abre desde abajo una **tarjeta mini-lector** (56 % de la pantalla, animada): arriba queda intacto el comentario/texto donde estabas, abajo el pasaje destino con su propia navegación (← → de capítulos dentro de la tarjeta) y botón **«Leer aquí»** para quien sí quiera fijar ese pasaje como lectura principal. ✕ la cierra y sigues exactamente donde estabas.
+- Aplica también a las **referencias cruzadas** (TSK): cada referencia del panel abre la tarjeta dividida en vez de navegar — coherente con la filosofía D22 (nada te saca de tu lugar).
+- El mini-lector usa la misma obra activa y el mismo caché del lector (cero descargas repetidas). Animación respetuosa de prefers-reduced-motion.
+- Desplegado (`77efc10d`). Commit y push.

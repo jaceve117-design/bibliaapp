@@ -63,6 +63,8 @@ export default function Lector() {
   const [panelCita, setPanelCita] = useState<PanelCita | null>(null);
   const [panelTermino, setPanelTermino] = useState<Termino | null>(null);
   const [panelInfo, setPanelInfo] = useState(false);
+  const [pasaje, setPasaje] = useState<{ osis: string; c: number } | null>(null);
+  const [pasajeTexto, setPasajeTexto] = useState<ObraJson | null>(null);
   const [lexico, setLexico] = useState<Termino[] | null>(null);
   const reTerminos = useRef<RegExp | null>(null);
   const columna = useRef<HTMLDivElement>(null);
@@ -322,6 +324,28 @@ export default function Lector() {
       .catch(() => setLexico([]));
   }, [comentario, lexico]);
 
+  // tarjeta de pasaje (pantalla dividida): carga el libro citado sin mover la lectura principal
+  useEffect(() => {
+    if (!pasaje) {
+      setPasajeTexto(null);
+      return;
+    }
+    const clave = `obra:${pasaje.osis}`;
+    const enCache = cache.get(clave) as ObraJson | undefined;
+    if (enCache) {
+      setPasajeTexto(enCache);
+      return;
+    }
+    setPasajeTexto(null);
+    fetch(`/data/${obra}/${pasaje.osis}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: ObraJson | null) => {
+        if (json) cache.set(clave, json);
+        setPasajeTexto(json);
+      })
+      .catch(() => setPasajeTexto(null));
+  }, [pasaje, obra]);
+
   // ficha léxica: busca el Strong en TBESG (griego) o TBESH (hebreo)
   const abrirLexico = (p: Palabra) => {
     setLex({ palabra: p });
@@ -461,6 +485,27 @@ export default function Lector() {
       if (ultimo < trozo.length) nodos.push(<span key={clave++}>{trozo.slice(ultimo)}</span>);
     }
     return nodos;
+  };
+
+  // pantalla dividida: tarjeta de pasaje abajo, lectura principal arriba intacta
+  const abrirTarjeta = (osisDest: string, capDest: number) => {
+    setPasaje({ osis: osisDest, c: capDest });
+    setPanelCita(null);
+    setPanelRefs(null);
+  };
+
+  const moverTarjeta = (delta: number) => {
+    setPasaje((prev) => {
+      if (!prev || !manifest) return prev;
+      const idx = manifest.libros.findIndex((l) => l.osis === prev.osis);
+      if (idx < 0) return prev;
+      const libro = manifest.libros[idx];
+      const nueva = prev.c + delta;
+      if (nueva >= 1 && nueva <= libro.caps) return { ...prev, c: nueva };
+      const otro = manifest.libros[idx + delta];
+      if (!otro) return prev;
+      return { osis: otro.osis, c: delta > 0 ? 1 : otro.caps };
+    });
   };
 
   return (
@@ -779,9 +824,8 @@ export default function Lector() {
                         key={r}
                         className="ref-item"
                         onClick={() => {
-                          setOsis(o);
-                          setCap(Number(c));
-                          setPanelRefs(null);
+                          const [o, c] = r.split(".");
+                          abrirTarjeta(o, Number(c));
                         }}
                       >
                         <b>{libro?.nombre ?? o}</b> {c}:{v}
@@ -825,11 +869,7 @@ export default function Lector() {
                 <button
                   className="btn btn-fantasma"
                   style={{ marginTop: 12 }}
-                  onClick={() => {
-                    setOsis(panelCita.osis);
-                    setCap(panelCita.c);
-                    setPanelCita(null);
-                  }}
+                  onClick={() => abrirTarjeta(panelCita.osis, panelCita.c)}
                 >
                   {tr.abrirPasaje}
                 </button>
@@ -908,6 +948,57 @@ export default function Lector() {
                   Interlineal y léxicos: STEPBible-Data (Tyndale House), CC BY 4.0
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {pasaje && (
+        <div className="split-card">
+          <div className="split-cab">
+            <span className="split-titulo">
+              {manifest?.libros.find((l) => l.osis === pasaje.osis)?.nombre ?? pasaje.osis} {pasaje.c}
+            </span>
+            <span className="split-acciones">
+              <button className="icono-btn" onClick={() => moverTarjeta(-1)} aria-label={tr.anterior} title={tr.anterior}>
+                ←
+              </button>
+              <button className="icono-btn" onClick={() => moverTarjeta(1)} aria-label={tr.siguiente} title={tr.siguiente}>
+                →
+              </button>
+              <button
+                className="btn btn-fantasma"
+                style={{ padding: "5px 10px", fontSize: 12 }}
+                onClick={() => {
+                  setOsis(pasaje.osis);
+                  setCap(pasaje.c);
+                  setPasaje(null);
+                }}
+                title={tr.leerAqui}
+              >
+                {tr.leerAqui}
+              </button>
+              <button className="icono-btn" onClick={() => setPasaje(null)} aria-label={tr.lexCerrar} title={tr.lexCerrar}>
+                ✕
+              </button>
+            </span>
+          </div>
+          <div className="split-contenido">
+            {pasajeTexto ? (
+              <div className="texto-biblico split-versos">
+                {pasajeTexto.versos
+                  .filter((v) => v.c === pasaje.c)
+                  .map((v) => (
+                    <span key={v.osis} className="verso" data-osis={v.osis}>
+                      <sup className="num">{v.v}</sup> {v.t}{" "}
+                    </span>
+                  ))}
+              </div>
+            ) : (
+              <p style={{ color: "var(--muted)" }}>…</p>
+            )}
+            <div className="lex-fuente" style={{ marginTop: 14 }}>
+              {manifest?.obra} · {pasaje.osis}.{pasaje.c}
             </div>
           </div>
         </div>

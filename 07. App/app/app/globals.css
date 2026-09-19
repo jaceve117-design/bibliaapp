@@ -266,6 +266,49 @@ body {
   text-transform: uppercase; color: var(--accent-strong); margin-bottom: 4px;
 }
 
+/* ── pantalla dividida: tarjeta de pasaje (mini-lector) ── */
+
+.split-card {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  height: 56vh;
+  z-index: 45;
+  background: var(--bg);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: split-entra 0.22s ease;
+}
+@keyframes split-entra {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.split-cab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.split-titulo {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  margin-right: auto;
+}
+.split-acciones { display: flex; align-items: center; gap: 6px; }
+.split-contenido {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 24px;
+}
+.split-versos { font-size: calc(1.05rem * var(--factor-texto, 1)); line-height: 1.85; }
+
 .marca {
   font-family: var(--serif);
   font-size: 21px;
