@@ -165,7 +165,14 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
 
 **Métrica de obras validadas: 4 de 6** — RV1909 · WEB · STEPBible-Data · TSK/OpenBible.
 
-**Siguiente:** Easton (ingesta + búsqueda contextual) y Matthew Henry (base del piloto de traducción); con las 6, glosario maestro y puerta D20.
+### 2026-09-17 · GLM — Easton ingerido (5/6) + buscador de diccionario en el lector
+
+- **Easton's Bible Dictionary 1897 completo: 3.962 entradas** (rango esperado de la edición), 26 letras, índice de búsqueda con nombres normalizados (`public/data/easton/`).
+- Fuente: `neuu-org/bible-dictionary-dataset` (texto PD, agregador CC BY 4.0 — el que ya había fichado la investigación de ChatGPT). Homónimos de la fuente resueltos con sufijo (p. ej. «Hail» ×2). La letra X no existe en la edición — tratada como vacía.
+- **Buscador de diccionario en el lector** (botón ⌕ en la barra fija): búsqueda en vivo por término (empieza-por primero, sin acentos), ficha con definición completa y referencias bíblicas. Atribución visible: PD + «traducción ES en curso».
+- Redesplegado a Cloudflare (`07ae5ec9.bibliaapp.pages.dev`), índice servido 200. Commit `4d228f9`.
+
+**Siguiente:** Matthew Henry (última del núcleo) → glosario maestro → piloto de traducción con puerta D20.
 
 ### 2026-09-17 · GLM — GitHub + despliegue temporal en Cloudflare Pages (PWA real)
 
