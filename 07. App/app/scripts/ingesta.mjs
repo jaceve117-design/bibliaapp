@@ -87,6 +87,27 @@ const stripInline = (s) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+/**
+ * La edición impresa RV1909 abre cada capítulo con versalitas, que el USFM
+ * digitaliza como MAYÚSCULAS ("EN el principio"). Se restauran a mayúscula
+ * inicial normal (solo verso 1 de cada capítulo, máx. 3 palabras). Las
+ * versalitas de medio verso (el nombre divino, p. ej. "JEHOVÁ" en Salmos)
+ * se CONSERVAN: son convención con significado.
+ */
+function normalizarInicioCapitulo(t) {
+  const tokens = t.split(' ');
+  let i = 0;
+  while (i < tokens.length && i < 4) {
+    const letras = tokens[i].replace(/[^A-Za-zÁÉÍÓÚÑÜáéíóúñü]/g, '');
+    if (letras.length === 0) break;              // token sin letras (números, etc.)
+    if (letras !== letras.toUpperCase()) break;  // ya minúscula/mixto: fin de las versalitas
+    // monosílabos ("Y", "A") ya están correctos; se saltan sin frenar la normalización
+    tokens[i] = tokens[i].charAt(0) + tokens[i].slice(1).toLowerCase();
+    i++;
+  }
+  return tokens.join(' ');
+}
+
 function parseBook(file) {
   // notas al pie y finales se quitan ANTES de partir por líneas (span multilínea)
   const text = fs
@@ -109,7 +130,8 @@ function parseBook(file) {
     const mV = line.match(/^\\v (\d+)\s*(.*)$/);
     if (mV) {
       if (cur) (caps[cap] ??= []).push(cur);
-      cur = { v: Number(mV[1]), t: stripInline(mV[2]) };
+      const numeroVerso = Number(mV[1]);
+      cur = { v: numeroVerso, t: numeroVerso === 1 ? normalizarInicioCapitulo(stripInline(mV[2])) : stripInline(mV[2]) };
       continue;
     }
     if (cur) {

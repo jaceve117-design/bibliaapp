@@ -232,3 +232,15 @@ La muestra de traducción ya está pública en producción para que la evalúes 
 Decisión requerida: **¿la calidad de la traducción es publicable con nuestro nombre?** (Claude E12: escalar una traducción mediocre es el único error irreversible del proyecto). Respuestas posibles: (a) apruebo el método → se traduce Juan 1 completo y luego se escala; (b) hay que corregir el método → dime qué ajustar (registro, terminología, ritmo).
 
 Decisiones de usuario también pendientes: licencia de nuestras traducciones · modelo de sostenimiento · nombre y dominio.
+
+### 2026-09-19 · GLM — PUERTA D20 SUPERADA + traducción escala (sección 2 de Juan 1) + corrección de mayúsculas RV1909
+
+- **⟡ D20 — VEREDICTO DEL USUARIO: método de traducción APROBADO** («la traducción de Juan está muy bien, sus acentos y su redacción son impecables»). La puerta se cierra con veredicto (a): continúa la traducción de Juan 1 y luego el escalado. Nota formal: la revisión editorial humana detallada (B2) sigue como control de calidad continuo sobre cada sección publicada.
+- **Aclaración registrada**: el usuario confirmó que solo veía EN — correcto por diseño: solo la muestra piloto (Jn 1, resumen + sección 1) estaba en ES. Con la aprobación, la traducción escala.
+- **Corrección RV1909 (reporte del usuario)**: los inicios de capítulo traían palabra(s) en MAYÚSCULAS — versalitas de la edición impresa 1909 digitalizadas literalmente por eBible («EN el principio»). Añadida `normalizarInicioCapitulo()` al pipeline: verso 1 de cada capítulo pasa a mayúscula inicial normal («En el principio», «Y Fueron acabados», «A Todos los sedientos»). Las versalitas de medio verso (nombre divino «JEHOVÁ», p. ej. Sal 23:1) se CONSERVAN por ser convención con significado. Regenerada RV1909 (31.102 marcadores, portón ✓). Las 2.855+ coincidencias con STEPBible/TSK no se afectan (coordenadas intactas).
+- **Traducción**: sección 2 de Juan 1 «El testimonio de Juan el Bautista; la encarnación de Cristo» (24 párrafos, Jn 1:6-14) traducida y fusionada → JHN cap. 1: **2 de 7 secciones en ES**. Fuente de traducción archivada en `06. Traduccion/traducciones/jhn1_s2_es.json`. Quedan 5 secciones de Juan 1.
+- **SW v2** (`biblioteca-v2`): fuerza refresco de caché en las PWA instaladas para recibir la RV1909 corregida.
+- Reparado un error de sintaxis JSON en henry-es (llave faltante del Write original — detectado por el flujo de fusión validada).
+- Desplegado (`aa5f97db`) y verificado: henry-es 200, rv1909 200, lector 200; el texto corregido se sirve desde el despliegue (el alias podía mostrar copia del edge hasta expirar TTL).
+
+**Siguiente:** traducir las secciones 3-7 de Juan 1 por incrementos → Juan 1 completo en ES → escalado al corpus del MVP (paso 6) y cierre del núcleo (SBLGNT, JFB, Barnes, Nave's — con sus fichas legales primero).

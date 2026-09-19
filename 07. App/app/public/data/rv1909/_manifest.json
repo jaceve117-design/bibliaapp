@@ -5,7 +5,7 @@
   "licencia": "Dominio público",
   "fuente": "eBible.org — https://ebible.org/Scriptures/spaRV1909_usfm.zip",
   "crudo_en": "05. Datos/corpus_crudo/rv1909_usfm",
-  "fecha_ingesta": "2026-09-17",
+  "fecha_ingesta": "2026-09-19",
   "formato_entrada": "USFM (con marcado \\w|strong preservado en el crudo)",
   "canon": "Protestante, 66 libros (D3). Los archivos no canónicos del crudo quedan preservados para la decisión pendiente del canon.",
   "total_versos": 31102,
