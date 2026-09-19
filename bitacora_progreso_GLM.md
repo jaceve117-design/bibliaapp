@@ -174,6 +174,28 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
 
 **Siguiente:** Matthew Henry (última del núcleo) → glosario maestro → piloto de traducción con puerta D20.
 
+### 2026-09-17 · GLM — NÚCLEO COMPLETO 6/6: Matthew Henry + modo Comentario + glosario v1 + vigilante
+
+**Datos (`scripts/ingesta-henry.mjs`, crudo en `05. Datos/corpus_crudo/mhenry/`):**
+- Fuente hallada y verificada: **lyteword/mhenry-complete** — comentario COMPLETO de 6 volúmenes en markdown, licencia **CC0-1.0** (verificada vía GitHub API) sobre obra PD (1706–1721). Doble seguridad jurídica: PD subyacente + renuncia CC0 de la edición digital, sin marcado propietario (evita el problema CCEL/ThML). Ficha legal actualizada.
+- **1.189 capítulos — 100 % de cobertura contra RV1909 — 3.366 secciones — ~6,3 millones de palabras.** El texto KJV citado en el markdown NO se publica (ya tenemos RV1909 propia).
+- Correcciones del portón durante la ingesta: resolución de carpetas por volumen (volume-1..6), nombres de archivo `psalm-N.md` en Salmos, umbral de contenido por capítulo.
+- Salida: `public/data/henry/{OSIS}.json` (34 MB) + manifiesto.
+
+**Producto:**
+- **Modo Comentario (botón ✎)**: resumen del capítulo al inicio + secciones de Henry colapsables ancladas al verso de inicio (▸ Comentario de Matthew Henry — título · N párrafos). Atribución visible en la obra y en el pie. El flujo B15 queda completo: pasaje → interlineal → léxico → comentario → referencias → diccionario.
+
+**Traducción (Fase 4 se prepara):**
+- **Glosario teológico maestro v1** creado → `06. Traduccion/Glosario teologico maestro v1.md`: 60+ términos fijos con justificación (justificación/propiciación/expiación distinguídos, imputación, pacto, quicken→vivificar, LORD→Jehová por RV1909, etc.) + principios de estilo B5 + pendientes para el revisor humano (B2). **Ya se puede empezar a traducir sin riesgo de incoherencia terminológica.**
+
+**Operación:**
+- Redesplegado a Cloudflare (`924a5c5f.bibliaapp.pages.dev`), henry-JHN 200. Commit y push.
+- **Vigilante creado**: automatización recurrente cada 4 h (`automation-1cdbc91d`) que lee esta BP, continúa el siguiente paso ejecutable, despliega y registra; si solo queda bloqueado en decisiones del usuario, lo anota y no inventa decisiones. Nota honesta: GLM no tiene acceso a un medidor de cuota — el ciclo de 4 h es el que pidió el usuario.
+
+**Métrica de obras validadas: 6 de 6** — RV1909 · WEB · STEPBible-Data (TAHOT/TAGNT/TBESH/TBESG) · TSK/OpenBible · Easton · Matthew Henry.
+
+**Estado del plan:** pasos 0-2 y 5 completos; paso 3 avanzado (capa interlineal + comentario de toda la Biblia; falta traducción del piloto); puerta D20 abierta para cuando el editor humano revise la traducción que ahora empieza. Siguiente tarea ejecutable: piloto de traducción ES de Henry sobre Juan 1 con el glosario v1 (proceso editorial con revisión — no proceso por lotes, E5).
+
 ### 2026-09-17 · GLM — GitHub + despliegue temporal en Cloudflare Pages (PWA real)
 
 - **Repositorio**: `git remote add origin` + push a `https://github.com/jaceve117-design/bibliaapp.git` (rama `main`).

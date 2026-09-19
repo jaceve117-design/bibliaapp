@@ -22,6 +22,8 @@ type InterJson = { osis: string; dir: "ltr" | "rtl"; versos: Record<string, Pala
 type EntradaLex = { w: string; t: string; m: string; g: string; d: string };
 type IndiceItem = { s: string; n: string; l: string };
 type EntradaDic = { n: string; d: string; r: string[] };
+type SeccionHenry = { t: string; v: number | null; p: string[] };
+type HenryJson = { osis: string; c: Record<string, { r: string | null; s: SeccionHenry[] }> };
 
 const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
@@ -49,6 +51,8 @@ export default function Lector() {
   const [dicIndice, setDicIndice] = useState<IndiceItem[] | null>(null);
   const [dicQuery, setDicQuery] = useState("");
   const [dicEntrada, setDicEntrada] = useState<EntradaDic | null>(null);
+  const [comentario, setComentario] = useState(false);
+  const [henry, setHenry] = useState<HenryJson | null>(null);
   const columna = useRef<HTMLDivElement>(null);
   const lexCache = useRef(cacheLex);
 
@@ -184,6 +188,28 @@ export default function Lector() {
     window.history.replaceState(null, "", `/es/lector?obra=${obra}&ref=${osis}.${cap}`);
     columna.current?.scrollIntoView({ block: "start" });
   }, [obra, osis, cap, cargando]);
+
+  // comentario de Matthew Henry: carga perezosa por libro
+  useEffect(() => {
+    if (!comentario) {
+      setHenry(null);
+      return;
+    }
+    const clave = `henry:${osis}`;
+    const enCache = cache.get(clave) as HenryJson | undefined;
+    if (enCache) {
+      setHenry(enCache);
+      return;
+    }
+    setHenry(null);
+    fetch(`/data/henry/${osis}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: HenryJson | null) => {
+        if (json) cache.set(clave, json);
+        setHenry(json);
+      })
+      .catch(() => setHenry(null));
+  }, [comentario, osis]);
 
   // referencias cruzadas (TSK): carga perezosa al primer clic en un número de verso
   const abrirReferencias = (v: Verso) => {
@@ -355,6 +381,15 @@ export default function Lector() {
               ⌕
             </button>
             <button
+              className="icono-btn"
+              onClick={() => setComentario(!comentario)}
+              aria-label={tr.comentario}
+              title={tr.comentario}
+              style={comentario ? { borderColor: "var(--accent)", color: "var(--accent-strong)" } : undefined}
+            >
+              ✎
+            </button>
+            <button
               className={`icono-btn${interlineal ? " activo" : ""}`}
               onClick={() => setInterlineal(!interlineal)}
               aria-label={tr.interlineal}
@@ -425,14 +460,30 @@ export default function Lector() {
             </div>
           ) : (
             <div className="texto-biblico">
-              {versos.map((v) => (
-                <span key={v.osis} className="verso" data-osis={v.osis}>
-                  <sup className="num ref-btn" onClick={() => abrirReferencias(v)} title={tr.referencias} role="button">
-                    {v.v}
-                  </sup>
-                  {v.t}{" "}
-                </span>
-              ))}
+              {comentario && henry?.c[String(cap)]?.r && (
+                <div className="com-bloque com-resumen">
+                  <div className="com-titulo">{tr.resumenCapitulo}</div>
+                  {henry.c[String(cap)].r}
+                </div>
+              )}
+              {versos.map((v) => {
+                const secciones = comentario
+                  ? (henry?.c[String(cap)]?.s ?? []).filter((s) => s.v === v.v)
+                  : [];
+                return (
+                  <span key={v.osis} style={{ display: "inline" }}>
+                    <span className="verso" data-osis={v.osis}>
+                      <sup className="num ref-btn" onClick={() => abrirReferencias(v)} title={tr.referencias} role="button">
+                        {v.v}
+                      </sup>
+                      {v.t}{" "}
+                    </span>
+                    {secciones.map((s, i) => (
+                      <ComentarioBloque key={`${v.osis}-${i}`} seccion={s} tr={tr} />
+                    ))}
+                  </span>
+                );
+              })}
             </div>
           )}
 
@@ -444,6 +495,9 @@ export default function Lector() {
             <span>{manifest?.fuente}</span>
             {interlineal && <span>
               <b>Interlineal:</b> STEPBible-Data (TAHOT/TAGNT, CC BY 4.0)
+            </span>}
+            {comentario && <span>
+              <b>Comentario:</b> Matthew Henry Complete (1706–1721) · Dominio público
             </span>}
             <span>
               Ingesta validada: {manifest?.total_versos.toLocaleString("es")} versos ·{" "}
@@ -601,5 +655,36 @@ export default function Lector() {
         </div>
       </footer>
     </>
+  );
+}
+
+/** Bloque de comentario de Henry colapsado por defecto (los capítulos son extensos). */
+function ComentarioBloque({
+  seccion,
+  tr,
+}: {
+  seccion: SeccionHenry;
+  tr: ReturnType<typeof t>;
+}) {
+  const [abierto, setAbierto] = useState(false);
+  return (
+    <span className="com-bloque-wrap">
+      <button className="com-toggle" onClick={() => setAbierto(!abierto)}>
+        {abierto ? "▾" : "▸"} {tr.comentarioDe} — <i>{seccion.t}</i> ({seccion.p.length})
+      </button>
+      {abierto && (
+        <span className="com-bloque">
+          <span className="com-titulo">
+            {seccion.t}
+            {seccion.v ? ` — desde el verso ${seccion.v}` : ""}
+          </span>
+          {seccion.p.map((p, i) => (
+            <span key={i} className="com-parrafo">
+              {p}
+            </span>
+          ))}
+        </span>
+      )}
+    </span>
   );
 }
