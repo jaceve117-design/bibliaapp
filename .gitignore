@@ -15,3 +15,6 @@ Thumbs.db
 
 # Corpus crudo: re-descargable (URLs en fichas y manifiestos), fuera del git
 05. Datos/corpus_crudo/
+
+# Build de export estático (regenerable con npm run build)
+07. App/app/out/

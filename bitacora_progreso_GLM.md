@@ -166,3 +166,13 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
 **Métrica de obras validadas: 4 de 6** — RV1909 · WEB · STEPBible-Data · TSK/OpenBible.
 
 **Siguiente:** Easton (ingesta + búsqueda contextual) y Matthew Henry (base del piloto de traducción); con las 6, glosario maestro y puerta D20.
+
+### 2026-09-17 · GLM — GitHub + despliegue temporal en Cloudflare Pages (PWA real)
+
+- **Repositorio**: `git remote add origin` + push a `https://github.com/jaceve117-design/bibliaapp.git` (rama `main`).
+- **Export estático**: `next.config.ts` con `output: "export"` (coherente con D9: sin servidor en runtime). `redirect()` de la raíz reemplazado por redirección cliente; `manifest.ts` marcado `force-static`. Build → `out/` (66 MB, corpus incluido).
+- **Cloudflare Pages**: proyecto `bibliaapp` creado con wrangler (cuenta jac.eve117@gmail.com) y desplegado por upload directo.
+  - **URL temporal de producción: https://bibliaapp.pages.dev** (el PWA ya se instala de verdad: HTTPS + service worker + manifest).
+  - Verificado: raíz 200 · /es/lector 200 · manifest 200 · sw.js 200 · datos 200.
+  - Redeploys: `cd 07. App/app && npm run build && npx wrangler pages deploy out --project-name=bibliaapp --branch=main`.
+- Pendiente menor: conectar el repo de GitHub al proyecto de Pages para CI automático (hoy el deploy es manual por wrangler); `out/` añadido a .gitignore.
