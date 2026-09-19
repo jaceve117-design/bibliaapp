@@ -331,3 +331,12 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`a39c37ff`). Verificado: lector 200, henry-es con 7 secciones en producción (tras asentarse el caché del edge; el hash de deployment ya lo servía correcto).
 
 **Estado:** Juan 1 100 % en ES con citas interactivas (D22), léxico transliterado, toggle ES/EN y barras ancladas. **Siguiente:** escalado gradual — completar el evangelio de Juan (21 capítulos, ~879 versos, 106 secciones de Henry) por incrementos, y/o paso 6 (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's — fichas legales primero). El usuario decide la prioridad.
+
+### 2026-09-19 · GLM (vigilante) — Juan 2 COMPLETO en español (caps ES: 1, 2)
+
+- **Nuevo instrumento de producción:** `scripts/fusiona-henry-es.mjs` — fusión genérica de fragmentos de traducción por capítulo, con portón de paridad contra el original EN (secciones, párrafos, verso de inicio, párrafos vacíos, traducciones incompletas detectadas por proporción ES/EN). Las fuentes de traducción se archivan en `06. Traduccion/traducciones/` (trazabilidad).
+- **Juan 2 completo en español** (3 secciones, ~54k caracteres de original): 1. «El agua hecha vino» (v.1-11, 26 párrafos — el primer milagro, las bodas, la reprensión a su madre, las tinajas, el gobernador del convite, la sobriedad). 2. «El comercio del templo castigado; la muerte y resurrección de Cristo anunciadas» (v.12-22, 28 párrafos — Capernaum, la primera pascua, la purificación del templo, el celo que devora, la señal del templo de su cuerpo). 3. «El éxito del ministerio de Cristo» (v.23-25, 5 párrafos — los casi creyentes de Jerusalén y la omnisciencia de Cristo).
+- Corregido de paso un bug del validador (párrafos legítimamente cortos como «Aquí tenemos:» no deben fallar; la regla ahora compara proporción contra el original EN).
+- Desplegado (`f6d3fe82`). Verificado: lector 200, henry-es JN caps 1,2 en producción, JN 2 con 3 secciones.
+
+**Posición exacta de la traducción:** Juan 1 y Juan 2 completos en ES (caps 1-2 de 21). **Siguiente:** Juan 3 (Nicodemo — 2 secciones, ~89k chars, el más denso: probablemente dividido en 2 turnos de vigilante), luego Juan 4-21 por incrementos. Juan entero ≈ 1,7M caracteres EN — es el proyecto de traducción más largo del libro, y avanza capítulo por capítulo sin detenerse.
