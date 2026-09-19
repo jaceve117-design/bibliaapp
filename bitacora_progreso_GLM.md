@@ -313,3 +313,12 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`bd0d4e94`). Verificado: lector 200, henry-es 200, léxico 200. Commit y push.
 
 **Siguiente:** secciones 5-7 de Juan 1 → capítulo completo en ES (5/7 → 6/7 → 7/7).
+
+### 2026-09-19 · GLM — Bug del hueco invisible corregido + sección 5 de Juan 1 en ES (5/7)
+
+- **BUG corregido (reporte del usuario con captura)**: al activar el comentario se abría un hueco grande e invisible entre el header y el verso 1. Causa: el recuadro «Resumen del capítulo» usaba la clase `com-bloque` — que tras la animación de colapso pasó a ser el contenedor grid con `grid-template-rows: 0fr` + `opacity: 0` — el resumen quedaba renderizado pero invisible, ocupando su espacio. Corregido: el resumen usa su propia clase `com-resumen` (colisión de nombres eliminada).
+- **Traducción (5/7)**: sección 5 «El testimonio de Juan: He aquí el Cordero de Dios» (12 párrafos, Jn 1:29-34): el Cordero de Dios y el pacto, quita el pecado del mundo (culpa y poder), la señal de la paloma, el Espíritu sin medida, «Yo vi y he dado testimonio de que éste es el Hijo de Dios», y el testimonio privado del día siguiente que entrega a sus discípulos a Cristo.
+- Léxico transliterado: **30 términos** (+4: ho airon, emblepsas, anēr, quod erat demonstrandum).
+- Desplegado (`5778b0de`). Verificado: lector 200, henry-es 200.
+
+**Siguiente:** secciones 6-7 de Juan 1 (llamados de Andrés/Pedro y de Felipe/Natanael) → capítulo completo en ES.

@@ -676,7 +676,7 @@ export default function Lector() {
           ) : (
             <div className="texto-biblico">
               {comentario && rCom && (
-                <div className="com-bloque com-resumen">
+                <div className="com-resumen">
                   <div className="com-titulo">{tr.resumenCapitulo}</div>
                   {renderMarcado(rCom)}
                 </div>
