@@ -216,3 +216,19 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
   - Áreas seguras iOS (`env(safe-area-inset-top/bottom)`) para la PWA instalada (notch y barra gestual), viewportFit: cover ya estaba.
   - Ajustes ≤420px: marca más compacta, link «Lector» del header oculto (la portada tiene su CTA), paddings reducidos.
 - Verificado en el CSS del build desplegado (overflow-x:clip, flex-wrap, safe-areas OK). Redesplegado a Cloudflare (`2e2c45da`).
+
+### 2026-09-17 · GLM (vigilante, turno automático) — Piloto de traducción D20: Juan 1, resumen + sección 1
+
+- **Traducido y desplegado el piloto para la puerta D20**: resumen + sección 1 «La divinidad de Cristo» (10 párrafos, la de mayor densidad doctrinal de Juan 1) de Matthew Henry al español, siguiendo el glosario maestro v1 (Verbo, Jehová, Observa como rúbrica, citas alineadas a RV1909).
+- **Datos**: `public/data/henry-es/JHN.json` + `_manifest.json` — estructura paralela 1:1 con el EN (mismos índices de sección/párrafo → el original está siempre a un clic, B3). Estado declarado: `sin_revisar`.
+- **Producto**: en modo Comentario (✎) sobre Juan, aparece toggle **ES | EN** con nota de estado («sin revisar — pendiente B2 y puerta D20»); las secciones aún sin traducir caen al original EN con etiqueta «sección aún sin traducir».
+- **Alcance consciente**: Juan 1 completo tiene ~120k caracteres en 7 secciones; el turno automatizado tradujo la muestra doctrinal representativa. Las 6 secciones restantes + el resto del libro se traducen por incrementos siguientes (proceso editorial E5, no lote).
+- Verificado: henry-es-JHN 200 en producción (`b87ad4b7.bibliaapp.pages.dev`). Commit y push.
+
+## ⟡ BLOQUEADO EN USUARIO (puerta D20)
+
+La muestra de traducción ya está pública en producción para que la evalúes tú (o el editor humano): **https://bibliaapp.pages.dev/es/lector → Juan → cap 1 → botón ✎ → toggle ES**.
+
+Decisión requerida: **¿la calidad de la traducción es publicable con nuestro nombre?** (Claude E12: escalar una traducción mediocre es el único error irreversible del proyecto). Respuestas posibles: (a) apruebo el método → se traduce Juan 1 completo y luego se escala; (b) hay que corregir el método → dime qué ajustar (registro, terminología, ritmo).
+
+Decisiones de usuario también pendientes: licencia de nuestras traducciones · modelo de sostenimiento · nombre y dominio.

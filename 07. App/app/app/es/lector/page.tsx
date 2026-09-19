@@ -24,6 +24,7 @@ type IndiceItem = { s: string; n: string; l: string };
 type EntradaDic = { n: string; d: string; r: string[] };
 type SeccionHenry = { t: string; v: number | null; p: string[] };
 type HenryJson = { osis: string; c: Record<string, { r: string | null; s: SeccionHenry[] }> };
+type HenryEsJson = HenryJson & { estado?: string };
 
 const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
@@ -53,6 +54,8 @@ export default function Lector() {
   const [dicEntrada, setDicEntrada] = useState<EntradaDic | null>(null);
   const [comentario, setComentario] = useState(false);
   const [henry, setHenry] = useState<HenryJson | null>(null);
+  const [henryEs, setHenryEs] = useState<HenryEsJson | null>(null);
+  const [comIdioma, setComIdioma] = useState<"es" | "en">("es");
   const columna = useRef<HTMLDivElement>(null);
   const lexCache = useRef(cacheLex);
 
@@ -189,26 +192,41 @@ export default function Lector() {
     columna.current?.scrollIntoView({ block: "start" });
   }, [obra, osis, cap, cargando]);
 
-  // comentario de Matthew Henry: carga perezosa por libro
+  // comentario de Matthew Henry: carga perezosa por libro (EN + traducción ES si existe)
   useEffect(() => {
     if (!comentario) {
       setHenry(null);
+      setHenryEs(null);
       return;
     }
     const clave = `henry:${osis}`;
     const enCache = cache.get(clave) as HenryJson | undefined;
     if (enCache) {
       setHenry(enCache);
+    } else {
+      setHenry(null);
+      fetch(`/data/henry/${osis}.json`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((json: HenryJson | null) => {
+          if (json) cache.set(clave, json);
+          setHenry(json);
+        })
+        .catch(() => setHenry(null));
+    }
+    const claveEs = `henry-es:${osis}`;
+    const esCache = cache.get(claveEs) as HenryEsJson | undefined;
+    if (esCache) {
+      setHenryEs(esCache);
       return;
     }
-    setHenry(null);
-    fetch(`/data/henry/${osis}.json`)
+    setHenryEs(null);
+    fetch(`/data/henry-es/${osis}.json`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((json: HenryJson | null) => {
-        if (json) cache.set(clave, json);
-        setHenry(json);
+      .then((json: HenryEsJson | null) => {
+        if (json) cache.set(claveEs, json);
+        setHenryEs(json);
       })
-      .catch(() => setHenry(null));
+      .catch(() => setHenryEs(null));
   }, [comentario, osis]);
 
   // referencias cruzadas (TSK): carga perezosa al primer clic en un número de verso
@@ -316,6 +334,23 @@ export default function Lector() {
   const info = manifest?.libros.find((l) => l.osis === osis);
   const nVacios = manifest?.incidentes.length ?? 0;
   const dir = interData?.dir ?? "ltr";
+
+  // comentario: contenido según idioma (ES preferido si existe traducción del capítulo;
+  // secciones sin traducir caen al original EN con etiqueta — trazabilidad B3)
+  const capClave = String(cap);
+  const capEs = henryEs?.c[capClave];
+  const esCapDisp = !!capEs;
+  const idiomaEfectivo: "es" | "en" = esCapDisp && comIdioma === "es" ? "es" : "en";
+  const capCom = henry?.c[capClave];
+  const rCom = idiomaEfectivo === "es" && esCapDisp ? (capEs?.r ?? null) : (capCom?.r ?? null);
+  const seccionesCom = (capCom?.s ?? []).map((sEn, i) => {
+    if (idiomaEfectivo === "es") {
+      const sEs = capEs?.s?.[i];
+      if (sEs) return { ...sEs, sinTraducir: false };
+      return { ...sEn, sinTraducir: true };
+    }
+    return { ...sEn, sinTraducir: false };
+  });
 
   const limpiarDef = (d: string) =>
     d
@@ -460,15 +495,34 @@ export default function Lector() {
             </div>
           ) : (
             <div className="texto-biblico">
-              {comentario && henry?.c[String(cap)]?.r && (
+              {comentario && esCapDisp && (
+                <div className="avisos">
+                  <span className="obras-toggle" style={{ marginRight: 10, verticalAlign: "middle" }}>
+                    <button
+                      className={`obras-tab${idiomaEfectivo === "es" ? " activa" : ""}`}
+                      onClick={() => setComIdioma("es")}
+                    >
+                      ES
+                    </button>
+                    <button
+                      className={`obras-tab${idiomaEfectivo === "en" ? " activa" : ""}`}
+                      onClick={() => setComIdioma("en")}
+                    >
+                      EN
+                    </button>
+                  </span>
+                  {tr.estadoNota}
+                </div>
+              )}
+              {comentario && rCom && (
                 <div className="com-bloque com-resumen">
                   <div className="com-titulo">{tr.resumenCapitulo}</div>
-                  {henry.c[String(cap)].r}
+                  {rCom}
                 </div>
               )}
               {versos.map((v) => {
                 const secciones = comentario
-                  ? (henry?.c[String(cap)]?.s ?? []).filter((s) => s.v === v.v)
+                  ? seccionesCom.filter((s) => s.v === v.v)
                   : [];
                 return (
                   <span key={v.osis} style={{ display: "inline" }}>
@@ -663,7 +717,7 @@ function ComentarioBloque({
   seccion,
   tr,
 }: {
-  seccion: SeccionHenry;
+  seccion: SeccionHenry & { sinTraducir?: boolean };
   tr: ReturnType<typeof t>;
 }) {
   const [abierto, setAbierto] = useState(false);
@@ -671,6 +725,7 @@ function ComentarioBloque({
     <span className="com-bloque-wrap">
       <button className="com-toggle" onClick={() => setAbierto(!abierto)}>
         {abierto ? "▾" : "▸"} {tr.comentarioDe} — <i>{seccion.t}</i> ({seccion.p.length})
+        {seccion.sinTraducir && <b style={{ marginLeft: 6 }}>· {tr.sinTraducir}</b>}
       </button>
       {abierto && (
         <span className="com-bloque">

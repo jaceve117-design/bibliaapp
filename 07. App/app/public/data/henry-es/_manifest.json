@@ -1,0 +1,16 @@
+{
+  "obra": "Matthew Henry, Complete Commentary — traducción al español (piloto D20)",
+  "original_en": "public/data/henry/ (estructura paralela 1:1 por índices)",
+  "traductor": "GLM (ZCode), asistido",
+  "glosario": "06. Traduccion/Glosario teologico maestro v1.md",
+  "estado_revision": "sin_revisar — pendiente de revisión editorial humana (B2) y puerta D20",
+  "fecha": "2026-09-17",
+  "cobertura": {
+    "JHN": { "capitulos": ["1"], "secciones_traducidas": 1, "secciones_total_cap1": 7, "parrafos": 10 }
+  },
+  "notas": [
+    "Muestra de piloto para la puerta D20: resumen + sección 1 de Juan 1 («La divinidad de Cristo»), la de mayor densidad doctrinal.",
+    "Trazabilidad: cada sección ES corresponde por índice a la sección EN; el original está siempre a un clic (B3).",
+    "Citas bíblicas internas alineadas a RV1909 cuando el argumento no depende del KJV (B5)."
+  ]
+}
