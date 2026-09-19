@@ -322,3 +322,12 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`5778b0de`). Verificado: lector 200, henry-es 200.
 
 **Siguiente:** secciones 6-7 de Juan 1 (llamados de Andrés/Pedro y de Felipe/Natanael) → capítulo completo en ES.
+
+### 2026-09-19 · GLM (vigilante) — JUAN 1 COMPLETO EN ESPAÑOL (7/7) + refinamientos de tarjeta
+
+- **Traducción (7/7):** secciones 6 «El llamamiento de Andrés y de Pedro» (15 párrafos, Jn 1:35-42) y 7 «El llamamiento de Felipe y de Natanael» (22 párrafos, Jn 1:43-51) traducidas, validadas contra sus originales (paridad de párrafos y verso de inicio) y fusionadas. **Juan 1 queda COMPLETO en español** — el primer capítulo entero del comentario de Matthew Henry en ES con trazabilidad 1:1 al original.
+- Léxico transliterado: **32 términos** (+2: Cephas —piedra—, Boanerges —hijos del trueno—).
+- **Refinamiento de la tarjeta de pasaje** (feedback del usuario): eliminados «Leer aquí» y las flechas — la tarjeta es solo lectura con su ✕ roja; el lector lee el pasaje, cierra, y vuelve a su línea secuencial del comentario sin perder jamás su lugar. (El handler moverTarjeta quedó eliminado.)
+- Desplegado (`a39c37ff`). Verificado: lector 200, henry-es con 7 secciones en producción (tras asentarse el caché del edge; el hash de deployment ya lo servía correcto).
+
+**Estado:** Juan 1 100 % en ES con citas interactivas (D22), léxico transliterado, toggle ES/EN y barras ancladas. **Siguiente:** escalado gradual — completar el evangelio de Juan (21 capítulos, ~879 versos, 106 secciones de Henry) por incrementos, y/o paso 6 (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's — fichas legales primero). El usuario decide la prioridad.
