@@ -407,7 +407,14 @@ export default function Lector() {
   const seccionesCom = (capCom?.s ?? []).map((sEn, i) => {
     if (idiomaEfectivo === "es") {
       const sEs = capEs?.s?.[i];
-      if (sEs) return { ...sEs, sinTraducir: false };
+      if (sEs) {
+        const pTrad = sEs.p.filter(Boolean);
+        if (pTrad.length) {
+          // sección parcial: solo los párrafos ya traducidos (el original EN queda a un clic)
+          return { ...sEn, t: sEs.t || sEn.t, v: sEs.v || sEn.v, p: pTrad, sinTraducir: false, parcial: pTrad.length < (sEn.p?.length ?? 0) };
+        }
+        return { ...sEn, sinTraducir: true };
+      }
       return { ...sEn, sinTraducir: true };
     }
     return { ...sEn, sinTraducir: false };

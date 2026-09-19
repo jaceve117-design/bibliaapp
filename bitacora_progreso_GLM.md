@@ -340,3 +340,14 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`f6d3fe82`). Verificado: lector 200, henry-es JN caps 1,2 en producción, JN 2 con 3 secciones.
 
 **Posición exacta de la traducción:** Juan 1 y Juan 2 completos en ES (caps 1-2 de 21). **Siguiente:** Juan 3 (Nicodemo — 2 secciones, ~89k chars, el más denso: probablemente dividido en 2 turnos de vigilante), luego Juan 4-21 por incrementos. Juan entero ≈ 1,7M caracteres EN — es el proyecto de traducción más largo del libro, y avanza capítulo por capítulo sin detenerse.
+
+### 2026-09-19 · GLM (vigilante) — Juan 3 iniciado: infraestructura de traducción parcial + P1-P15 de 44
+
+- **Infraestructura para el maratón**: el fusionador ahora soporta traducción PARCIAL por párrafo (args: índice de sección + índice de párrafo). Los párrafos no traducidos quedan como "" y el lector los omite; el manifiesto registra párrafos_traducidos/parrafos_total por capítulo. El lector muestra solo los párrafos traducidos de secciones parciales (con el original EN siempre a un clic).
+- **Bug del resumen invisible corregido** (reporte del usuario con captura): el recuadro «Resumen del capítulo» usaba la clase `com-bloque` — el contenedor colapsable invisible de las animaciones — y quedaba renderizado pero invisible ocupando su espacio. Corregido con clase propia `com-resumen`.
+- **Juan 3 (Nicodemo) iniciado**: sección 1 «La entrevista de Cristo con Nicodemo» — párrafos 1-15 de 44 traducidos (~13k chars): Nicodemo su persona y su venida de noche (Noctes Christianae), «Rabí, sabemos que has venido como maestro de Dios», el nuevo nacimiento (anothen: otra vez Y de lo alto), «De cierto, de cierto», la objeción de Nicodemo (geron on) y su disposición a ser enseñado, y la confirmación de Cristo (Jn 3:5).
+- **Posición exacta**: JN 3, sección 1, párrafo 15 de 44 (21% del capítulo). Siguiente: P16-P44 de la misma sección (incluye «lo que es nacer del Espíritu», la ilustración del viento, «Si no creéis las cosas de la tierra…»).
+- Léxico transliterado: 26 términos (se agregará Noctes Christianae y anōthen en el próximo lote).
+- Desplegado (`eea85879`). Verificado: JN 3.1 15/44 párrafos ES en producción. Commit y push.
+
+**Nota de escala para el usuario**: Juan 3 tiene 72 párrafos y ~89k caracteres de original (el doble de Juan 1). A este ritmo de un turno del vigilante por ~12-16 párrafos, el evangelio de Juan completo (1.060 párrafos restantes ≈ 1,6M caracteres) tomaría del orden de 70-90 turnos de vigilante (≈ 2-3 semanas de ciclos). El pipeline está optimizado: cada turno traduce, valida, fusiona, despliega y registra sin intervención.
