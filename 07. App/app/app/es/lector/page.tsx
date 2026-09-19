@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Cabecera from "@/components/Cabecera";
+import TamTexto from "@/components/TamTexto";
 import { t } from "@/lib/i18n";
+import { parseCita, segmentarPorCitas } from "@/lib/referencias";
 
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
 type Verso = { c: number; v: number; osis: string; t: string };
@@ -25,6 +27,8 @@ type EntradaDic = { n: string; d: string; r: string[] };
 type SeccionHenry = { t: string; v: number | null; p: string[] };
 type HenryJson = { osis: string; c: Record<string, { r: string | null; s: SeccionHenry[] }> };
 type HenryEsJson = HenryJson & { estado?: string };
+type Termino = { t: string; variantes: string[]; idioma: string; sig: string };
+type PanelCita = { etiqueta: string; osis: string; c: number; versos: { v: number; t: string }[]; cargando: boolean; mas: boolean };
 
 const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
@@ -56,6 +60,11 @@ export default function Lector() {
   const [henry, setHenry] = useState<HenryJson | null>(null);
   const [henryEs, setHenryEs] = useState<HenryEsJson | null>(null);
   const [comIdioma, setComIdioma] = useState<"es" | "en">("es");
+  const [panelCita, setPanelCita] = useState<PanelCita | null>(null);
+  const [panelTermino, setPanelTermino] = useState<Termino | null>(null);
+  const [panelInfo, setPanelInfo] = useState(false);
+  const [lexico, setLexico] = useState<Termino[] | null>(null);
+  const reTerminos = useRef<RegExp | null>(null);
   const columna = useRef<HTMLDivElement>(null);
   const lexCache = useRef(cacheLex);
 
@@ -296,6 +305,23 @@ export default function Lector() {
       .catch(() => setDicEntrada(null));
   };
 
+  // léxico transliterado (D22): se carga al abrir el comentario; el render lo usa para términos clicables
+  useEffect(() => {
+    if (!comentario || lexico) return;
+    fetch("/data/lexico-translit.json")
+      .then((r) => (r.ok ? r.json() : { terminos: [] }))
+      .then((d) => {
+        const terminos: Termino[] = d.terminos ?? [];
+        setLexico(terminos);
+        const variantes = terminos
+          .flatMap((t) => t.variantes)
+          .sort((a, b) => b.length - a.length)
+          .map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+        reTerminos.current = variantes.length ? new RegExp("\\b(" + variantes.join("|") + ")\\b", "gi") : null;
+      })
+      .catch(() => setLexico([]));
+  }, [comentario, lexico]);
+
   // ficha léxica: busca el Strong en TBESG (griego) o TBESH (hebreo)
   const abrirLexico = (p: Palabra) => {
     setLex({ palabra: p });
@@ -362,6 +388,81 @@ export default function Lector() {
       .replace(/&amp;/g, "&")
       .trim();
 
+  // D22: cita clicable → pop-up con el texto del verso en la obra activa
+  const abrirCita = (cita: NonNullable<ReturnType<typeof parseCita>>) => {
+    const primero = cita.refs[0];
+    const ultima = cita.refs[cita.refs.length - 1];
+    const mismoCap = ultima.c === primero.c;
+    const visibles = mismoCap ? cita.refs.filter((r) => r.v <= primero.v + 11) : cita.refs.filter((r) => r.c === primero.c).slice(0, 12);
+    const mas = cita.refs.length > visibles.length;
+    setPanelCita({ etiqueta: cita.etiqueta, osis: primero.osis, c: primero.c, versos: [], cargando: true, mas });
+    const clave = `${obra}:${primero.osis}`;
+    const usar = (data: ObraJson) => {
+      const lista = visibles.map((r) => {
+        const v = data.versos.find((x) => x.c === r.c && x.v === r.v);
+        return { v: r.v, t: v?.t ?? "" };
+      }).filter((v) => v.t);
+      setPanelCita((prev) => (prev && prev.etiqueta === cita.etiqueta ? { ...prev, versos: lista, cargando: false } : prev));
+    };
+    const enCache = cache.get(clave) as ObraJson | undefined;
+    if (enCache) {
+      usar(enCache);
+      return;
+    }
+    fetch(`/data/${obra}/${primero.osis}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: ObraJson | null) => {
+        if (!data) {
+          setPanelCita((prev) => (prev && prev.etiqueta === cita.etiqueta ? { ...prev, cargando: false } : prev));
+          return;
+        }
+        cache.set(clave, data);
+        usar(data);
+      })
+      .catch(() => setPanelCita(null));
+  };
+
+  // D22: renderiza un párrafo con citas y términos transliterados clicables
+  const renderMarcado = (texto: string): React.ReactNode => {
+    const nodos: React.ReactNode[] = [];
+    let clave = 0;
+    for (const seg of segmentarPorCitas(texto)) {
+      if (seg.tipo === "cita" && seg.cita) {
+        const cita = seg.cita;
+        nodos.push(
+          <button key={clave++} className="cita" onClick={() => abrirCita(cita)} title={tr.verTexto}>
+            {seg.contenido}
+          </button>
+        );
+        continue;
+      }
+      const trozo = seg.contenido;
+      if (!reTerminos.current) {
+        nodos.push(<span key={clave++}>{trozo}</span>);
+        continue;
+      }
+      let ultimo = 0;
+      for (const m of trozo.matchAll(reTerminos.current)) {
+        const idx = m.index ?? 0;
+        if (idx > ultimo) nodos.push(<span key={clave++}>{trozo.slice(ultimo, idx)}</span>);
+        const term = (lexico ?? []).find((t) => t.variantes.some((v) => v.toLowerCase() === m[0].toLowerCase()));
+        nodos.push(
+          <button
+            key={clave++}
+            className="termino"
+            onClick={() => term && setPanelTermino(term)}
+            title={term ? term.idioma + " · " + term.sig : undefined}
+          >
+            {trozo.slice(idx, idx + m[0].length)}
+          </button>
+        );
+        ultimo = idx + m[0].length;
+      }
+      if (ultimo < trozo.length) nodos.push(<span key={clave++}>{trozo.slice(ultimo)}</span>);
+    }
+    return nodos;
+  };
+
   return (
     <>
       <Cabecera locale="es">
@@ -415,14 +516,8 @@ export default function Lector() {
             >
               ⌕
             </button>
-            <button
-              className="icono-btn"
-              onClick={() => setComentario(!comentario)}
-              aria-label={tr.comentario}
-              title={tr.comentario}
-              style={comentario ? { borderColor: "var(--accent)", color: "var(--accent-strong)" } : undefined}
-            >
-              ✎
+            <button className="icono-btn" onClick={() => setPanelInfo(true)} aria-label={tr.info} title={tr.info}>
+              ⓘ
             </button>
             <button
               className={`icono-btn${interlineal ? " activo" : ""}`}
@@ -441,6 +536,57 @@ export default function Lector() {
             </button>
           </div>
         </div>
+        <div className="com-strip-fila">
+          <div
+            className={`com-strip${comentario ? " activa" : ""}`}
+            role="button"
+            tabIndex={0}
+            onClick={() => setComentario(!comentario)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") setComentario(!comentario);
+            }}
+            aria-pressed={comentario}
+            title={tr.comentario}
+          >
+            <span className="com-strip-izq">
+              <span className="com-strip-icono">✎</span>
+              <span className="autor">{tr.autorComentario}</span>
+            </span>
+            <span
+              className="com-strip-der"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+              role="group"
+              aria-label={tr.comentario}
+            >
+              {henryEs && (
+                <>
+                  {idiomaEfectivo === "es" && esCapDisp && (
+                    <span className="badge-revision" title={tr.estadoNota}>
+                      {tr.sinRevisar}
+                    </span>
+                  )}
+                  <span className="obras-toggle">
+                    <button
+                      className={`obras-tab${comIdioma === "es" ? " activa" : ""}`}
+                      onClick={() => setComIdioma("es")}
+                      aria-label="Comentario en español"
+                    >
+                      ES
+                    </button>
+                    <button
+                      className={`obras-tab${comIdioma === "en" ? " activa" : ""}`}
+                      onClick={() => setComIdioma("en")}
+                      aria-label="Commentary in English"
+                    >
+                      EN
+                    </button>
+                  </span>
+                </>
+              )}
+            </span>
+          </div>
+        </div>
       </Cabecera>
 
       <main>
@@ -453,14 +599,6 @@ export default function Lector() {
               {osis}.{cap} · {manifest?.osis_obra ?? ""}
             </span>
           </div>
-
-          {nVacios > 0 && (
-            <div className="avisos">
-              Edición de trabajo: {nVacios} marcadores de verso quedaron vacíos en la edición fuente
-              (versificación propia o versos en nota) y están documentados en el manifiesto de
-              ingesta. No se rellenaron de memoria.
-            </div>
-          )}
 
           {cargando ? (
             <p style={{ color: "var(--muted)" }}>…</p>
@@ -495,29 +633,10 @@ export default function Lector() {
             </div>
           ) : (
             <div className="texto-biblico">
-              {comentario && esCapDisp && (
-                <div className="avisos">
-                  <span className="obras-toggle" style={{ marginRight: 10, verticalAlign: "middle" }}>
-                    <button
-                      className={`obras-tab${idiomaEfectivo === "es" ? " activa" : ""}`}
-                      onClick={() => setComIdioma("es")}
-                    >
-                      ES
-                    </button>
-                    <button
-                      className={`obras-tab${idiomaEfectivo === "en" ? " activa" : ""}`}
-                      onClick={() => setComIdioma("en")}
-                    >
-                      EN
-                    </button>
-                  </span>
-                  {tr.estadoNota}
-                </div>
-              )}
               {comentario && rCom && (
                 <div className="com-bloque com-resumen">
                   <div className="com-titulo">{tr.resumenCapitulo}</div>
-                  {rCom}
+                  {renderMarcado(rCom)}
                 </div>
               )}
               {versos.map((v) => {
@@ -533,34 +652,13 @@ export default function Lector() {
                       {v.t}{" "}
                     </span>
                     {secciones.map((s, i) => (
-                      <ComentarioBloque key={`${v.osis}-${i}`} seccion={s} tr={tr} />
+                      <ComentarioBloque key={`${v.osis}-${i}`} seccion={s} tr={tr} renderFn={renderMarcado} />
                     ))}
                   </span>
                 );
               })}
             </div>
           )}
-
-          <div className="atribucion-obra">
-            <span>
-              <b>{manifest?.obra}</b>
-            </span>
-            <span>{manifest?.licencia}</span>
-            <span>{manifest?.fuente}</span>
-            {interlineal && <span>
-              <b>Interlineal:</b> STEPBible-Data (TAHOT/TAGNT, CC BY 4.0)
-            </span>}
-            {comentario && <span>
-              <b>Comentario:</b> Matthew Henry Complete (1706–1721) · Dominio público
-            </span>}
-            <span>
-              Ingesta validada: {manifest?.total_versos.toLocaleString("es")} versos ·{" "}
-              {manifest?.fecha_ingesta}
-            </span>
-            <span>
-              OSIS {osis}.{cap}
-            </span>
-          </div>
         </div>
       </main>
 
@@ -702,6 +800,119 @@ export default function Lector() {
         </div>
       )}
 
+      {panelCita && (
+        <div className="lex-panel" role="dialog" aria-label={tr.verTexto}>
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>
+                {panelCita.etiqueta} · {manifest?.osis_obra}
+              </span>
+              <button className="icono-btn" onClick={() => setPanelCita(null)} aria-label={tr.lexCerrar}>
+                ✕
+              </button>
+            </div>
+            {panelCita.cargando ? (
+              <div className="lex-meta">…</div>
+            ) : panelCita.versos.length ? (
+              <>
+                <div className="cita-versos">
+                  {panelCita.versos.map((v) => (
+                    <div key={v.v} className="cita-verso">
+                      <sup className="num">{v.v}</sup> {v.t}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  className="btn btn-fantasma"
+                  style={{ marginTop: 12 }}
+                  onClick={() => {
+                    setOsis(panelCita.osis);
+                    setCap(panelCita.c);
+                    setPanelCita(null);
+                  }}
+                >
+                  {tr.abrirPasaje}
+                </button>
+              </>
+            ) : (
+              <div className="lex-meta">{tr.citaVacia}</div>
+            )}
+            <div className="lex-fuente">{tr.pieFuente}</div>
+          </div>
+        </div>
+      )}
+
+      {panelTermino && (
+        <div className="lex-panel" role="dialog" aria-label={tr.lexico}>
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>
+                {panelTermino.t}
+              </span>
+              <button className="icono-btn" onClick={() => setPanelTermino(null)} aria-label={tr.lexCerrar}>
+                ✕
+              </button>
+            </div>
+            <div className="lex-meta">{panelTermino.idioma}</div>
+            <div className="lex-def">{panelTermino.sig}</div>
+            <div className="lex-fuente">Curaduría editorial · {tr.fuenteRefs}</div>
+          </div>
+        </div>
+      )}
+
+      {panelInfo && (
+        <div className="lex-panel" role="dialog" aria-label={tr.info}>
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>
+                {tr.info}
+              </span>
+              <button className="icono-btn" onClick={() => setPanelInfo(false)} aria-label={tr.lexCerrar}>
+                ✕
+              </button>
+            </div>
+            <div className="info-seccion">
+              <div className="info-titulo">{tr.infoReferencia}</div>
+              <div className="lex-def">
+                {info?.nombre} {cap} · {osis}.{cap} · {manifest?.osis_obra}
+              </div>
+            </div>
+            {nVacios > 0 && (
+              <div className="info-seccion">
+                <div className="info-titulo">{tr.infoEdicion}</div>
+                <div className="lex-def">
+                  {nVacios} {tr.infoEdicionTexto}
+                </div>
+              </div>
+            )}
+            {comentario && (
+              <div className="info-seccion">
+                <div className="info-titulo">{tr.infoComentario}</div>
+                <div className="lex-def">
+                  Matthew Henry, Complete Commentary (1706–1721) · Dominio público · edición CC0 ·{" "}
+                  {henryEs ? tr.estadoNota : tr.comentarioEN}
+                </div>
+              </div>
+            )}
+            <div className="info-seccion">
+              <div className="info-titulo">{tr.infoAtribucion}</div>
+              <div className="lex-def">
+                <b>{manifest?.obra}</b> · {manifest?.licencia}
+                <br />
+                {manifest?.fuente}
+                <br />
+                {tr.pieIngesta}: {manifest?.total_versos.toLocaleString("es")} · {manifest?.fecha_ingesta}
+              </div>
+              {interlineal && (
+                <div className="lex-def">
+                  Interlineal y léxicos: STEPBible-Data (Tyndale House), CC BY 4.0
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <footer className="pie">
         <div className="pie-inner">
           <span>{manifest?.obra}</span>
@@ -716,9 +927,11 @@ export default function Lector() {
 function ComentarioBloque({
   seccion,
   tr,
+  renderFn,
 }: {
   seccion: SeccionHenry & { sinTraducir?: boolean };
   tr: ReturnType<typeof t>;
+  renderFn: (texto: string) => React.ReactNode;
 }) {
   const [abierto, setAbierto] = useState(false);
   return (
@@ -735,7 +948,7 @@ function ComentarioBloque({
           </span>
           {seccion.p.map((p, i) => (
             <span key={i} className="com-parrafo">
-              {p}
+              {renderFn(p)}
             </span>
           ))}
         </span>

@@ -244,3 +244,17 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`aa5f97db`) y verificado: henry-es 200, rv1909 200, lector 200; el texto corregido se sirve desde el despliegue (el alias podía mostrar copia del edge hasta expirar TTL).
 
 **Siguiente:** traducir las secciones 3-7 de Juan 1 por incrementos → Juan 1 completo en ES → escalado al corpus del MVP (paso 6) y cierre del núcleo (SBLGNT, JFB, Barnes, Nave's — con sus fichas legales primero).
+
+### 2026-09-19 · GLM — D22: comentarios interactivos + mejoras visuales de la PWA (petición del usuario)
+
+**NUEVA REGLA D22 (a petición explícita del usuario):** todo comentario — presente o futuro — se publica con (a) citas bíblicas interactivas (pop-up con el texto del verso, sin salir del comentario) y (b) términos en lenguas originales clicables (pop-up con idioma + significado). Es requisito de ingesta: un comentarista no se publica sin este marcado. El texto del pop-up sale de la obra activa ya cargada (cero licencias nuevas).
+
+- **Citas bíblicas clicables**: detector en runtime con mapa de ~90 abreviaturas EN+ES → OSIS (`lib/referencias.ts`). Rangos ("1:1-5") y listas ("40:12,28") resueltos; rangos >12 versos muestran los primeros + botón «Abrir pasaje →» que navega al lector. El texto se sirve de la obra activa (RV1909/WEB) ya cacheada.
+- **Términos transliterados clicables** (*ho logos*, *sarx egeneto*, *shequiná*, *homousios* vs *homoiousioi*, *Memra*…): léxico curado `public/data/lexico-translit.json` (17 términos de Juan 1, secciones 1-2) que **crece con cada sección traducida** — el traductor agrega entradas al toparse con términos nuevos. Pop-up con idioma y significado.
+- **Franja del comentarista (fija)**: el botón ✎ se transformó en una franja permanente bajo la línea de controles: «✎ Matthew Henry · 1706» + badge «SIN REVISAR» + **toggle ES|EN anclado a la derecha** — siempre visible al hacer scroll, para contrastar traducciones sin buscar el aviso. Tocar la franja activa/desactiva el modo Comentario.
+- **Todo lo informativo sale de la columna de lectura** (petición del usuario) y vive en el panel **ⓘ**: edición de trabajo (versos vacíos documentados), estado de la traducción, atribución completa (obra, licencia, fuente, fecha, total), referencia actual. La columna de lectura queda limpia.
+- **Botón Aa** junto al de tema: tamaño del texto −2 a +2, persistido en el dispositivo y aplicado antes del primer paint (sin parpadeo). Escala el texto bíblico y los párrafos de comentario.
+- **Densificación quirúrgica**: cabecera 8-10px de padding (antes 12-16px), selects y botones más compactos (34px), fila del lector más cercana al header, mejor aprovechamiento de espacio en cada control.
+- Verificado en producción: léxico 200, lector 200. Commit y push.
+
+**Siguiente:** traducir las secciones 3-7 de Juan 1 (agregando entradas al léxico transliterado a medida que aparezcan términos) → Juan 1 completo en ES → escalado (paso 6).

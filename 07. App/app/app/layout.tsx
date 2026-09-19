@@ -19,8 +19,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-/** Anti-parpadeo: fija el tema antes del primer paint (localStorage → preferencia del sistema). */
-const temaInit = `try{var t=localStorage.getItem('tema')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'oscuro':'claro');document.documentElement.setAttribute('data-theme',t)}catch(e){}`;
+/** Anti-parpadeo: fija tema y tamaño de texto antes del primer paint. */
+const temaInit = `try{var t=localStorage.getItem('tema')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'oscuro':'claro');document.documentElement.setAttribute('data-theme',t);var f=localStorage.getItem('tam');if(f)document.documentElement.style.setProperty('--factor-texto',f)}catch(e){}`;
 
 export default function RootLayout({
   children,

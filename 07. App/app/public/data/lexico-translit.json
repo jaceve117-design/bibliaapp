@@ -1,0 +1,24 @@
+{
+  "descripcion": "Léxico de términos transliterados (hebreo/griego/arameo/latín) citados en los comentarios. Regla D22: el lector no sale del comentario para entender un término. Crece con cada sección traducida.",
+  "fecha": "2026-09-19",
+  "fuente": "curaduría editorial propia sobre el texto de Matthew Henry (edición CC0) — se amplía por sección",
+  "terminos": [
+    { "t": "ho logos", "variantes": ["ho logos", "ho Logos"], "idioma": "griego", "sig": "ὁ λόγος — «el Verbo». Palabra, razón y discurso a la vez; título con que Juan designa a Cristo." },
+    { "t": "logos endiathetos", "variantes": ["logos endiathetos"], "idioma": "griego", "sig": "λόγος ἐνδιάθετος — «palabra concebida»: el pensamiento aún interior." },
+    { "t": "logos prophorikos", "variantes": ["logos prophorikos"], "idioma": "griego", "sig": "λόγος προφορικός — «palabra proferida»: el pensamiento expresado." },
+    { "t": "Memra", "variantes": ["Memra"], "idioma": "arameo", "sig": "«Verbo» en el tárgum caldeo: las paráfrasis arameas del AT llamaban Memra del Señor a su acción y presencia." },
+    { "t": "achronos", "variantes": ["achronos"], "idioma": "griego", "sig": "ἀχρόνος — «sin tiempo»: sin comienzo; eterno." },
+    { "t": "eis martyrian", "variantes": ["eis martyrian"], "idioma": "griego", "sig": "εἰς μαρτυρίαν — «para testimonio»: el fin para el que vino Juan el Bautista." },
+    { "t": "ta idia", "variantes": ["Ta idia", "ta idia"], "idioma": "griego", "sig": "τὰ ἴδια — «sus propias cosas»: posesión, no relación personal." },
+    { "t": "tous idious", "variantes": ["tous idious"], "idioma": "griego", "sig": "τοὺς ἰδίους — «los suyos» en sentido personal y afectivo; así se llama a los creyentes (Jn 13:1)." },
+    { "t": "exousian", "variantes": ["exousian", "Exousian"], "idioma": "griego", "sig": "ἐξουσίαν — «potestad, autoridad»: la palabra de Jn 1:12 (RV1909: «les dio potestad»)." },
+    { "t": "Fiunt, non nascuntur Christiani", "variantes": ["Fiunt, non nascuntur Christiani"], "idioma": "latín", "sig": "«no se nace cristiano, se llega a ser cristiano» — Tertuliano, contra la fe heredada sin conversión." },
+    { "t": "somatoun ten psychen", "variantes": ["somatoun ten psychen"], "idioma": "griego", "sig": "«corporificar el alma»: quedar el hombre reducido a pura materialidad por la caída." },
+    { "t": "Theos en", "variantes": ["Theos en", "Theos ēn"], "idioma": "griego", "sig": "θεὸς ἦν — «era Dios»: lo que Jn 1:1 afirma del Verbo (contra quien lo reduce a hombre hecho dios)." },
+    { "t": "sarx egeneto", "variantes": ["sarx egeneto", "sarxegeneto"], "idioma": "griego", "sig": "σὰρξ ἐγένετο — «fue hecho carne»: la encarnación (Jn 1:14)." },
+    { "t": "eskenosen en hemin", "variantes": ["eskenosen en hemin"], "idioma": "griego", "sig": "ἐσκήνωσεν ἐν ἡμῖν — «acampó entre nosotros»: habitó como en tienda (de σκηνή, tabernáculo)." },
+    { "t": "shechinah", "variantes": ["shechinah", "shechiná", "Shechinah"], "idioma": "hebreo", "sig": "השכינה — «la morada»: presencia gloriosa de Dios que habitaba entre los querubines; figura de Cristo encarnado." },
+    { "t": "homoiousioi", "variantes": ["homoiousioi"], "idioma": "griego", "sig": "ὁμοιούσιοι — «de naturaleza semejante»: lo que los creyentes son por la gracia (2 P 1:4), no igual a Cristo." },
+    { "t": "homousios", "variantes": ["homousios"], "idioma": "griego", "sig": "ὁμοούσιος — «de la misma sustancia»: Cristo es de la misma naturaleza que el Padre (Credo de Nicea)." }
+  ]
+}

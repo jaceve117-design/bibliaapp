@@ -116,14 +116,14 @@ body {
   background: transparent;
   border: 1px solid var(--line);
   color: var(--ink-soft);
-  border-radius: 999px;
-  width: 38px;
-  height: 38px;
+  border-radius: 9px;
+  width: 34px;
+  height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
   transition: all 0.15s ease;
 }
 .icono-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
@@ -153,10 +153,10 @@ body {
 .cabecera-inner {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 12px 16px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 .cabecera-sub {
   border-top: 1px solid var(--line);
@@ -164,20 +164,106 @@ body {
 .cabecera-sub-inner {
   max-width: 720px;
   margin: 0 auto;
-  padding: 10px 12px;
+  padding: 7px 10px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap; /* en móvil estrecho los controles bajan de línea en vez de desbordar */
-  row-gap: 8px;
+  row-gap: 6px;
 }
 .cabecera-sub-inner .sel {
-  flex: 1 1 110px;
+  flex: 1 1 100px;
   min-width: 0; /* los select se encogen antes que desbordar */
+  padding: 7px 9px;
+  font-size: 13px;
 }
 .cabecera-sub-inner .obras-toggle,
 .cabecera-sub-inner .lector-acciones {
   flex-shrink: 0;
+}
+.com-strip-fila {
+  border-top: 1px solid var(--line);
+}
+.com-strip {
+  display: flex;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.com-strip:hover { background: var(--hover); }
+.com-strip.activa,
+.com-strip.activa:hover { background: var(--accent-soft); }
+.com-strip:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.com-strip-izq { display: inline-flex; align-items: center; gap: 7px; min-width: 0; }
+.com-strip-icono {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 6px;
+  border: 1px solid var(--line-strong); color: var(--ink-soft);
+  font-size: 12px; flex-shrink: 0;
+}
+.com-strip.activa .com-strip-icono {
+  background: var(--accent); border-color: var(--accent); color: #14161e;
+}
+.com-strip .autor {
+  font-weight: 600; color: var(--ink-soft);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.com-strip.activa .autor { color: var(--accent-strong); }
+.com-strip-der { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.badge-revision {
+  font-family: var(--sans);
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent-strong); border: 1px solid var(--accent); border-radius: 999px;
+  padding: 2px 7px; cursor: help;
+}
+
+/* citas bíblicas y términos originales dentro de los comentarios (D22) */
+.cita {
+  background: none; border: none; padding: 0;
+  font: inherit; color: var(--accent-strong); cursor: pointer;
+  text-decoration: underline dotted; text-underline-offset: 3px;
+}
+.cita:hover { color: var(--accent); text-decoration-style: solid; }
+.termino {
+  background: none; border: none; padding: 0; font: inherit;
+  font-style: italic; color: var(--ink-soft); cursor: help;
+  border-bottom: 1px dotted var(--accent);
+}
+.termino:hover { color: var(--accent-strong); }
+
+/* pop-up del tamaño de texto */
+.tam-wrap { position: relative; }
+.tam-popo {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 60;
+  background: var(--bg-elev); border: 1px solid var(--line-strong);
+  border-radius: 10px; box-shadow: var(--shadow); padding: 7px;
+  display: flex; gap: 4px;
+}
+.tam-opt {
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  background: transparent; border: 1px solid var(--line); color: var(--ink-soft);
+  border-radius: 7px; padding: 6px 9px; cursor: pointer;
+}
+.tam-opt.activa { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tam-opt:hover:not(.activa) { border-color: var(--accent); }
+
+/* panel de información (todo lo informativo vive aquí, fuera de la lectura) */
+.info-seccion { margin-bottom: 14px; }
+.info-titulo {
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent-strong); margin-bottom: 4px;
 }
 
 .marca {
@@ -284,13 +370,13 @@ body {
 }
 .obras-tab {
   font-family: var(--sans);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
   background: var(--bg-elev);
   color: var(--muted);
   border: none;
-  padding: 9px 13px;
+  padding: 8px 10px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -311,7 +397,7 @@ body {
 .lector-columna {
   max-width: 720px;
   margin: 0 auto;
-  padding: clamp(36px, 7vh, 72px) 16px 48px;
+  padding: 26px 16px 48px;
   overflow-wrap: break-word;
 }
 
@@ -337,7 +423,7 @@ body {
 }
 
 .texto-biblico {
-  font-size: clamp(1.12rem, 0.95rem + 0.8vw, 1.32rem);
+  font-size: calc(clamp(1.12rem, 0.95rem + 0.8vw, 1.32rem) * var(--factor-texto, 1));
   line-height: 1.95;
   color: var(--ink);
   text-wrap: pretty;
@@ -553,7 +639,7 @@ body {
 }
 .com-bloque .com-parrafo {
   display: block;
-  font-size: 15px;
+  font-size: calc(15px * var(--factor-texto, 1));
   line-height: 1.75;
   color: var(--ink-soft);
   margin-bottom: 10px;
@@ -566,7 +652,7 @@ body {
   border-radius: 0 8px 8px 0;
   padding: 12px 16px;
   margin-bottom: 22px;
-  font-size: 14.5px;
+  font-size: calc(14.5px * var(--factor-texto, 1));
   line-height: 1.7;
   color: var(--ink-soft);
 }

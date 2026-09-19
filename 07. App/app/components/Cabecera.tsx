@@ -2,12 +2,14 @@ import Link from "next/link";
 import Tema from "./Tema";
 import { t, type Locale } from "@/lib/i18n";
 
-/** Cabecera fija (sticky). `children` se renderiza como segunda fila, también fija. */
+/** Cabecera fija (sticky). `children` se renderiza como filas extra, también fijas. `extra` va junto al botón de tema. */
 export default function Cabecera({
   locale,
+  extra,
   children,
 }: {
   locale: Locale;
+  extra?: React.ReactNode;
   children?: React.ReactNode;
 }) {
   const tr = t(locale);
@@ -31,6 +33,7 @@ export default function Cabecera({
           >
             {tr.lector}
           </Link>
+          {extra}
           <Tema etiqueta={tr.tema} />
         </div>
       </div>
