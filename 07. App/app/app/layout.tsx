@@ -1,10 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import RegistrarSW from "@/components/RegistrarSW";
 
 export const metadata: Metadata = {
   title: "Biblioteca — estudio bíblico serio, en español",
   description:
     "Biblioteca cristiana digital: texto bíblico, lenguas originales, comentarios, diccionarios y notas del lector, conectados alrededor de cada pasaje. Construcción inicial sobre corpus libre verificado.",
+  applicationName: "Biblioteca",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Biblioteca" },
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/icon-192.png" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#12100d",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 /** Anti-parpadeo: fija el tema antes del primer paint (localStorage → preferencia del sistema). */
@@ -18,7 +30,10 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: temaInit }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <RegistrarSW />
+      </body>
     </html>
   );
 }

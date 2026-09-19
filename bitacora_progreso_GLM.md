@@ -49,7 +49,7 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
 | 2 | Fundación técnica | Andamio web + tokens de diseño · esquema `work/edition/node/link/lemma` con OSIS · pipeline USFM→JSON con validación como portón · semilla de datos real | Lector muestra texto real ingerido por pipeline validado | `[x]` pipeline genérico multi-edición: **RV1909 + WEB validadas** · pendiente: esquema PostgreSQL |
 | 3 | Corte vertical — piloto | Libro piloto (Juan 1 como demo inicial; Romanos/Juan completo a decidir): capa STEPBible con interlineal · RV1909+WEB del libro · glosario maestro · traducción de Henry del libro · revisión humana 100 % doctrinal | Piloto completo navegable ES+EN+griego con comentario traducido | `[~]` capa STEPBible completa de TODA la Biblia ingerida y visible · traducción del piloto (Henry) pendiente |
 | 4 | ⟡ Puerta de calidad | ¿La traducción es publicable con nuestro nombre? Si no: corregir método antes de escalar | Decisión registrada en esta BP | `[ ]` |
-| 5 | Conexiones | TSK (~500.000 referencias) anclado a OSIS | Referencias visibles en el lector | `[ ]` |
+| 5 | Conexiones | TSK (~500.000 referencias) anclado a OSIS | Referencias visibles en el lector | `[x]` 386.384 referencias validadas y navegables en el panel del verso |
 | 6 | Escalado corpus | Núcleo 6 fuentes validado + cierre (SBLGNT, JFB, Barnes, Nave's) — cada obra: ficha + ingesta validada + atribución | Métrica: obras en estado `validada` / `lanzar` | `[ ]` |
 | 7 | Producto completo | Flujo pasaje→interlineal→léxico→comentario→nota/subrayado · notas locales + export/import · panel Fuentes · reporte de errores · etiquetado autor/tradición/fecha | Flujo completo sin fricción en el corpus | `[ ]` |
 | 8 | ⟡ Puerta legal | Página pública de atribuciones · revisión abogado PI (foco ES/AL) | Informe favorable registrado | `[ ]` |
@@ -150,3 +150,19 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
 **Métrica de obras validadas: 3 de 6** — RV1909 · WEB · STEPBible-Data (TAHOT+TAGNT+TBESH+TBESG).
 
 **Siguiente:** TSK (referencias cruzadas) → 4/6; después Easton y Matthew Henry; con las 6, glosario maestro y piloto de traducción (puerta D20).
+
+### 2026-09-17 · GLM — TSK + OpenBible (4/6) y PWA instalable
+
+**Datos (`scripts/ingesta-tsk.mjs`, crudo en `05. Datos/corpus_crudo/tsk_data/`):**
+- Fuentes reales localizadas: la página `/data` de OpenBible.info hoy da 404 — el dataset vive agregado en `neuu-org/bible-crossrefs-dataset` (licencia CC BY 4.0 verificada leyendo su LICENSE). TSK crudo = 32 shards SoulLiberty (PD); OpenBible = TSV con licencia declarada en su propia primera línea («CC-BY 2016-02-01»).
+- **386.384 referencias** en **30.412 versos**, 66 libros. **Portón: 99,94 % de orígenes alineados** a RV1909; 88.069 destinos no resolubles por versificación (Salmos NRSV, variantes KJV) descartados y contados en el manifiesto — el crudo queda preservado para la tarea 2.2.
+- Correcciones de mapeo (descubiertas con inventario completo de códigos): OpenBible usa nombres NRSV largos (Matt, Acts, 1Kgs…); los shards TSK usan variantes (1JO, EZE, JAM, SOS…). Mapas completos añadidos.
+- Salida: 4,9 MB en `public/data/tsk/`.
+
+**Producto:**
+- **Panel de referencias cruzadas**: los números de verso ahora son clicables → panel con las referencias (nombre de libro en español), clic en cada una navega al pasaje. Juan 3:16 trae 23 referencias (Jn 11:25, 2Co 5:19, 1Ti 1:15…). Atribución TSK+OpenBible visible en el panel.
+- **PWA instalable**: manifest con iconos propios generados (rombo dorado sobre tinta, 192/512 + maskable), service worker mínimo (precache del shell, cache-first para el corpus → **lectura offline** de capítulos visitados, network-first para navegaciones), registro solo en producción, `theme-color` y metadatos iOS.
+
+**Métrica de obras validadas: 4 de 6** — RV1909 · WEB · STEPBible-Data · TSK/OpenBible.
+
+**Siguiente:** Easton (ingesta + búsqueda contextual) y Matthew Henry (base del piloto de traducción); con las 6, glosario maestro y puerta D20.

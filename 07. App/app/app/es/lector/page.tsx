@@ -42,6 +42,7 @@ export default function Lector() {
   const [interlineal, setInterlineal] = useState(false);
   const [interData, setInterData] = useState<InterJson | null>(null);
   const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex } | null>(null);
+  const [panelRefs, setPanelRefs] = useState<{ verso: Verso; refs: string[]; cargadas: boolean } | null>(null);
   const columna = useRef<HTMLDivElement>(null);
   const lexCache = useRef(cacheLex);
 
@@ -177,6 +178,26 @@ export default function Lector() {
     window.history.replaceState(null, "", `/es/lector?obra=${obra}&ref=${osis}.${cap}`);
     columna.current?.scrollIntoView({ block: "start" });
   }, [obra, osis, cap, cargando]);
+
+  // referencias cruzadas (TSK): carga perezosa al primer clic en un número de verso
+  const abrirReferencias = (v: Verso) => {
+    setPanelRefs({ verso: v, refs: [], cargadas: false });
+    const clave = `tsk:${osis}`;
+    const enCache = cache.get(clave) as Record<string, string[]> | undefined;
+    const usar = (datos: Record<string, string[]>) =>
+      setPanelRefs({ verso: v, refs: datos[`${v.c}.${v.v}`] ?? [], cargadas: true });
+    if (enCache) {
+      usar(enCache);
+      return;
+    }
+    fetch(`/data/tsk/${osis}.json`)
+      .then((r) => (r.ok ? r.json() : { refs: {} }))
+      .then((data) => {
+        cache.set(clave, data);
+        usar(data);
+      })
+      .catch(() => setPanelRefs({ verso: v, refs: [], cargadas: true }));
+  };
 
   // ficha léxica: busca el Strong en TBESG (griego) o TBESH (hebreo)
   const abrirLexico = (p: Palabra) => {
@@ -345,7 +366,9 @@ export default function Lector() {
             <div className="texto-biblico">
               {versos.map((v) => (
                 <span key={v.osis} className="verso" data-osis={v.osis}>
-                  <sup className="num">{v.v}</sup>
+                  <sup className="num ref-btn" onClick={() => abrirReferencias(v)} title={tr.referencias} role="button">
+                    {v.v}
+                  </sup>
                   {v.t}{" "}
                 </span>
               ))}
@@ -398,6 +421,49 @@ export default function Lector() {
             <div className="lex-fuente">
               Léxico: TBESG/TBESH — STEPBible-Data (Tyndale House), CC BY 4.0
             </div>
+          </div>
+        </div>
+      )}
+
+      {panelRefs && (
+        <div className="lex-panel" role="dialog" aria-label={tr.referencias}>
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>
+                {tr.referencias} · {info?.nombre} {panelRefs.verso.c}:{panelRefs.verso.v}
+              </span>
+              <button className="icono-btn" onClick={() => setPanelRefs(null)} aria-label={tr.lexCerrar}>
+                ✕
+              </button>
+            </div>
+            {panelRefs.cargadas ? (
+              panelRefs.refs.length ? (
+                <div className="refs-lista">
+                  {panelRefs.refs.map((r) => {
+                    const [o, c, v] = r.split(".");
+                    const libro = manifest?.libros.find((l) => l.osis === o);
+                    return (
+                      <button
+                        key={r}
+                        className="ref-item"
+                        onClick={() => {
+                          setOsis(o);
+                          setCap(Number(c));
+                          setPanelRefs(null);
+                        }}
+                      >
+                        <b>{libro?.nombre ?? o}</b> {c}:{v}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="lex-meta">{tr.sinReferencias}</div>
+              )
+            ) : (
+              <div className="lex-meta">…</div>
+            )}
+            <div className="lex-fuente">{tr.fuenteRefs}</div>
           </div>
         </div>
       )}
