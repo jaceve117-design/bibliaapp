@@ -1,8 +1,8 @@
 /* Service worker mínimo de Biblioteca:
    - precache del shell del lector
-   - cache-first para datos (/data/*) y assets estáticos (inmutables por build)
+   - stale-while-revalidate para datos (/data/*) · cache-first para assets (inmutables por build)
    - network-first para navegaciones, con respaldo offline al lector cacheado */
-const CACHE = "biblioteca-v4";
+const CACHE = "biblioteca-v5";
 const PRECACHE = ["/es", "/es/lector", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -29,8 +29,10 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
 
-  // datos del corpus y assets: cache-first (el corpus es inmutable por build)
-  if (url.pathname.startsWith("/data/") || url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+  // datos del corpus: stale-while-revalidate (sirve el caché al instante y actualiza en segundo
+  // plano — los JSON de datos cambian de contenido sin cambiar de ruta, y así cada visita los
+  // renueva sin esperar red). Assets con hash en el nombre: cache-first (son inmutables por build).
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
     e.respondWith(
       caches.open(CACHE).then(async (c) => {
         const hit = await c.match(req);
@@ -38,6 +40,21 @@ self.addEventListener("fetch", (e) => {
         const res = await fetch(req);
         if (res.ok) c.put(req, res.clone());
         return res;
+      })
+    );
+    return;
+  }
+  if (url.pathname.startsWith("/data/")) {
+    e.respondWith(
+      caches.open(CACHE).then(async (c) => {
+        const hit = await c.match(req);
+        const red = fetch(req)
+          .then((res) => {
+            if (res.ok) c.put(req, res.clone());
+            return res;
+          })
+          .catch(() => undefined);
+        return hit || (await red) || Response.error();
       })
     );
     return;

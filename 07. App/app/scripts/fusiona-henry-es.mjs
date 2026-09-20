@@ -30,7 +30,7 @@ es.c[cap] ??= { r: null, s: [] };
 es.c[cap].s ??= [];
 
 let errores = [];
-frag.s.forEach((sec, i) => {
+(frag.s ?? []).forEach((sec, i) => {
   const idx = secBase + i;
   const orig = en.s?.[idx];
   if (!orig) { errores.push(`sección ${idx}: el original EN no tiene esa sección`); return; }
