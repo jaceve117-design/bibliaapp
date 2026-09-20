@@ -707,3 +707,18 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Se cumple así la directiva del usuario: «termina de hacer toda la traducción de Juan — continúa sin detenerte hasta completar todo Juan». En producción: https://bibliaapp.pages.dev (lector /es/lector → JHN caps 1-21).
 - **Siguientes pasos ejecutables (sin decisión del usuario, según plan de la BP):** revisión de pulido (incl. el párrafo condensado de JN 6.4), y evaluar con el usuario el paso 6 — cierre del núcleo (SBLGNT, JFB, Barnes, Nave's — fichas legales primero).
 - **Bloqueado en usuario (sin cambios):** licencia de las traducciones propias, modelo de sostenimiento, nombre/dominio, puertas ⟡.
+
+### 2026-09-19 · GLM (vigilante) — PULIDO POST-JUAN: párrafos acortados completados (JN 4.2 y JN 5.3) — Juan sigue completo (2064/2064)
+
+**Revisión de pulido (la deuda pendiente del hito Juan).** Diagnóstico con sondeo comparativo ES/EN por índice (paridad 1:1) sobre todo el evangelio: umbral ES<55% del EN (EN>350 chars).
+- **Hallazgos y corrección (1 deploy):**
+  - **JN 4 s2 idx34** (la mujer samaritana): estaba reducido a un suelto de 48 chars («(2.) La cuenta que él dio de ello») frente a 942 del EN — la traducción saltaba el punto (1.). Reescrito completo (965 chars): «Ve, llama a tu marido» — las mujeres que quieren aprender han de preguntar a sus maridos en casa (1Co 14:35); «coherederos de la gracia de la vida» (1P 3:7); «hay menester de arte y prudencia en dar reprensiones; el rodear el asunto, como la mujer de Tecoa (2S 14:20)».
+  - **JN 5 s3 idx14** (el testimonio del Padre): estaba cortado a media frase a la mitad del párrafo (2378/4663 chars), además con un residual de inglés («no estaban acquainted»). Completado íntegro (4.695 chars): la explicación de la voz y la paloma («pudisteis oír aquella voz… si hubierais atendido al ministerio de Juan»); «No tenéis su palabra morando en vosotros» (Jn 5:38) — la palabra entre ellos mas no en ellos; el no permanecer («como caminante, no como el hombre en su casa»); y la prueba de la morada de la palabra («A quien él envió, vosotros no creéis»).
+  - **Residuales «acquainted» eliminados (×3):** 2 en el fusionado (JN 5.3 y JN 5.2) y 1 en el fragmento de archivo jhn5_s2. La deuda del párrafo de JN 6.4 ya estaba resuelta en turnos previos (82% del EN, completo).
+  - Fragmento de archivo **jhn5_s3_es.json** actualizado con la misma corrección (trazabilidad).
+- **Banda 55-70% del EN (aceptable, para futura revisión):** JN 11 s4 idx8 (61%) y JN 17 s3 idx23 (67%) son condensaciones que cierran coherentemente hacia el párrafo siguiente (el EN también acaba en transición); no están rotos.
+- Desplegado (`d6d7612a`). Verificado en producción: los dos párrafos corregidos presentes (965 y 4.695 chars), **JUAN 2064/2064**, lector 200 (hash y alias), sonda de residuos = 0. Commit y push.
+
+**Posición exacta: Juan completo y pulido en su estructura (21/21 caps, 2.064/2.064 párrafos; 0 párrafos bajo el 55% del EN).**
+- **Siguiente turno (ejecutable sin decisión del usuario):** revisión opcional de los dos condensados moderados (JN 11.4 idx8, JN 17.3 idx23) u otras mejoras del lector según plan de la BP.
+- **Bloqueado en usuario (sin cambios):** paso 6 del plan (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's — fichas legales primero), licencia de traducciones propias, modelo de sostenimiento, nombre/dominio, puertas ⟡.
