@@ -21,6 +21,10 @@ if (!osis || !capArg || !fragPath) {
 const cap = String(Number(capArg));
 const secBase = Number(secArg ?? '0');
 const pBase = Number(pArg ?? '0');
+if (Number(pArg ?? '0') !== 0 && (frag.s?.length ?? 0) > 1) {
+  console.error('✗ FUSIÓN FALLÓ: pBase≠0 sólo es válido para fragmentos de UNA sección (el desplazamiento se aplicaría a todas y corrompería las posteriores).');
+  process.exit(1);
+}
 const frag = JSON.parse(fs.readFileSync(fragPath, 'utf8'));
 const en = JSON.parse(fs.readFileSync(path.join(ROOT, '..', 'public', 'data', 'henry', `${osis}.json`), 'utf8')).c[cap];
 const rutaEs = path.join(ROOT, '..', 'public', 'data', 'henry-es', `${osis}.json`);
