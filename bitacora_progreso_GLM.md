@@ -722,3 +722,18 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 **Posición exacta: Juan completo y pulido en su estructura (21/21 caps, 2.064/2.064 párrafos; 0 párrafos bajo el 55% del EN).**
 - **Siguiente turno (ejecutable sin decisión del usuario):** revisión opcional de los dos condensados moderados (JN 11.4 idx8, JN 17.3 idx23) u otras mejoras del lector según plan de la BP.
 - **Bloqueado en usuario (sin cambios):** paso 6 del plan (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's — fichas legales primero), licencia de traducciones propias, modelo de sostenimiento, nombre/dominio, puertas ⟡.
+
+### 2026-09-19 · GLM (vigilante) — PULIDO POST-JUAN II: condensados moderados completados + familia «apprehend» normalizada — Juan completo (2064/2064)
+
+**Segunda pasada de pulido (según «Siguiente» de la BP).**
+- **Condensados moderados completados (los 2 restantes, ya bajo el umbral):**
+  - **JN 11 s4 idx8** (el concilio y el peligro romano, 257→396 chars): ahora completo el discurso de Caifás y compañía — «Si no le callamos, y le quitamos de en medio, todos creerán en él; y, esto siendo alzamiento de rey nuevo, los romanos lo tomarán a mal, y vendrán con ejército, y quitarán nuestro lugar y nuestra nación; y por tanto no es tiempo de embrollar». Además limpiado el residual «apprehendían».
+  - **JN 17 s3 idx23** (la palabra dada y el odio del mundo, 256→392 chars): restauradas las cláusulas omitidas — «ellos la han recibido, ellos mismos han creído en ella, y han aceptado el fideicomiso de transmitirla al mundo; y por tanto el mundo los ha aborrecido, como también porque no son del mundo».
+  - Fragmentos de archivo **jhn11_s4_es.json** y **jhn17_s3-s4_es.json** actualizados (trazabilidad).
+- **Familia nueva de residuales detectada por la sonda: «apprehend» ×19** (grafía inglesa del válido español arcaico «aprehend*»). Normalización global apprehend→aprehend en el fusionado (19) y en 12 fragmentos archivados (19): caps 9, 12, 13, 14, 16, 17 y 18 — «aprehendidos por él (Fil 3:12)», «aprehender el sentido», «fue aprehendido», etc.
+- **Barrido final: 0 párrafos bajo el 60% del EN; JUAN 2064/2064; sonda global de residuos = 0.**
+- Desplegado (`988a27ac`, tras un intermedio `ec9e0468` que no llegó a verificarse porque la sonda posterior destapó la familia apprehend). Verificado en producción vía alias: los dos párrafos completos (396/392 chars), 0 «apprehend», 24 «aprehend» legítimos, lector 200. Commit y push.
+
+**Posición exacta: la traducción de Juan está completa y pulida (21/21 caps, 2.064/2.064 párrafos, 0 párrafos bajo el 60% del EN, 0 residuales de inglés en sonda amplia).**
+- **Siguiente turno:** no queda deuda de traducción ni de pulido conocida de Juan. Opciones ejecutables sin decisión del usuario: barrido fino de estilo (75-90% del EN) o mejoras menores del lector según plan. El paso 6 (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's) requiere crear fichas legales en 02. Legal/ antes de ingesta — evaluar en su momento.
+- **Bloqueado en usuario (sin cambios):** licencia de traducciones propias, modelo de sostenimiento, nombre/dominio, puertas ⟡.
