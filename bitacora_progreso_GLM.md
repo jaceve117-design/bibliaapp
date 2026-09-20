@@ -416,3 +416,11 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`7ed02b47`). Verificado: lector 200; JN 5 al 70% en producción. Commit y push.
 
 **Siguiente turno:** JN 5, sección 3 (idx 29 párrafos, secBase=2, pBase=0) → Juan 5 COMPLETO (98/98). Luego Juan 6.
+
+### 2026-09-20 · GLM (vigilante) — Juan 5 COMPLETO en español (98/98 párrafos) — 5/21 capítulos
+
+- **Traducida y fusionada la sección 3 de Juan 5** «Cristo prueba su misión divina; la infidelidad de los judíos reprendida» (29 párrafos, ~34k chars, Jn 5:31-47): el apartar su propio testimonio («todos los hombres son mentirosos»), el testimonio del Padre (donde da comisión, da credenciales), Juan como antorcha que arde y alumbra («fuisteis dispuestos a gozaros por un tiempo en su luz»), las obras mayores como testimonio mayor, el testimonio del Padre por voz del cielo (Bath-kol), «Escudriñad las Escrituras» (las dos lecturas que da Henry: indicación y mandato; el cielo el fin, Cristo el camino), la sentencia de los incrédulos («no queréis venir a mí para que tengáis vida», no tienen el amor de Dios, reciben a los que vienen en su propio nombre, buscan la honra unos de otros), y Moisés como testigo contra ellos («si no creéis a sus escritos, ¿cómo creeréis a mis palabras?»).
+- **Juan 5 COMPLETO: 98/98 párrafos (100%)** — caps ES completos: 1, 2, 3, 4, 5 de 21 (~305k caracteres ES de Henry traducidos).
+- Desplegado (`0751e330`). Verificado: JN 5 = 98/98 párrafos ES en producción. Commit y push.
+
+**Posición exacta:** caps ES completos 1-5 de 21. **Siguiente:** Juan 6 (el mayor del libro — la multiplicación de los panes, Cristo sobre el mar, el pan de vida; 5 secciones aprox. ~150k chars — se dividirá en 3-4 turnos de vigilante). Luego Juan 7 en adelante.
