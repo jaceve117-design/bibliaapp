@@ -378,3 +378,10 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - **Traducida y fusionada la sección 2 de Juan 4, primera parte** «Cristo en el pozo de Samaria» (párrafos 1-22 de 58, Jn 4:4-10): Samaria y su historia, «Es necesario que pasase por Samaria», Sicar y la heredad de Jacob, Cristo cansado del camino («cuando seamos llevados con facilidad, pensemos en el cansancio de nuestro Maestro»), la mujer de Samaria al pozo, «Dame de beber», la pendencia judíos-samaritanos, y «Si conocieses el don de Dios… tú le pedirías y él te daría agua viva».
 - **Posición exacta**: JN 4, sección 2, párrafo 22 de 58. Siguiente: párrafos 23-58 (la objeción «¿Eres tú mayor que nuestro padre Jacob?», el agua que quita la sed para siempre, los cinco maridos, la adoración en espíritu y verdad, «Yo soy, el que habla contigo, soy»).
 - Desplegado (`6f3f6e8a`). Verificado: lector 200; JN 4 en producción 9/9 + 22/58 párrafos ES. Commit y push.
+
+### 2026-09-20 · GLM (vigilante) — Cadencia del vigilante bajada a 30 minutos (petición del usuario)
+
+- **Datos medidos**: promedio real entre incrementos de trabajo activo = ~34 min (los huecos de 222-261 min eran esperas del ciclo 4h). El ritmo natural de trabajo es de ~30 min por incremento de ~25-30k caracteres traducidos.
+- **Cron reprogramado**: de `0 */4 * * *` a `*/30 * * * *` (título: «Vigilante GLM 30min»). A este ritmo, todo Juan (19 capítulos restantes, ~1,9M chars) estaría completado en el orden de 40-70 turnos exitosos ≈ 1-3 días de ciclos.
+- **Advertencia registrada**: si la cuota de tokens se agota a mitad de camino, los disparos de 30 min fallarán suavemente y reintentarán — que es justo el comportamiento deseado (reanudar apenas vuelva la cuota). Si el consumo resultara excesivo, se puede volver a 4h o 2h con una palabra.
+- Verificado en producción: lector 200. Commit y push.
