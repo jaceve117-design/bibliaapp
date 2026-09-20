@@ -2,7 +2,7 @@
    - precache del shell del lector
    - cache-first para datos (/data/*) y assets estáticos (inmutables por build)
    - network-first para navegaciones, con respaldo offline al lector cacheado */
-const CACHE = "biblioteca-v2";
+const CACHE = "biblioteca-v3";
 const PRECACHE = ["/es", "/es/lector", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {
