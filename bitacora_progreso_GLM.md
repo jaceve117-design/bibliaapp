@@ -408,3 +408,11 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`724f9e87`). Verificado: JN 5.1 32/32 párrafos ES en producción. Commit y push.
 
 **Posición global**: caps ES completos 1, 2, 3, 4 de 21 + JN 5.1 (32/98 párrafos del cap). **Siguiente turno**: JN 5 sección 2 (37 párrafos), luego sección 3 (29), y así Juan 5 completo.
+
+### 2026-09-20 · GLM (vigilante) — Juan 5.2 completa en ES: 69/98 párrafos (70% del capítulo)
+
+- **Traducida y fusionada la sección 2 de Juan 5** «El discurso de Cristo con los judíos; todo juicio cometido a Cristo; la carta cristiana» (37 párrafos, ~35k chars, Jn 5:17-47): la doctrina sentada («Mi Padre hasta ahora trabaja, y yo trabajo»), el escándalo tomado (querían matarle por hacerse igual a Dios), la unidad del Hijo con el Padre («el Hijo no puede hacer nada por sí mismo, sino lo que ve hacer al Padre»), las instancias del amor del Padre (mayores obras: resucitar los muertos), las dos resurrecciones (la que ahora es: muertos en pecados vivificados por la voz del Hijo; la que ha de venir: «todos los que están en los sepulcros oirán su voz»), la retribución (resurrección de vida / de condenación), la autoridad para ejecutar juicio, las razones («porque el Hijo del hombre es»), «todos honren al Hijo como honran al Padre», el carácter cristiano («el que oye mi palabra y cree al que me envió»), la carta cristiana (no viene a condenación; ha pasado de muerte a vida), y la justicia de su juicio («no busco mi voluntad, sino la del que me envió»).
+- **Posición exacta**: JN 5, secciones 1-2 completas (69/98 párrafos, 70% del capítulo). Queda la sección 3 (29 párrafos, Jn 5:31-47: Cristo prueba su misión divina —el testimonio de Juan, las obras, el Padre, las Escrituras— y la infidelidad de los judíos reprendida) para completar el capítulo 5.
+- Desplegado (`7ed02b47`). Verificado: lector 200; JN 5 al 70% en producción. Commit y push.
+
+**Siguiente turno:** JN 5, sección 3 (idx 29 párrafos, secBase=2, pBase=0) → Juan 5 COMPLETO (98/98). Luego Juan 6.
