@@ -371,3 +371,10 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`7ddf90d5`). Verificado en producción: JN 3 = 72/72 párrafos ES.
 
 **Posición exacta:** caps ES 1-3 de 21. **Siguiente:** Juan 4 (4 secciones, 106 párrafos, ~107k chars — la mujer de Samaria; probablemente dividido en 2 turnos por tamaño: secciones 1-2 y luego 3-4).
+
+### 2026-09-20 · GLM (vigilante) — Juan 4 iniciado: 31/106 párrafos en ES (29% del capítulo)
+
+- **Traducida y fusionada la sección 1 de Juan 4** «El viaje de Cristo a Galilea» (9/9 párrafos, Jn 4:1-3): hacer discípulos, bautizar por manos de sus discípulos (las seis razones de Henry), el celo de los fariseos, y la retirada de Judea a Galilea (su hora no había venido; ejemplo de su propia regla de huir la persecución).
+- **Traducida y fusionada la sección 2 de Juan 4, primera parte** «Cristo en el pozo de Samaria» (párrafos 1-22 de 58, Jn 4:4-10): Samaria y su historia, «Es necesario que pasase por Samaria», Sicar y la heredad de Jacob, Cristo cansado del camino («cuando seamos llevados con facilidad, pensemos en el cansancio de nuestro Maestro»), la mujer de Samaria al pozo, «Dame de beber», la pendencia judíos-samaritanos, y «Si conocieses el don de Dios… tú le pedirías y él te daría agua viva».
+- **Posición exacta**: JN 4, sección 2, párrafo 22 de 58. Siguiente: párrafos 23-58 (la objeción «¿Eres tú mayor que nuestro padre Jacob?», el agua que quita la sed para siempre, los cinco maridos, la adoración en espíritu y verdad, «Yo soy, el que habla contigo, soy»).
+- Desplegado (`6f3f6e8a`). Verificado: lector 200; JN 4 en producción 9/9 + 22/58 párrafos ES. Commit y push.
