@@ -400,3 +400,11 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`9ac78686`). Verificado: lector 200, sw 200, hash deployment con contenido correcto. Commit y push.
 
 **Posición exacta**: caps ES completos: 1, 2, 3, 4 de 21. **Siguiente:** Juan 5 (3 secciones, ~98k chars: el paralítico de Betesda), luego Juan 6 (el mayor: ~5 secciones), Juan 7, etc.
+
+### 2026-09-20 · GLM (vigilante) — Juan 5.1 completo en ES: «La curación en el estanque de Betesda» (32/32 párrafos)
+
+- **Traducida y fusionada la sección 1 de Juan 5** (~30k chars, Jn 5:1-16): la fiesta y el estanque de Betesda (casa de misericordia), los cinco pórticos con la multitud de enfermos (ciegos, cojos, secos), el ángel que agitaba las aguas, el paciente treinta y ocho años enfermo (con la nota conmovedora de Baxter: «te doy gracias por semejante disciplina de cincuenta y ocho años»), «¿Quieres ser sano?», «No tengo hombre que me meta en el estanque», «Levántate, toma tu lecho y anda», la carga del lecho en sábado, la defensa del hombre ante los judíos, Cristo hallándole en el templo, y «He aquí, has sido sano; no peques más, no sea que venga a ti alguna cosa peor».
+- **Posición exacta**: JN 5, sección 1 COMPLETA (32/32). Quedan las secciones 2 (37 párrafos: el discurso con los judíos, todo juicio cometido al Hijo, la carta cristiana) y 3 (29 párrafos: Cristo prueba su misión divina, la infidelidad de los judíos reprendida) para completar el capítulo 5.
+- Desplegado (`724f9e87`). Verificado: JN 5.1 32/32 párrafos ES en producción. Commit y push.
+
+**Posición global**: caps ES completos 1, 2, 3, 4 de 21 + JN 5.1 (32/98 párrafos del cap). **Siguiente turno**: JN 5 sección 2 (37 párrafos), luego sección 3 (29), y así Juan 5 completo.
