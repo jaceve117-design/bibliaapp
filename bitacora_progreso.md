@@ -3,7 +3,102 @@
 **Proyecto:** Biblioteca cristiana digital — Biblias, comentarios, diccionarios, teología, enciclopedias y manuscritos.
 **Carpeta madre:** `20. Biblias_Comments_Dicionarios`
 **Inicio:** 2026-09-14
-**Estado global:** Fase 0 — Investigación y orden previo al desarrollo.
+**Estado global:** Construcción en curso — núcleo 6/6 ingerido · PWA desplegada · traducción de Matthew Henry avanzando por Juan.
+**⚠️ Hay una directiva operativa activa más abajo. Léela antes de continuar.**
+
+---
+
+# ⚠️ DIRECTIVA OPERATIVA ACTIVA — LEER ANTES DE CADA TURNO
+
+> **Para la automatización de GLM.** Este bloque se lee **primero**, en cada turno, antes de continuar con cualquier traducción.
+> Si hay una directiva marcada `ACTIVA`, **la directiva manda sobre la traducción de Matthew Henry.**
+> Cuando una directiva se completa, se marca `CUMPLIDA` con fecha y se reanuda el ciclo normal.
+
+---
+
+## Cláusula permanente · Reserva de cuota
+
+**Vigente desde 2026-09-20. No caduca.**
+
+La automatización **se detiene por sí sola cuando la cuota semanal restante baja al 10 % o menos.**
+
+Al detenerse:
+1. Termina limpiamente el incremento en curso — nunca dejar una sección a medias ni un commit parcial.
+2. Anota en `bitacora_progreso_GLM.md`: fecha, cuota restante y punto exacto donde quedó.
+3. **No reanuda sola.** Espera instrucción explícita del usuario.
+
+El 10 % es reserva operativa: existe para que quede margen de trabajo manual y de corrección de urgencias hasta el reinicio del ciclo semanal.
+
+---
+
+## Directiva D-001 · `ACTIVA` · Ventana de integración
+
+**Emitida:** 2026-09-20 por Claude, a petición del usuario.
+**Objetivo:** integrar trabajo ya terminado que hoy está en disco sin cablear, aprovechando una pausa corta y acotada de la traducción.
+
+### Paso 0 — Pausar Matthew Henry
+
+Termina el incremento en curso y commítealo. **A partir de ahí, no inicies más secciones de Henry** hasta completar el paso 5. La traducción **no se cancela, se pausa**: se reanuda exactamente donde quedó.
+
+Anota en tu BP el punto de reanudación (libro, capítulo, sección, párrafo).
+
+### Paso 1 — Refactor del selector de comentario
+
+En `07. App/app/app/es/lector/page.tsx`:
+
+- Hoy el estado es `const [comentario, setComentario] = useState(false)` — un booleano — y la ruta `/data/henry-es/` está fija en el código.
+- Conviértelo en **selección de obra**: `null` = cerrado, o el id de la obra activa.
+- Generaliza carga perezosa, caché y léxico transliterado para que funcionen con **cualquier** obra de comentario, no solo Henry.
+- No cambies el comportamiento visible todavía: con una sola obra disponible, el lector debe verse y funcionar igual que ahora.
+
+**Por qué esto va primero:** desbloquea todo lo demás. Hacerlo después obliga a migrar datos ya generados.
+
+### Paso 2 — Cablear la morfología en español
+
+Los datos **ya están generados y listos** — no hay que traducir nada:
+
+- `07. App/app/public/data/morfologia/codigos-griego-es.json` — 1.082 códigos, 99,94 % de cobertura del NT
+- `07. App/app/public/data/morfologia/codigos-hebreo-es.json` — 941 códigos, 99,40 % de cobertura del AT
+
+Estructura: `{ "_meta": {...}, "codigos": { "V-PAI-3S": "verbo presente voz activa indicativo 3a persona singular", ... } }`
+
+En el interlineal, donde hoy se muestra el código crudo, muestra la etiqueta en español. Si un código no está en el mapa, **cae al código original** — nunca dejes el hueco vacío.
+
+Documentación completa y procedencia en `06. Traduccion/morfologia/LEEME.md`.
+
+### Paso 3 — Atribución CC BY 4.0
+
+La licencia de STEPBible **exige** atribución visible donde se muestren sus datos. Añádela al panel de fuentes y donde aparezca el interlineal:
+
+> Datos morfológicos de STEPBible.org, Tyndale House Cambridge, CC BY 4.0
+
+### Paso 4 — ⚠️ Cotejar la tabla griega (obligatorio antes de publicar)
+
+La tabla **hebrea** está verificada contra la legenda oficial de OpenScriptures. La **griega no**: se reconstruyó sobre el esquema Robinson/Tauber porque el intro oficial de TAGNT está en un Google Doc no accesible programáticamente.
+
+**Esto incumple la regla C1/C2 del proyecto — cita literal, no de memoria.**
+
+Abre `TinyURL.com/TAGNT-Intro`, coteja las ~80 entradas de la sección `griego` de `06. Traduccion/morfologia/morfologia-atomos-es.json`, corrige lo que discrepe y **regenera** los códigos desde los átomos. Luego pon `verificada_en_fuente: true`.
+
+Si el documento sigue sin ser accesible: **déjalo marcado como no verificado, no lo publiques como verificado**, y anota el bloqueo en tu BP para escalarlo al usuario.
+
+### Paso 5 — Cerrar la ventana
+
+- Validación integral y despliegue.
+- Marca esta directiva como `CUMPLIDA` con fecha en este mismo bloque.
+- **Reanuda Matthew Henry** exactamente en el punto anotado en el paso 0.
+
+---
+
+## Cola posterior · no ejecutar sin directiva propia
+
+Siguiente lote de traducción barata, por orden de valor por esfuerzo. **Se programa más adelante**, en su propia ventana, no dentro de D-001:
+
+1. **Glosas de TBESH y TBESG** — 22.717 definiciones breves del léxico hebreo y griego. Es lo que completa el interlineal en español.
+2. **Easton en español** — 3.962 entradas, ya ingerido en inglés.
+3. **Encabezados del TSK.**
+
+Y como decisión de producto pendiente del usuario: **traducir JFB completo antes de terminar Henry**, para dar comentario en el 100 % de los versículos en vez de profundidad en el 0,5 %. Requiere antes las fichas legales de JFB, Barnes, Nave's y SBLGNT (regla C1: nada entra sin ficha).
 
 ---
 
@@ -18,6 +113,7 @@ Reglas de uso:
 3. **Los estados son:** `[ ]` pendiente · `[~]` en curso · `[x]` hecho · `[!]` bloqueado o con decisión pendiente.
 4. **Si una decisión cambia**, se anota en *Decisiones tomadas* con la fecha y el motivo. No se reescribe la decisión anterior.
 5. **Nada entra al repositorio de datos sin su ficha de licencia.** Es regla dura, ver Fase 2.
+6. **El bloque de directiva operativa se lee primero, en cada turno.** Una directiva `ACTIVA` tiene prioridad sobre el ciclo normal de traducción. Al completarla se marca `CUMPLIDA` con fecha y se reanuda el ciclo.
 
 ---
 
@@ -46,6 +142,8 @@ Reglas de uso:
 | D19 | Mar Muerto | **Módulo general aplazado a post-v1.** Cuando entre, solo el ángulo Qumrán ↔ texto masorético anclado al versículo. *(finalistas: Claude A4/A5)* | 2026-09-17 |
 | D20 | Calidad de traducción | **Puerta dura:** no se escala la ingesta hasta aprobar la revisión editorial humana del piloto. Escalar una traducción mediocre es el único error irreversible. *(finalistas: Claude E12)* | 2026-09-17 |
 | D21 | Búsqueda semántica | **pgvector aplazado a post-MVP.** El MVP busca con `tsvector` (spanish/english); la búsqueda "por idea" provisional sale de TSK + Nave's + lemas. *(finalistas: GLM C3)* | 2026-09-17 |
+| D22 | Tercera ola del corpus | **Confesiones y patrística.** Tras la segunda ola (ISBE, Clarke, Gill, Calvino, Keil & Delitzsch, Vulgata/LXX/TR, Sefaria, Pleiades) entra el bloque que hoy falta: confesiones y catecismos históricos (Westminster, Heidelberg, Dordrecht, Segunda Helvética) y padres de la iglesia (edición Schaff). Cubre el hueco de teología sistemática: el corpus actual explica qué dice cada pasaje, no qué cree la tradición ni de dónde sale. | 2026-09-20 |
+| D23 | Prioridad de traducción | **Los gloss del léxico y el vocabulario morfológico se traducen antes que más prosa de comentario.** Unos miles de definiciones breves (TBESH/TBESG) y un vocabulario cerrado de etiquetas morfológicas desbloquean el interlineal completo para el lector hispanohablante; es el mayor valor por palabra traducida de todo el proyecto. | 2026-09-20 |
 
 ### Decisiones pendientes
 
@@ -244,3 +342,36 @@ El diferenciador del proyecto. Se trata como trabajo editorial, no como procesam
   2. Sustituir la cascada de nueve fases por un **corte vertical de un solo libro** antes de la ingesta masiva.
   3. Reducir el corpus del MVP de ocho bloques a **seis fuentes**.
   4. **Aplazar el módulo del Mar Muerto**, salvo el ángulo de divergencias Qumrán/texto masorético ancladas al versículo.
+
+### 2026-09-20 · Claude
+
+- Revisión del estado del proyecto tras la construcción de GLM: núcleo 6/6 ingerido, TSK con 386.384 referencias navegables, PWA desplegada, Matthew Henry traducido hasta Juan 6.
+- Inventario de recursos teológicos del corpus entregado al usuario: núcleo ya ingerido, cierre del núcleo (JFB, Barnes, Nave's, SBLGNT) y segunda ola.
+- Señalado el hueco de **teología sistemática y patrística**, caído del plan al recortar a seis fuentes. El usuario lo repone como **tercera ola** → **D22**.
+- Análisis de carga de traducción por recurso. Conclusiones:
+  - **No se traduce** el texto fuente (hebreo, griego, latín), la RV1909 ni las referencias del TSK.
+  - **Ya existe en español en dominio público** buena parte de la tercera ola: confesiones y catecismos con traducciones históricas, y la *Institución* de Calvino en la traducción de **Cipriano de Valera (1597)**. Se busca y verifica, no se traduce.
+  - **Mayor valor por palabra:** los gloss de TBESH/TBESG y el vocabulario cerrado de etiquetas morfológicas → **D23**.
+  - Riesgo señalado: **John Gill** es, con diferencia, la obra de mayor volumen del backlog; conviene medir su coste antes de comprometerla.
+  - Nota de coherencia: la tercera ola (D22) revierte parcialmente `A7`, que el usuario había descartado en las ideas finalistas. Queda anotado para que la trazabilidad sea honesta.
+
+### 2026-09-20 · Claude — Morfología en español (primer entregable de traducción barata)
+
+**Verificación previa:** automatización de GLM **activa** (commits cada ~30 min, Juan 8 en curso). Se aplicó la regla del usuario: se ejecuta solo lo que no colisiona.
+
+- **NO ejecutado:** refactor del selector de comentario en `page.tsx`. Sí colisiona — GLM edita código de la app (service worker, rutas de `/data`) y despliega cada media hora; un refactor a medias en un archivo de 1.095 líneas iría a producción. **Requiere pausar la automatización.**
+- **Sí ejecutado (100 % aditivo, archivos nuevos):** traducción del vocabulario morfológico de STEPBible → `06. Traduccion/morfologia/` y copia lista para consumir en `07. App/app/public/data/morfologia/`.
+
+**Resultado medido:** 2.061 códigos traducidos (1.082 griegos + 941 hebreos/arameos) que etiquetan 474.911 palabras de toda la Biblia. Cobertura **99,94 %** de los tokens del NT y **99,40 %** del AT. Los dos esquemas son composicionales, así que la fuente real es un diccionario de ~150 átomos del que se componen todos los códigos: corregir un átomo y regenerar recalcula todo de forma coherente.
+
+**Procedencia, con una asimetría que hay que cerrar:**
+- *Hebreo* — verificado literalmente contra la legenda oficial de OpenScriptures que TAHOT declara seguir. `verificada_en_fuente: true`.
+- *Griego* — ⚠️ **PENDIENTE.** El intro oficial de TAGNT vive en un Google Doc no accesible programáticamente; la tabla se reconstruyó sobre el esquema Robinson/Tauber. **Incumple C1/C2 (cita literal) y no debe publicarse sin cotejo.** Marcado `verificada_en_fuente: false`. Es un cotejo de una sentada: ~80 entradas.
+- Lo no resuelto **no se inventó**: quedó registrado en `_pendientes.json`.
+
+**Atribución CC BY 4.0 obligatoria** donde se muestren: *«Datos morfológicos de STEPBible.org, Tyndale House Cambridge, CC BY 4.0»*. La traducción de las etiquetas es obra derivada nuestra.
+
+**Pendiente para cablearlo en el lector** — entra en la misma ventana que el refactor, con la automatización pausada.
+
+**Nota sobre Cloudflare:** el usuario confirma suscripción de pago y que el espacio no es restricción. El límite relevante deja de ser el almacén y pasa a ser el **paquete offline** (B11): qué subconjunto baja al dispositivo. Se decide con datos de uso, no ahora.
+
