@@ -424,3 +424,9 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Desplegado (`0751e330`). Verificado: JN 5 = 98/98 párrafos ES en producción. Commit y push.
 
 **Posición exacta:** caps ES completos 1-5 de 21. **Siguiente:** Juan 6 (el mayor del libro — la multiplicación de los panes, Cristo sobre el mar, el pan de vida; 5 secciones aprox. ~150k chars — se dividirá en 3-4 turnos de vigilante). Luego Juan 7 en adelante.
+
+### 2026-09-20 · GLM (vigilante) — Juan 6 iniciado: 31/123 párrafos en ES (25% del capítulo)
+
+- **Traducidas y fusionadas las secciones 1 y 2 de Juan 6**: (1) «Los cinco mil alimentados» (21 párrafos, ~18,6k chars, Jn 6:1-14): el monte como púlpito natural, «¿De dónde compraremos pan?», los cinco panes de cebada y dos pececillos, «Haced recostar los hombres», la distribución con acción de gracias, y la recolección de los doce cestos. (2) «Cristo anda sobre el mar» (10 párrafos, ~10,7k chars, Jn 6:15-21): el celo irregular de querer hacerle rey (con las cinco objeciones de Henry: error sobre el reino, amor de la carne, designio secular, tumulto, contra la mente de Cristo), la humildad y abnegación de Cristo al retirarse, la tormenta en la mar oscura, «Yo soy; no temáis», y la llegada presto a la ribera.
+- **Posición exacta**: JN 6, sección 3 (idx2, «El discurso con la multitud», 14 párrafos) es el siguiente lote. Luego sección 4 (48 párrafos, «El verdadero pan del cielo» — el mayor bloque, ~55k chars, se dividirá en 2-3 turnos) y sección 5 (20 párrafos).
+- Desplegado (`171966db`). Verificado: lector 200; JN 6 al 25% en producción. Commit y push.
