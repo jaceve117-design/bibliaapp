@@ -385,3 +385,9 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - **Cron reprogramado**: de `0 */4 * * *` a `*/30 * * * *` (título: «Vigilante GLM 30min»). A este ritmo, todo Juan (19 capítulos restantes, ~1,9M chars) estaría completado en el orden de 40-70 turnos exitosos ≈ 1-3 días de ciclos.
 - **Advertencia registrada**: si la cuota de tokens se agota a mitad de camino, los disparos de 30 min fallarán suavemente y reintentarán — que es justo el comportamiento deseado (reanudar apenas vuelva la cuota). Si el consumo resultara excesivo, se puede volver a 4h o 2h con una palabra.
 - Verificado en producción: lector 200. Commit y push.
+
+### 2026-09-20 · GLM (vigilante) — Juan 4.2 ampliado: párrafos 34/58 (41% del capítulo)
+
+- **Traducidos y fusionados los párrafos 23-35 de la sección 2 de Juan 4** (~13k chars): la objeción «No tienes con qué sacarla… ¿Eres tú mayor que nuestro padre Jacob?», la defensa de Jacob (la providencia en los pozos de generación en generación, la llaneza del patriarca), los tres yerros de la mujer (llamar padre a Jacob sin derecho, atribuirle el pozo como don, comparar desfavorablemente a Cristo), la respuesta de Cristo (el agua de Jacob quita la sed pero vuelve; el agua viva satisface para siempre: «una fuente de agua que brota para vida eterna»), la petición de la mujer («Dame esta agua, para que no venga aquí a sacar»), y el giro de Cristo al marido: el método de tratar con las almas («primero puntadas en el corazón, y luego sanadas»).
+- **Posición exacta**: JN 4, sección 2, párrafo 34 de 58 (41% del capítulo). Siguiente: párrafos 36-58 (23 párrafos): los cinco maridos, la adoración en espíritu y verdad, «Yo soy, el que habla contigo, soy yo», la siega y los segadores, y «Yo soy el Mesías».
+- Desplegado (`32321758`). Verificado: JN 4.2 34/58 párrafos ES en producción. Commit y push.
