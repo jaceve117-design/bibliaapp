@@ -21,6 +21,8 @@ type Manifest = {
 };
 type Palabra = { g: string; t: string; e: string; es?: string; s: string; m: string; lex?: string; tp: string };
 type InterJson = { osis: string; dir: "ltr" | "rtl"; versos: Record<string, Palabra[]> };
+type GrVerso = { c: number; v: number; osis: string; t: string; w: [string, string, string][] };
+type GrJson = { osis: string; versos: GrVerso[] };
 type EntradaLex = { w: string; t: string; m: string; g: string; d: string };
 type IndiceItem = { s: string; n: string; l: string };
 type EntradaDic = { n: string; d: string; r: string[] };
@@ -55,6 +57,8 @@ export default function Lector() {
   const [cargando, setCargando] = useState(true);
   const [interlineal, setInterlineal] = useState(false);
   const [interData, setInterData] = useState<InterJson | null>(null);
+  const [griego, setGriego] = useState(false);
+  const [grData, setGrData] = useState<GrJson | null>(null);
   const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex } | null>(null);
   const [panelRefs, setPanelRefs] = useState<{ verso: Verso; refs: string[]; cargadas: boolean } | null>(null);
   const [dicPanel, setDicPanel] = useState(false);
@@ -251,6 +255,28 @@ export default function Lector() {
       })
       .catch(() => setInterData(null));
   }, [interlineal, osis]);
+
+  // texto griego (SBLGNT): carga perezosa por libro
+  useEffect(() => {
+    if (!griego) {
+      setGrData(null);
+      return;
+    }
+    const clave = `sblgnt:${osis}`;
+    const enCache = cache.get(clave) as GrJson | undefined;
+    if (enCache) {
+      setGrData(enCache);
+      return;
+    }
+    setGrData(null);
+    fetch(`/data/sblgnt/${osis}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: GrJson | null) => {
+        if (json) cache.set(clave, json);
+        setGrData(json);
+      })
+      .catch(() => setGrData(null));
+  }, [griego, osis]);
 
   const caps = texto?.versos.length
     ? Math.max(...texto.versos.map((v) => v.c))
@@ -686,12 +712,27 @@ export default function Lector() {
             </button>
             <button
               className={`icono-btn${interlineal ? " activo" : ""}`}
-              onClick={() => setInterlineal(!interlineal)}
+              onClick={() => {
+                setInterlineal(!interlineal);
+                if (!interlineal) setGriego(false);
+              }}
               aria-label={tr.interlineal}
               title={tr.interlineal}
               style={interlineal ? { borderColor: "var(--accent)", color: "var(--accent-strong)" } : undefined}
             >
               Ω
+            </button>
+            <button
+              className={`icono-btn${griego ? " activo" : ""}`}
+              onClick={() => {
+                setGriego(!griego);
+                if (!griego) setInterlineal(false);
+              }}
+              aria-label={tr.griegoSblgnt}
+              title={tr.griegoSblgnt}
+              style={griego ? { borderColor: "var(--accent)", color: "var(--accent-strong)" } : undefined}
+            >
+              Ξ
             </button>
             <button
               className={`icono-btn${Object.keys(notas).length ? " activo" : ""}`}
@@ -778,6 +819,24 @@ export default function Lector() {
 
           {cargando ? (
             <p style={{ color: "var(--muted)" }}>…</p>
+          ) : griego ? (
+            <div className="texto-biblico griego-vista" lang="el">
+              {(grData?.versos ?? [])
+                .filter((gv) => gv.c === cap)
+                .map((gv) => (
+                  <span key={gv.osis} className="verso" data-osis={gv.osis}>
+                    <sup className="num">{gv.v}</sup>
+                    {gv.w.map(([g, lemma, pos], i) => (
+                      <span key={i} className="palabra-g" title={`${lemma} · ${pos}`}>
+                        {g}{" "}
+                      </span>
+                    ))}
+                  </span>
+                ))}
+              {grData && !(grData.versos ?? []).some((gv) => gv.c === cap) && (
+                <p style={{ color: "var(--muted)" }}>…</p>
+              )}
+            </div>
           ) : interlineal ? (
             <div className={`interlin${dir === "rtl" ? " rtl" : ""}`}>
               {versos.map((v) => {

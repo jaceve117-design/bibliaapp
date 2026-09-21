@@ -1,0 +1,206 @@
+{
+  "obra": "SBL Greek New Testament (SBLGNT) — ed. Michael W. Holmes",
+  "osis_obra": "SBLGNT",
+  "licencia": "CC BY 4.0 (Society of Biblical Literature) · morfología MorphGNT CC BY 4.0",
+  "fuente": "https://github.com/morphgnt/sblgnt (crudo archivado en 05. Datos/corpus_crudo/sblgnt/)",
+  "fecha_ingesta": "2026-09-21",
+  "total_versos": 7927,
+  "incidentes": [
+    {
+      "osis": "MAT",
+      "tipo": "conteo vs RV1909: 1068 vs 1071 (dif -3)"
+    },
+    {
+      "osis": "MRK",
+      "tipo": "conteo vs RV1909: 673 vs 678 (dif -5)"
+    },
+    {
+      "osis": "LUK",
+      "tipo": "conteo vs RV1909: 1149 vs 1151 (dif -2)"
+    },
+    {
+      "osis": "JHN",
+      "tipo": "conteo vs RV1909: 866 vs 879 (dif -13)"
+    },
+    {
+      "osis": "ACT",
+      "tipo": "conteo vs RV1909: 1002 vs 1006 (dif -4)"
+    },
+    {
+      "osis": "ROM",
+      "tipo": "conteo vs RV1909: 430 vs 433 (dif -3)"
+    },
+    {
+      "osis": "3JN",
+      "tipo": "conteo vs RV1909: 15 vs 14 (dif 1)"
+    },
+    {
+      "osis": "REV",
+      "tipo": "conteo vs RV1909: 405 vs 404 (dif 1)"
+    }
+  ],
+  "libros": [
+    {
+      "osis": "MAT",
+      "nombre": "Mateo",
+      "caps": 28,
+      "versos": 1068
+    },
+    {
+      "osis": "MRK",
+      "nombre": "Marcos",
+      "caps": 16,
+      "versos": 673
+    },
+    {
+      "osis": "LUK",
+      "nombre": "Lucas",
+      "caps": 24,
+      "versos": 1149
+    },
+    {
+      "osis": "JHN",
+      "nombre": "Juan",
+      "caps": 21,
+      "versos": 866
+    },
+    {
+      "osis": "ACT",
+      "nombre": "Hechos",
+      "caps": 28,
+      "versos": 1002
+    },
+    {
+      "osis": "ROM",
+      "nombre": "Romanos",
+      "caps": 16,
+      "versos": 430
+    },
+    {
+      "osis": "1CO",
+      "nombre": "1 Corintios",
+      "caps": 16,
+      "versos": 437
+    },
+    {
+      "osis": "2CO",
+      "nombre": "2 Corintios",
+      "caps": 13,
+      "versos": 256
+    },
+    {
+      "osis": "GAL",
+      "nombre": "Gálatas",
+      "caps": 6,
+      "versos": 149
+    },
+    {
+      "osis": "EPH",
+      "nombre": "Efesios",
+      "caps": 6,
+      "versos": 155
+    },
+    {
+      "osis": "PHP",
+      "nombre": "Filipenses",
+      "caps": 4,
+      "versos": 104
+    },
+    {
+      "osis": "COL",
+      "nombre": "Colosenses",
+      "caps": 4,
+      "versos": 95
+    },
+    {
+      "osis": "1TH",
+      "nombre": "1 Tesalonicenses",
+      "caps": 5,
+      "versos": 89
+    },
+    {
+      "osis": "2TH",
+      "nombre": "2 Tesalonicenses",
+      "caps": 3,
+      "versos": 47
+    },
+    {
+      "osis": "1TI",
+      "nombre": "1 Timoteo",
+      "caps": 6,
+      "versos": 113
+    },
+    {
+      "osis": "2TI",
+      "nombre": "2 Timoteo",
+      "caps": 4,
+      "versos": 83
+    },
+    {
+      "osis": "TIT",
+      "nombre": "Tito",
+      "caps": 3,
+      "versos": 46
+    },
+    {
+      "osis": "PHM",
+      "nombre": "Filemón",
+      "caps": 1,
+      "versos": 25
+    },
+    {
+      "osis": "HEB",
+      "nombre": "Hebreos",
+      "caps": 13,
+      "versos": 303
+    },
+    {
+      "osis": "JAS",
+      "nombre": "Santiago",
+      "caps": 5,
+      "versos": 108
+    },
+    {
+      "osis": "1PE",
+      "nombre": "1 Pedro",
+      "caps": 5,
+      "versos": 105
+    },
+    {
+      "osis": "2PE",
+      "nombre": "2 Pedro",
+      "caps": 3,
+      "versos": 61
+    },
+    {
+      "osis": "1JN",
+      "nombre": "1 Juan",
+      "caps": 5,
+      "versos": 105
+    },
+    {
+      "osis": "2JN",
+      "nombre": "2 Juan",
+      "caps": 1,
+      "versos": 13
+    },
+    {
+      "osis": "3JN",
+      "nombre": "3 Juan",
+      "caps": 1,
+      "versos": 15
+    },
+    {
+      "osis": "JUD",
+      "nombre": "Judas",
+      "caps": 1,
+      "versos": 25
+    },
+    {
+      "osis": "REV",
+      "nombre": "Apocalipsis",
+      "caps": 22,
+      "versos": 405
+    }
+  ]
+}

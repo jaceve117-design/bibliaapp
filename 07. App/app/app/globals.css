@@ -857,3 +857,9 @@ body {
   color: var(--ink);
 }
 .fuente-item .lex-meta { margin-top: 4px; font-size: 0.82rem; }
+
+/* ── Vista griega SBLGNT (paso 6: cierre del núcleo) ── */
+.griego-vista { font-family: var(--serif); }
+.griego-vista .verso { font-size: 1.08em; line-height: 2; }
+.griego-vista .palabra-g { cursor: help; }
+.griego-vista .palabra-g:hover { color: var(--accent-strong); }
