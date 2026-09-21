@@ -75,6 +75,9 @@ export default function Lector() {
   const [panelNotas, setPanelNotas] = useState(false);
   const [msgNotas, setMsgNotas] = useState<string | null>(null);
   const refArchivo = useRef<HTMLInputElement>(null);
+  const [panelFuentes, setPanelFuentes] = useState(false);
+  const [reporteTexto, setReporteTexto] = useState("");
+  const [reporteCopiado, setReporteCopiado] = useState(false);
   const reTerminos = useRef<RegExp | null>(null);
   const columna = useRef<HTMLDivElement>(null);
   const lexCache = useRef(cacheLex);
@@ -146,6 +149,28 @@ export default function Lector() {
       setMsgNotas(tr.notasImportOk);
     } catch {
       setMsgNotas(tr.notasImportError);
+    }
+  };
+
+  // canal de reporte de errores (B5): el reporte se compone localmente con contexto exacto
+  const componerReporte = () =>
+    [
+      "— Reporte de error —",
+      `Obra: ${manifest?.obra ?? obra} (${manifest?.osis_obra ?? obra})`,
+      `Referencia: ${osis}.${cap}`,
+      `URL: ${typeof window !== "undefined" ? window.location.href : ""}`,
+      "",
+      "Descripción:",
+      reporteTexto.trim() || "(sin descripción)",
+    ].join("\n");
+
+  const copiarReporte = async () => {
+    try {
+      await navigator.clipboard.writeText(componerReporte());
+      setReporteCopiado(true);
+      setTimeout(() => setReporteCopiado(false), 4000);
+    } catch {
+      /* portapapeles no disponible */
     }
   };
 
@@ -648,6 +673,18 @@ export default function Lector() {
               ⓘ
             </button>
             <button
+              className="icono-btn"
+              onClick={() => {
+                setPanelFuentes(true);
+                setReporteTexto("");
+                setReporteCopiado(false);
+              }}
+              aria-label={tr.fuentes}
+              title={tr.fuentes}
+            >
+              ≣
+            </button>
+            <button
               className={`icono-btn${interlineal ? " activo" : ""}`}
               onClick={() => setInterlineal(!interlineal)}
               aria-label={tr.interlineal}
@@ -1034,6 +1071,67 @@ export default function Lector() {
             <div className="lex-meta">{panelTermino.idioma}</div>
             <div className="lex-def">{panelTermino.sig}</div>
             <div className="lex-fuente">Curaduría editorial · {tr.fuenteRefs}</div>
+          </div>
+        </div>
+      )}
+
+      {panelFuentes && (
+        <div className="lex-panel" role="dialog" aria-label={tr.fuentes}>
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>
+                {tr.fuentes}
+              </span>
+              <button
+                className="icono-btn cerrar"
+                onClick={() => {
+                  setPanelFuentes(false);
+                  setReporteTexto("");
+                  setReporteCopiado(false);
+                }}
+                aria-label={tr.lexCerrar}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="fuente-item">
+              <b>{manifest?.obra}</b> · {manifest?.licencia}
+              <div className="lex-meta">{manifest?.fuente} · {tr.fuentesEstadoNucleo}</div>
+            </div>
+            <div className="fuente-item">
+              <b>Interlineal y léxicos</b> — STEPBible-Data (Tyndale House), CC BY 4.0
+              <div className="lex-meta">TAHOT/TAGNT + TBESG/TBESH · autoridad académica Tyndale House, Cambridge · {tr.fuentesEstadoNucleo}</div>
+            </div>
+            <div className="fuente-item">
+              <b>Treasury of Scripture Knowledge</b> — R. A. Torrey, 1907 · dominio público
+              <div className="lex-meta">+ OpenBible.info cross-references (CC BY) · {tr.fuentesEstadoNucleo}</div>
+            </div>
+            <div className="fuente-item">
+              <b>Easton's Bible Dictionary</b> — M. G. Easton, 1897 · dominio público
+              <div className="lex-meta">tradición: presbiteriana evangélica (escocesa-estadounidense) · {tr.fuentesEstadoNucleo} · ES en curso</div>
+            </div>
+            <div className="fuente-item">
+              <b>Matthew Henry, Complete Commentary</b> — Matthew Henry, 1706–1721 · dominio público (edición CC0)
+              <div className="lex-meta">
+                tradición: puritana/noconformista inglesa · {henryEs ? tr.fuentesEstadoEs : tr.fuentesEstadoEn} · JUAN 21/21
+              </div>
+            </div>
+            <div className="nota-editor">
+              <div className="info-titulo">{tr.reportarError}</div>
+              <textarea
+                className="nota-area"
+                placeholder={tr.reportarPlaceholder}
+                value={reporteTexto}
+                onChange={(e) => setReporteTexto(e.target.value)}
+                rows={3}
+              />
+              <div className="notas-acciones">
+                <button className="btn btn-fantasma" onClick={copiarReporte}>
+                  ⧉ {reporteCopiado ? tr.reporteCopiado : tr.copiarReporte}
+                </button>
+              </div>
+              <div className="lex-meta" style={{ marginTop: 8 }}>{tr.fuenteReporte}</div>
+            </div>
           </div>
         </div>
       )}

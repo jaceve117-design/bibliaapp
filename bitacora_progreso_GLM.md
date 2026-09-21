@@ -787,3 +787,19 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 
 **Posición exacta:** pasos 0-1-2-5 completos · paso 3 completo salvo revisión humana doctrinal (⟡) · paso 7: **notas locales + export/import ✓** (restan en paso 7: panel Fuentes dedicado y canal de reporte de errores — mejoras menores futuras).
 - **Bloqueado en usuario (sin cambios):** paso 4 ⟡ (puerta de calidad), paso 6 (cierre del núcleo), licencia de traducciones propias (urgente: ya hay párrafos publicados), modelo de sostenimiento, nombre/dominio.
+
+### 2026-09-19 · GLM (vigilante) — PASO 7 COMPLETO: panel Fuentes + canal de reporte de errores — Juan sigue completo (2064/2064)
+
+**Segunda mejora del paso 7 (las dos que quedaban de la lista del turno anterior).**
+- **Panel Fuentes (botón ≣ en la cabecera):** consolidación del etiquetado autor/tradición/fecha/licencia por obra (B15/B16) para las 6 del núcleo:
+  - RV1909 / WEB (obra activa, con su manifiesto: licencia y fuente exactas).
+  - Interlineal y léxicos — STEPBible-Data (Tyndale House, Cambridge), CC BY 4.0 (TAHOT/TAGNT + TBESG/TBESH).
+  - Treasury of Scripture Knowledge — R. A. Torrey, 1907 · dominio público + OpenBible.info (CC BY).
+  - Easton's Bible Dictionary — M. G. Easton, 1897 · dominio público · tradición presbiteriana evangélica · ES en curso.
+  - Matthew Henry, Complete Commentary — 1706–1721 · dominio público (edición CC0) · tradición puritana/noconformista · estado de la traducción ES (asistida, sin revisar) · JUAN 21/21.
+- **Canal de reporte de errores (B5):** al pie del panel Fuentes. El lector describe el error; el botón compone un reporte estructural (obra, OSIS, referencia, URL, descripción) y lo copia al portapapeles con confirmación visible. 100 % local (B14 — sin servicios externos ni decisiones de infraestructura pendientes; cuando el usuario fije el correo/dominio del proyecto, basta un mailto o formulario aparte).
+- Verificación: `tsc` limpio; build OK; desplegado (`f1d5b797`); lector 200 (hash y alias); **JUAN 2064/2064** intacto. Commit y push.
+
+**Posición exacta:** pasos 0-1-2-5 completos · paso 3 completo salvo revisión humana doctrinal (⟡) · **paso 7 COMPLETO en su alcance MVP**: flujo pasaje→interlineal→léxico→comentario→nota/subrayado ✓ · notas locales + export/import ✓ · panel Fuentes ✓ · reporte de errores ✓ · atribución visible ✓.
+- **Bloqueado en usuario (sin cambios):** paso 4 ⟡ (puerta de calidad), paso 6 (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's), licencia de traducciones propias (urgente — ya hay contenido publicado), modelo de sostenimiento, nombre/dominio.
+- Con esto, **todo lo ejecutable del plan MVP sin decisión del usuario está hecho**. Los siguientes turnos solo tendrán trabajo si el usuario decide (paso 4/6/8) o si surgen correcciones reportadas.

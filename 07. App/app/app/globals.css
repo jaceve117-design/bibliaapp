@@ -848,3 +848,12 @@ body {
 .refs-lista .ref-item.swatch-amarillo { border-left: 4px solid rgba(234, 179, 8, 0.8); }
 .refs-lista .ref-item.swatch-verde { border-left: 4px solid rgba(22, 163, 74, 0.7); }
 .refs-lista .ref-item.swatch-rosa { border-left: 4px solid rgba(219, 39, 119, 0.65); }
+
+/* ── Panel Fuentes (paso 7: etiquetado autor/tradición/fecha por obra) ── */
+.fuente-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.fuente-item .lex-meta { margin-top: 4px; font-size: 0.82rem; }
