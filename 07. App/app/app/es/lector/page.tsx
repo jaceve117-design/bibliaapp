@@ -1114,6 +1114,8 @@ export default function Lector() {
               <b>Matthew Henry, Complete Commentary</b> — Matthew Henry, 1706–1721 · dominio público (edición CC0)
               <div className="lex-meta">
                 tradición: puritana/noconformista inglesa · {henryEs ? tr.fuentesEstadoEs : tr.fuentesEstadoEn} · JUAN 21/21
+                <br />
+                Traducción ES: obra derivada propia · CC BY 4.0 (decisión B18)
               </div>
             </div>
             <div className="nota-editor">
@@ -1236,7 +1238,7 @@ export default function Lector() {
               <div className="info-seccion">
                 <div className="info-titulo">{tr.infoComentario}</div>
                 <div className="lex-def">
-                  Matthew Henry, Complete Commentary (1706–1721) · Dominio público · edición CC0 ·{" "}
+                  Matthew Henry, Complete Commentary (1706–1721) · Dominio público · edición CC0 · traducción ES CC BY 4.0 ·{" "}
                   {henryEs ? tr.estadoNota : tr.comentarioEN}
                 </div>
               </div>

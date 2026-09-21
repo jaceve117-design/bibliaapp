@@ -19,7 +19,7 @@
 ## Licencia
 
 - **Doble seguridad jurídica:** (1) obra subyacente en dominio público por fecha y muerte del autor; (2) la edición digital usada está dedicada al dominio público por CC0-1.0 — sin marcado propietario (a diferencia del caso CCEL/ThML).
-- `traductor` (para nuestra versión ES): GLM + revisión humana 100 % doctrinal (B2) — la traducción será obra derivada propia; **su licencia es decisión pendiente de bitácora, a cerrar antes del primer párrafo publicado**.
+- `traductor` (para nuestra versión ES): GLM + revisión humana 100 % doctrinal (B2) — obra derivada propia; **licencia: CC BY 4.0** (decisión B18, 2026-09-19 — ver `02. Legal/Decision B18 - Licencia de traducciones propias (CC BY 4.0).md`).
 - Copyleft: ninguno.
 - ⚠️ Regla del traductor ya aplicada: esta edición es el comentario COMPLETO original, no una revisión moderna con derechos.
 
