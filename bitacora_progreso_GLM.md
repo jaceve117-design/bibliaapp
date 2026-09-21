@@ -826,3 +826,51 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 - Verificación: `tsc` limpio; build OK; desplegado (`17d7152b`); producción: `/data/sblgnt/JHN.json` 200 (Jn 3:16 griego correcto, 25 palabras con lemas), manifiesto 27 libros/7.927 versos/8 incidentes, botón Ξ servido, lector 200, **JUAN ES 2064/2064** intacto. Commit y push.
 
 **Estado:** pasos 0-1-2-5-7 completos · paso 3 completo salvo revisión humana (⟡ materiales listos) · paso 4 [~] esperando revisión del usuario · **paso 6 [~]: SBLGNT ✓ (ingesta+validación+UI) — quedan JFB, Barnes y Nave's** (fichas PD listas; localizar espejos estructurados fiables en próximos turnos) · **traducción de MH en pausa por directiva del usuario**. Bloqueado en usuario: ratificación B18 (paso 8), modelo de sostenimiento, nombre/dominio.
+
+### 2026-09-21 · Claude (relevo por agotamiento de créditos de GLM) — Nave's terminada · morfología ES cableada · UX del versículo
+
+**Contexto.** GLM se quedó sin créditos a mitad de la interfaz de Nave's. Claude retomó el trabajo colgado y cerró la etapa a petición del usuario.
+
+**1 · Nave's Topical Bible — paso 6 avanza (2 de 4).**
+La ingesta estaba **completa** y sin commitear: 66 libros, **4.672 temas**, **77.954 aserciones**, `_manifest.json` y claves i18n ES/EN ya escritas. Faltaba solo la interfaz.
+- Añadido el bloque **Temas (Nave)** al panel de referencias del verso, con carga perezosa por libro, caché compartida (`nave:{OSIS}`) y atribución de dominio público al pie.
+- Pipeline conservado: `scripts/ingesta-nave.mjs`.
+- **Restan del paso 6: JFB y Barnes** (fichas PD ya archivadas; falta localizar espejos estructurados fiables).
+
+**2 · Morfología en español cableada — directiva `D-001.2` cumplida.**
+El interlineal ya no muestra códigos crudos. `V-PAI-3S` pasa a *«verbo presente voz activa indicativo 3a persona singular»*.
+- Mapa por idioma (`/data/morfologia/codigos-{griego,hebreo}-es.json`) con carga perezosa al abrir Ω y caché propia.
+- **Caída al código crudo** si falta una entrada: nunca un hueco vacío.
+- Códigos hebreos compuestos resueltos por partes: `HR/Ncfsa` → *«preposicion + sustantivo comun femenino singular absoluto»*.
+- **Cobertura medida sobre los datos que el lector renderiza**, no sobre el corpus teórico: **99,7 %** en Juan (16.014/16.069) y **99,2 %** en Génesis (20.007/20.161).
+- Atribución CC BY 4.0 ampliada en el panel Fuentes a las etiquetas traducidas y a Nave's.
+
+**3 · UX del versículo — petición directa del usuario.**
+Problema reportado: al pulsar el texto de un verso salía el menú nativo «Buscar con Google», y para guardar una nota había que acertar en el número del verso, un blanco diminuto.
+- **El versículo completo es ahora el blanco táctil**: abre el panel de referencias, temas, nota y subrayado. El número deja de ser botón. Añadidos `role="button"`, `tabIndex`, activación por teclado y foco visible.
+- **Selección nativa desactivada** sobre el texto del verso (`user-select` + `-webkit-touch-callout`), que es lo que dispara ese menú. Decisión del usuario: no conservarlo.
+- **Compensación — botón Copiar** en la cabecera del panel, con referencia bien formada: `«texto» — Juan 1:1 (RV1909)`. Acuse visual y respaldo para navegadores sin API de portapapeles. Queda mejor que el copiado nativo, que daba el texto sin referencia.
+
+**4 · Corrección de rigor en la bitácora maestra.**
+La deuda de la tabla morfológica griega estaba etiquetada como incumplimiento de **C1/C2**. **No lo es.** C1 exige la fase legal antes de ingerir y C2 las doce preguntas de la ficha; la regla de *«cita literal»* del brief `01.0` es **sobre la licencia**, que en STEPBible sí está verificada y atribuida. Lo pendiente es el **significado de los códigos gramaticales**: deuda de exactitud académica, no legal. Corregido con fecha, sin reescribir lo anterior.
+
+**5 · Directiva D-001 cerrada, y causa del desvío corregida.**
+GLM no ejecutó dos tareas de la directiva porque ambas numeraciones usaban «paso N» y colisionaron: al leer «paso 6» tiró de su propio plan (cierre del núcleo) en vez del de la directiva. **El fallo fue de la directiva.**
+> **Regla nueva vigente:** las tareas de directiva se identifican **`D-NNN.n`**. «Paso N» queda reservado en exclusiva a esta BP.
+
+El refactor `D-001.1` (selector de comentario) resultó **innecesario**: interlineal, léxico y Nave's cargan por su propia vía y no compiten con el comentario. Se reabre cuando entre **JFB**, la segunda obra de comentario, que es cuando el booleano `comentario` sí estorba.
+
+**Verificación:** `tsc --noEmit` limpio · `npm run build` código 0 · `versoTocable` y `copiarVerso` confirmados en los chunks publicados.
+**Commit:** `447fd5b` · **Despliegue:** https://27335dfb.bibliaapp.pages.dev
+
+**Estado:** pasos 0-1-2-5-7 completos · paso 3 completo salvo revisión humana (⟡ materiales listos) · paso 4 [~] esperando revisión del usuario · **paso 6 [~]: SBLGNT ✓ · Nave's ✓ — restan JFB y Barnes** · traducción de MH **en pausa por orden del usuario**.
+**Bloqueado en usuario (sin cambios):** ratificación B18 en la puerta legal, modelo de sostenimiento, nombre y dominio.
+**Deuda abierta:** cotejo de la tabla morfológica griega contra el intro de TAGNT (Google Doc inaccesible) — exactitud, no licencia.
+
+**⚠️ Hallazgo de infraestructura — techo de archivos en Cloudflare Pages.**
+El despliegue subió **5.194 archivos / 123 MB**, de los cuales **4.740 son de Nave's** (un JSON por tema). Cloudflare Pages admite 20.000 archivos por despliegue: hoy sobra margen, pero el patrón «un archivo por entrada» tiene techo.
+
+Consecuencia directa para la cola de traducción: las **glosas de TBESH/TBESG son 22.717 entradas**. Con un archivo por entrada **revientan el límite ellas solas**. Hay que agruparlas antes de generarlas — por letra inicial, por rango de Strong's, o en un único mapa como se hizo con la morfología (2.061 códigos en 2 archivos). Lo mismo aplica a Easton ES.
+
+**Decidir la estrategia de empaquetado antes de generar, no después.**
+
