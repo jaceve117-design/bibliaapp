@@ -896,3 +896,14 @@ Consecuencia directa para la cola de traducción: las **glosas de TBESH/TBESG so
 5. **Revisión doctrinal (paso 4 ⟡):** luz verde recibida — los materiales están en `06. Traduccion/Puerta paso 4 - Guía de revisión doctrinal (Juan).md`; el revisor lee en el lector (ES con EN a un clic) y reporta por el canal de errores. Al aprobar capítulo a capítulo se retira la etiqueta «sin revisar».
 
 **Estado:** pasos 0-1-2-5-7 ✓ · paso 3 completo salvo revisión humana · paso 4: materiales listos, revisión abierta al usuario · **paso 6: SBLGNT ✓ · Nave's ✓ · JFB ✓ — restan Barnes** (y cierre legal de SBLGNT ya fichada) · MH **en pausa por directiva**. Bloqueado en usuario: modelo de sostenimiento, nombre/dominio.
+
+### 2026-09-21 · GLM — UX del comentario: desplegable de comentaristas con insignia de idioma (petición del usuario)
+
+**Petición:** que la elección de comentarista sea un **desplegable** (ampliable a los que se agreguen) y que la traducción aparezca a la derecha solo cuando exista — como hoy con MH — mostrando si no el idioma disponible.
+- **Implementado:** la barra del comentario cambia el rótulo fijo por un **`<select>` de comentaristas** («Matthew Henry · 1706», «Jamieson, Fausset y Brown · 1871», …) — lista central `COMENTARIOS`; cada obra nueva del núcleo se añade con una línea. A la derecha:
+  - **Henry** (con traducción ES): insignia «sin revisar» + toggle ES/EN (como antes).
+  - **JFB** (solo EN): insignia pasiva «EN» con tooltip del estado de traducción.
+  - Los botones Henry/JFB del turno anterior quedan retirados (eran la solución interina).
+- Estilos con tokens (serif en el desplegable, insignia pill); `tsc` limpio; desplegado (`6c2edc95`); producción: lector 200, jfb 200, **JUAN ES 2064/2064**. Commit y push.
+
+**Estado sin otros cambios:** paso 6 con SBLGNT ✓ · Nave's ✓ · JFB ✓ (restan Barnes) · MH en pausa · revisión doctrinal abierta al usuario · bloqueado en usuario: sostenimiento y nombre/dominio.

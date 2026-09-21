@@ -42,6 +42,12 @@ const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
   { id: "web", etiqueta: "WEB" },
 ];
+// comentaristas disponibles en el desplegable de la barra del comentario
+const COMENTARIOS = [
+  { id: "henry", etiqueta: "Matthew Henry · 1706" },
+  { id: "jfb", etiqueta: "Jamieson, Fausset y Brown · 1871" },
+] as const;
+type ComFuente = (typeof COMENTARIOS)[number]["id"];
 const OSIS_INICIAL = "JHN";
 const CAP_INICIAL = 1;
 const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
@@ -74,7 +80,7 @@ export default function Lector() {
   const [henry, setHenry] = useState<HenryJson | null>(null);
   const [henryEs, setHenryEs] = useState<HenryEsJson | null>(null);
   const [comIdioma, setComIdioma] = useState<"es" | "en">("es");
-  const [comFuente, setComFuente] = useState<"henry" | "jfb">("henry");
+  const [comFuente, setComFuente] = useState<ComFuente>("henry");
   const [jfbData, setJfbData] = useState<JfbJson | null>(null);
   const [panelCita, setPanelCita] = useState<PanelCita | null>(null);
   const [panelTermino, setPanelTermino] = useState<Termino | null>(null);
@@ -872,7 +878,18 @@ export default function Lector() {
           >
             <span className="com-strip-izq">
               <span className="com-strip-icono">✎</span>
-              <span className="autor">{tr.autorComentario}</span>
+              <select
+                className="sel com-sel"
+                aria-label={tr.comentario}
+                value={comFuente}
+                onChange={(e) => setComFuente(e.target.value as ComFuente)}
+              >
+                {COMENTARIOS.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.etiqueta}
+                  </option>
+                ))}
+              </select>
             </span>
             <span
               className="com-strip-der"
@@ -881,46 +898,36 @@ export default function Lector() {
               role="group"
               aria-label={tr.comentario}
             >
-              <span className="obras-toggle">
-                <button
-                  className={`obras-tab${comFuente === "henry" ? " activa" : ""}`}
-                  onClick={() => setComFuente("henry")}
-                  aria-label="Comentario de Matthew Henry"
-                >
-                  Henry
-                </button>
-                <button
-                  className={`obras-tab${comFuente === "jfb" ? " activa" : ""}`}
-                  onClick={() => setComFuente("jfb")}
-                  aria-label="Comentario de Jamieson, Fausset y Brown"
-                >
-                  JFB
-                </button>
-              </span>
-              {comFuente === "henry" && henryEs && (
-                <>
-                  {idiomaEfectivo === "es" && esCapDisp && (
-                    <span className="badge-revision" title={tr.estadoNota}>
-                      {tr.sinRevisar}
+              {comFuente === "henry" ? (
+                henryEs && (
+                  <>
+                    {idiomaEfectivo === "es" && esCapDisp && (
+                      <span className="badge-revision" title={tr.estadoNota}>
+                        {tr.sinRevisar}
+                      </span>
+                    )}
+                    <span className="obras-toggle">
+                      <button
+                        className={`obras-tab${comIdioma === "es" ? " activa" : ""}`}
+                        onClick={() => setComIdioma("es")}
+                        aria-label="Comentario en español"
+                      >
+                        ES
+                      </button>
+                      <button
+                        className={`obras-tab${comIdioma === "en" ? " activa" : ""}`}
+                        onClick={() => setComIdioma("en")}
+                        aria-label="Commentary in English"
+                      >
+                        EN
+                      </button>
                     </span>
-                  )}
-                  <span className="obras-toggle">
-                    <button
-                      className={`obras-tab${comIdioma === "es" ? " activa" : ""}`}
-                      onClick={() => setComIdioma("es")}
-                      aria-label="Comentario en español"
-                    >
-                      ES
-                    </button>
-                    <button
-                      className={`obras-tab${comIdioma === "en" ? " activa" : ""}`}
-                      onClick={() => setComIdioma("en")}
-                      aria-label="Commentary in English"
-                    >
-                      EN
-                    </button>
-                  </span>
-                </>
+                  </>
+                )
+              ) : (
+                <span className="badge-idioma" title={tr.comentarioEN}>
+                  EN
+                </span>
               )}
             </span>
           </div>
