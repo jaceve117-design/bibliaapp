@@ -1,6 +1,6 @@
 # Ficha legal — Jamieson, Fausset and Brown Commentary (JFB)
 
-> Estado: **fichada** (pendiente de ingesta — paso 6, cierre del núcleo)
+> Estado: **aprobada y ejecutada** (ingesta validada 2026-09-21)
 > Uso previsto: comentario bíblico EN (traducción ES en ola posterior)
 
 ## Identificación
@@ -12,8 +12,8 @@
 | Titular de derechos | Ninguno vigente: dominio público (publicación 1871, autores fallecidos 1879/1910/1897) |
 | Idioma | Inglés |
 | Formato de ingesta | Texto estructurado por verso → JSON propio |
-| URL de origen candidato | https://www.studybible.info/Jamieson-Fausset-Brown (espejo público del texto PD) |
-| `verified_at` | 2026-09-19 (status PD por fecha de publicación, pre-1929; verificación de fuente concreta en el momento de la ingesta) |
+| URL de origen | https://www.ccel.org/ccel/jamieson/jfb.xml (ThML oficial; crudo en `05. Datos/corpus_crudo/jfb/`) |
+| `verified_at` | 2026-09-19 (status PD) · **2026-09-21: ingesta ejecutada desde CCEL ThML oficial** (66 libros, 19.768 anclas de verso) |
 | Jurisdicción | PD en EUA (pre-1929) · PD en España/AL (autores fallecidos hace más de 70 años) |
 
 ## Licencia
@@ -21,6 +21,12 @@
 - Licencia exacta: **Dominio público** por antigüedad (Inglaterra, 1871).
 - `traductor` (para nuestra versión ES): GLM + revisión humana 100 % doctrinal — obra derivada propia, licencia **CC BY 4.0** (decisión B18, 2026-09-19).
 - Copyleft: ninguno. `permite_embeddings: sí`.
+
+## Ingesta ejecutada (2026-09-21)
+
+- **66 libros, 19.768 anclas de verso** (`public/data/jfb/{OSIS}.json` + manifiesto).
+- JFB comenta por **anclas de versículo** (grupos): los versos sin ancla quedan cubiertos por el bloque previo, fiel a la edición impresa. Diferencias de granularidad vs RV1909 documentadas en el manifiesto (esperadas).
+- Integración: selector Henry/JFB en la barra del comentario (D-001.1 resuelta).
 
 ## Checklist de las 12 preguntas
 

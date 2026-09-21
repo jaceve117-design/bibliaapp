@@ -29,6 +29,7 @@ type EntradaDic = { n: string; d: string; r: string[] };
 type SeccionHenry = { t: string; v: number | null; p: string[] };
 type HenryJson = { osis: string; c: Record<string, { r: string | null; s: SeccionHenry[] }> };
 type HenryEsJson = HenryJson & { estado?: string };
+type JfbJson = { osis: string; c: Record<string, { v: number; p: string[] }[]> };
 type Termino = { t: string; variantes: string[]; idioma: string; sig: string };
 type PanelCita = { etiqueta: string; osis: string; c: number; versos: { v: number; t: string }[]; cargando: boolean; mas: boolean };
 type ColorSubrayado = "" | "amarillo" | "verde" | "rosa";
@@ -73,6 +74,8 @@ export default function Lector() {
   const [henry, setHenry] = useState<HenryJson | null>(null);
   const [henryEs, setHenryEs] = useState<HenryEsJson | null>(null);
   const [comIdioma, setComIdioma] = useState<"es" | "en">("es");
+  const [comFuente, setComFuente] = useState<"henry" | "jfb">("henry");
+  const [jfbData, setJfbData] = useState<JfbJson | null>(null);
   const [panelCita, setPanelCita] = useState<PanelCita | null>(null);
   const [panelTermino, setPanelTermino] = useState<Termino | null>(null);
   const [panelInfo, setPanelInfo] = useState(false);
@@ -394,6 +397,28 @@ export default function Lector() {
       .catch(() => setHenryEs(null));
   }, [comentario, osis]);
 
+  // JFB (paso 6): segunda obra de comentario — carga perezosa por libro
+  useEffect(() => {
+    if (!comentario || comFuente !== "jfb") {
+      setJfbData(null);
+      return;
+    }
+    const clave = `jfb:${osis}`;
+    const enCache = cache.get(clave) as JfbJson | undefined;
+    if (enCache) {
+      setJfbData(enCache);
+      return;
+    }
+    setJfbData(null);
+    fetch(`/data/jfb/${osis}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: JfbJson | null) => {
+        if (json) cache.set(clave, json);
+        setJfbData(json);
+      })
+      .catch(() => setJfbData(null));
+  }, [comentario, comFuente, osis]);
+
   // etiqueta morfológica legible: traduce el código; si falta, devuelve el código crudo.
   // Los códigos hebreos compuestos vienen separados por "/" (prefijo/raíz/sufijo).
   const morfLegible = (codigo: string): string => {
@@ -626,6 +651,10 @@ export default function Lector() {
     return { ...sEn, sinTraducir: false };
   });
 
+  // JFB: párrafos del capítulo, un elemento por ancla de verso («v. texto»)
+  const capJfb = jfbData?.c[capClave];
+  const parrafosJfb = (capJfb ?? []).flatMap((e) => e.p.map((x) => `${e.v}. ${x}`));
+
   const limpiarDef = (d: string) =>
     d
       .replace(/<BR\s*\/?>/gi, "\n")
@@ -852,7 +881,23 @@ export default function Lector() {
               role="group"
               aria-label={tr.comentario}
             >
-              {henryEs && (
+              <span className="obras-toggle">
+                <button
+                  className={`obras-tab${comFuente === "henry" ? " activa" : ""}`}
+                  onClick={() => setComFuente("henry")}
+                  aria-label="Comentario de Matthew Henry"
+                >
+                  Henry
+                </button>
+                <button
+                  className={`obras-tab${comFuente === "jfb" ? " activa" : ""}`}
+                  onClick={() => setComFuente("jfb")}
+                  aria-label="Comentario de Jamieson, Fausset y Brown"
+                >
+                  JFB
+                </button>
+              </span>
+              {comFuente === "henry" && henryEs && (
                 <>
                   {idiomaEfectivo === "es" && esCapDisp && (
                     <span className="badge-revision" title={tr.estadoNota}>
@@ -944,16 +989,24 @@ export default function Lector() {
             </div>
           ) : (
             <div className="texto-biblico">
-              {comentario && rCom && (
+              {comentario && comFuente === "henry" && rCom && (
                 <div className="com-resumen">
                   <div className="com-titulo">{tr.resumenCapitulo}</div>
                   {renderMarcado(rCom)}
                 </div>
               )}
+              {comentario && comFuente === "jfb" && parrafosJfb.length > 0 && (
+                <ComentarioBloque
+                  seccion={{ t: `${tr.jfbTitulo} — ${tr.jfbModo}`, v: null, p: parrafosJfb, sinTraducir: false }}
+                  tr={tr}
+                  renderFn={renderMarcado}
+                />
+              )}
               {versos.map((v) => {
-                const secciones = comentario
-                  ? seccionesCom.filter((s) => s.v === v.v)
-                  : [];
+                const secciones =
+                  comentario && comFuente === "henry"
+                    ? seccionesCom.filter((s) => s.v === v.v)
+                    : [];
                 const nVerso = notas[claveNota(v)];
                 return (
                   <span key={v.osis} style={{ display: "inline" }}>
@@ -1284,6 +1337,12 @@ export default function Lector() {
                 Traducción ES: obra derivada propia · CC BY 4.0 (decisión B18)
               </div>
             </div>
+            <div className="fuente-item">
+              <b>Jamieson, Fausset and Brown Commentary</b> — 1871 · dominio público
+              <div className="lex-meta">
+                tradición: evangélica escocesa-presbiteriana · {tr.fuentesEstadoEn} · texto EN · {tr.fuenteJfbCobertura}
+              </div>
+            </div>
             <div className="nota-editor">
               <div className="info-titulo">{tr.reportarError}</div>
               <textarea
@@ -1404,8 +1463,14 @@ export default function Lector() {
               <div className="info-seccion">
                 <div className="info-titulo">{tr.infoComentario}</div>
                 <div className="lex-def">
-                  Matthew Henry, Complete Commentary (1706–1721) · Dominio público · edición CC0 · traducción ES CC BY 4.0 ·{" "}
-                  {henryEs ? tr.estadoNota : tr.comentarioEN}
+                  {comFuente === "henry" ? (
+                    <>
+                      Matthew Henry, Complete Commentary (1706–1721) · Dominio público · edición CC0 · traducción ES CC BY 4.0 ·{" "}
+                      {henryEs ? tr.estadoNota : tr.comentarioEN}
+                    </>
+                  ) : (
+                    <>Jamieson, Fausset and Brown Commentary (1871) · Dominio público · texto EN (traducción ES en cola)</>
+                  )}
                 </div>
               </div>
             )}

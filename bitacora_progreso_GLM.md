@@ -31,7 +31,7 @@
 | B15 | **Experiencia MVP = un solo flujo impecable:** pasaje → interlineal → léxico → comentario → nota/subrayado, en las obras del corpus. Notas 100 % locales con exportación/importación desde el día uno. Atribución visible por obra. | GLM D1/D2/D3 ✔ |
 | B16 | **Estética:** sobria, elegante, minimalista y vanguardista; tipografía de lectura prolongada con hebreo y griego real, tokens con modo claro/oscuro. Etiquetado autor/tradición/fecha en cada obra. | GLM D4 + Claude A6 ✔ |
 | B17 | **Ejecución:** validación automática como PORTÓN de ingesta · Fase legal solo sobre el MVP · spike de OCR de ISBE antes de comprometer la segunda ola · avance por **obras validadas**, no por pasos administrativos. Estimación honesta: 4–6 meses MVP (1 dev + 1 editor parcial, 60 % limpieza de datos). | GLM E1–E4/E7 ✔ |
-| B18 | **Licencia de las traducciones propias: CC BY 4.0** (2026-09-19, autorizada por el usuario — «avanza con la licencia de traducciones»). Fundamento: coherencia con el corpus (PD + CC BY), sin copyleft (evita el riesgo ShareAlike), permite todo lo que las fichas prometen, atribución protege el proyecto. Detalle: `02. Legal/Decision B18 - Licencia de traducciones propias (CC BY 4.0).md`. Ratificación final en la puerta legal (paso 8). | Usuario (delegación) + GLM ✔ |
+| B18 | **Licencia de las traducciones propias: CC BY 4.0** (2026-09-19, autorizada por el usuario — «avanza con la licencia de traducciones»). Fundamento: coherencia con el corpus (PD + CC BY), sin copyleft (evita el riesgo ShareAlike), permite todo lo que las fichas prometen, atribución protege el proyecto. Detalle: `02. Legal/Decision B18 - Licencia de traducciones propias (CC BY 4.0).md`. **RATIFICADA por el usuario (2026-09-21: «la licencia también» — luz verde).** | Usuario ✔ |
 
 ### Enmiendas a la bitácora maestra registradas (2026-09-17)
 
@@ -70,6 +70,8 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
 ---
 
 ## 3. Decisiones técnicas de construcción (concretas, para esta implementación)
+
+- **Empaquetado de obras derivadas ES (decisión 2026-09-21, tras hallazgo del techo de 20.000 archivos de Cloudflare Pages):** NINGUNA obra derivada se genera como «un archivo por entrada». Convención: **un único mapa JSON por obra** (como la morfología ES: 2.061 códigos en 2 archivos) o, si el tamaño lo exige, particiones gruesas (por letra/rango). Aplica a las glosas ES de TBESH/TBESG (22.717 entradas) y a Easton ES. Decidir el empaquetado ANTES de generar.
 
 - **Stack:** Next.js (App Router) + TypeScript. CSS con **tokens propios** en `globals.css` (variables CSS): la estética manda sobre el framework.
 - **Tipografía:** stacks de sistema en esta fase inicial (Georgia/Palatino serif de lectura + system-ui de interfaz). La selección de tipografías autoalojadas con hebreo/griego real es tarea de Fase de diseño (B16) — **no** bloquea el arranque.
@@ -874,3 +876,23 @@ Consecuencia directa para la cola de traducción: las **glosas de TBESH/TBESG so
 
 **Decidir la estrategia de empaquetado antes de generar, no después.**
 
+
+### 2026-09-21 · GLM (vigilante) — DIRECTIVA DEL USUARIO: JFB INGERIDA E INTEGRADA (selector Henry/JFB) · B18 RATIFICADA · convención de empaquetado fijada · Barnes en cola — Juan sigue completo (2064/2064)
+
+**El usuario ordenó:** «continuamos con 1 y 2 y luego con lo mío — luz verde revisión en orden y la licencia también». Ejecutado:
+
+1. **JFB INGERIDA, VALIDADA E INTEGRADA (paso 6).**
+   - **Fuente:** ThML oficial de CCEL (`ccel.org/ccel/jamieson/jfb.xml`, 34 MB) — crudo en `05. Datos/corpus_crudo/jfb/`. Pipeline reproducible: `scripts/ingesta-jfb.mjs` (parser ThML: `scripCom parsed="|Libro|cap|v|capFin|vFin"` + párrafos `<p>`; decodificación de entidades; títulos div2 → OSIS).
+   - **Salida:** `public/data/jfb/{OSIS}.json` — **66 libros, 19.768 anclas de verso**, 0 libros vacíos. Granularidad fiel a la edición impresa: JFB ancla por versos clave; los versos sin ancla quedan cubiertos por el bloque previo (documentado en el manifiesto; dif. vs RV1909 informativas, p. ej. GEN 594/1533).
+   - **Lector (D-001.1 resuelta):** selector **Henry | JFB** en la barra del comentario (excluyente con ES/EN y con la etiqueta «sin revisar», que son de Henry). En modo JFB: un bloque colapsable por capítulo («Comentario de JFB — capítulo N — verso a verso (EN)»), cada ancla numerada, con citas enlazadas vía renderMarcado. ⓘ y panel Fuentes con la atribución JFB (1871 · PD · evangélica escocesa-presbiteriana · texto EN).
+   - Verificación: `tsc` limpio; build 0; desplegado (`32582676`); producción: `/data/jfb/JHN.json` 200 (21 caps; Jn 3:16 con ancla y comentario correcto), selector servido, lector 200, **JUAN ES 2064/2064**.
+
+2. **Convención de empaquetado de obras derivadas ES (cerrada la decisión):** ninguna obra derivada se genera «un archivo por entrada» (techo de 20.000 archivos de Pages). Un único mapa JSON por obra (como morfología ES) o particiones gruesas. Aplica a glosas TBESH/TBESG (22.717) y Easton ES. Registrada en la sección 3 de la BP. La generación de las glosas ES es la siguiente tarea de la cola de traducción (no es MH, puede ejecutarse sin decisión).
+
+3. **B18 RATIFICADA por el usuario** («la licencia también»): CC BY 4.0 para las traducciones propias. Registrado en la tabla de decisiones. Pendiente solo su reflejo formal en la puerta legal (paso 8).
+
+4. **Barnes (paso 6, en cola):** sondas de fuentes sin resultado limpio aún — CCEL (barnesnt/nt/ntb → 404), studybible.info (no tiene la obra: /Barnes cae en fallback), GitHub (solo Calvin/Meyer en pillar-commentary-data). Próximas vías: código de obra real de CCEL (su buscador), biblehub por verso (7.957 peticiones, viable con bucle cortés), o módulo e-Sword de BibleSupport. La ficha legal ya está lista.
+
+5. **Revisión doctrinal (paso 4 ⟡):** luz verde recibida — los materiales están en `06. Traduccion/Puerta paso 4 - Guía de revisión doctrinal (Juan).md`; el revisor lee en el lector (ES con EN a un clic) y reporta por el canal de errores. Al aprobar capítulo a capítulo se retira la etiqueta «sin revisar».
+
+**Estado:** pasos 0-1-2-5-7 ✓ · paso 3 completo salvo revisión humana · paso 4: materiales listos, revisión abierta al usuario · **paso 6: SBLGNT ✓ · Nave's ✓ · JFB ✓ — restan Barnes** (y cierre legal de SBLGNT ya fichada) · MH **en pausa por directiva**. Bloqueado en usuario: modelo de sostenimiento, nombre/dominio.
