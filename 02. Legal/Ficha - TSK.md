@@ -19,8 +19,8 @@
 ## Licencia
 
 - TSK subyacente: **dominio público** (Torrey, 1897).
-- OpenBible cross-refs: **CC BY 2016** (citada literal en la primera línea del archivo crudo).
-- Agregador neuu-org: **CC BY 4.0** (verificado).
+- OpenBible cross-refs: **CC BY 2016** — línea literal «#www.openbible.info CC-BY 2016-02-01» (primera línea del crudo; archivada en `02. Legal/Licencias literales — eBible y OpenBible.md`, sección 4).
+- Agregador neuu-org: **CC BY 4.0** (LICENSE «Copyright (c) 2026 NEUU» — archivada en `02. Legal/Licencias literales — eBible y OpenBible.md`, sección 5).
 - Consecuencia: atribución visible en el panel de referencias del lector (ya implementado): «TSK (Torrey, 1907 · dominio público) + OpenBible.info (CC BY)».
 - `permite_embeddings: sí` · copyleft: ninguno (BY).
 

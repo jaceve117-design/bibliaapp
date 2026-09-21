@@ -13,12 +13,12 @@
 | Idioma | Español |
 | Formato de ingesta | USFM 3 → JSON propio (`scripts/ingesta.mjs rv1909`) |
 | URL de origen | https://ebible.org/Scriptures/spaRV1909_usfm.zip |
-| `verified_at` | 2026-09-14 (existencia y descripción en ebible.org) · **⚠️ pendiente: archivar el texto literal de su página de copyright** |
+| `verified_at` | 2026-09-14 (existencia y descripción en ebible.org) · 2026-09-19 (texto literal de copyright archivado) |
 | Jurisdicción | PD en EUA (publicación 1909, pre-1928) · PD en España/AL (traductores fallecidos hace más de 70 años) |
 
 ## Licencia
 
-- Licencia exacta: **Dominio público** (declarada por eBible.org para esta edición). Cita literal: ⚠️ pendiente archivar de https://ebible.org/Scriptures/copyright.php (tarea 1.2 de bitácora).
+- Licencia exacta: **Dominio público** (declarada por eBible.org para esta edición). Cita literal: «Public Domain» / «Dominio Público» (página de la edición) y «are in the Public Domain (not copyrighted) in the USA, to the best of my knowledge» (declaración general de eBible.org) — **archivadas en `02. Legal/Licencias literales — eBible y OpenBible.md`** (secciones 1-2).
 - `traductor`: equipo de la British and Foreign Bible Society (1902/1909) — fallecidos hace más de 80 años.
 - `derechos_edicion_digital`: eBible.org publica la edición sin restricción de redistribución; el marcado USFM usado es estándar. Riesgo bajo.
 - Copyleft: ninguno.

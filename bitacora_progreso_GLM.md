@@ -45,9 +45,9 @@ Leyenda: ⟡ = puerta de decisión (no se pasa sin aprobación explícita del us
 | # | Paso | Contenido | Criterio de "hecho" | Estado |
 |---|---|---|---|---|
 | 0 | Cierre Fase 0 | Nombre, dominio y disponibilidad en tiendas (bloquea marca/despliegue) · `git init` | Nombre decidido por el usuario; repo inicial commiteado | nombre `[!]` bloqueado en usuario · git `[x]` commit `e0fa316` |
-| 1 | Fase legal MVP | Plantilla de ficha (12 preguntas + traductor + jurisdicción + embeddings) · fichas del corpus MVP | Fichas archivadas en `02. Legal/` con licencia literal | `[x]` plantilla + 6 fichas del núcleo · ⚠️ pendiente menor: archivar textos literales de eBible/OpenBible |
+| 1 | Fase legal MVP | Plantilla de ficha (12 preguntas + traductor + jurisdicción + embeddings) · fichas del corpus MVP | Fichas archivadas en `02. Legal/` con licencia literal | `[x]` plantilla + 6 fichas del núcleo · textos literales de eBible/OpenBible archivados (2026-09-19, `02. Legal/Licencias literales — eBible y OpenBible.md`) |
 | 2 | Fundación técnica | Andamio web + tokens de diseño · esquema `work/edition/node/link/lemma` con OSIS · pipeline USFM→JSON con validación como portón · semilla de datos real | Lector muestra texto real ingerido por pipeline validado | `[x]` pipeline genérico multi-edición: **RV1909 + WEB validadas** · pendiente: esquema PostgreSQL |
-| 3 | Corte vertical — piloto | Libro piloto (Juan 1 como demo inicial; Romanos/Juan completo a decidir): capa STEPBible con interlineal · RV1909+WEB del libro · glosario maestro · traducción de Henry del libro · revisión humana 100 % doctrinal | Piloto completo navegable ES+EN+griego con comentario traducido | `[~]` capa STEPBible completa de TODA la Biblia ingerida y visible · traducción del piloto (Henry) pendiente |
+| 3 | Corte vertical — piloto | Libro piloto (Juan 1 como demo inicial; Romanos/Juan completo a decidir): capa STEPBible con interlineal · RV1909+WEB del libro · glosario maestro · traducción de Henry del libro · revisión humana 100 % doctrinal | Piloto completo navegable ES+EN+griego con comentario traducido | `[~]` capa STEPBible completa de TODA la Biblia ingerida y visible · **traducción del piloto Henry-JUAN COMPLETA y pulida (2026-09-19: 21/21 caps, 2064/2064 párrafos, 0 residuales)** — queda revisión humana 100 % doctrinal (paso 4 ⟡, requiere decisión del usuario) |
 | 4 | ⟡ Puerta de calidad | ¿La traducción es publicable con nuestro nombre? Si no: corregir método antes de escalar | Decisión registrada en esta BP | `[ ]` |
 | 5 | Conexiones | TSK (~500.000 referencias) anclado a OSIS | Referencias visibles en el lector | `[x]` 386.384 referencias validadas y navegables en el panel del verso |
 | 6 | Escalado corpus | Núcleo 6 fuentes validado + cierre (SBLGNT, JFB, Barnes, Nave's) — cada obra: ficha + ingesta validada + atribución | Métrica: obras en estado `validada` / `lanzar` | `[ ]` |
@@ -756,3 +756,19 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 **Posición exacta: la traducción de Juan está completa y pulida en estructura (21/21 caps, 2.064/2.064 párrafos; 0 cortes duros salvo la anomalía de fuente; 0 residuales).** No queda deuda conocida de traducción ni pulido.
 - **Siguiente turno:** no hay pasos de traducción pendientes. Opciones: mejoras menores del lector según plan de la BP, o esperar decisión del usuario sobre el paso 6 (cierre del núcleo — requiere fichas legales en 02. Legal/).
 - **Bloqueado en usuario (sin cambios):** licencia de traducciones propias, modelo de sostenimiento, nombre/dominio, puertas ⟡.
+
+### 2026-09-19 · GLM (vigilante) — FASE LEGAL: textos literales de eBible/OpenBible archivados · estado del plan actualizado — Juan sigue completo (2064/2064)
+
+**Cierre del pendiente menor del paso 1 (fase legal MVP).** No quedaba deuda de traducción ni de pulido, así que el turno fue para la única tarea del plan ejecutable sin decisión del usuario.
+- **Archivado `02. Legal/Licencias literales — eBible y OpenBible.md`** con 5 secciones de citas verbatim, cada una con URL y fecha de captura (2026-09-19):
+  1. Declaración general de copyright de eBible.org («are in the Public Domain (not copyrighted) in the USA, to the best of my knowledge» — con spaRV1909 y eng-web en la tabla PD).
+  2. Página de copyright de la edición spaRV1909 («Public Domain» / «Dominio Público»; «Reina y Valera»; «Castellano 1909»).
+  3. Declaración de la World English Bible («is in the Public Domain. That means that it is not copyrighted.»; permisos «copy, publish, proclaim, distribute, redistribute, sell, give away, quote»; regla del nombre tras modificación — «This is to avoid confusion, not to limit your freedom.»; marca «World English Bible» de eBible.org).
+  4. Línea literal de OpenBible en el crudo archivado: «#www.openbible.info CC-BY 2016-02-01».
+  5. LICENSE del agregador neuu-org: «Creative Commons Attribution 4.0 International (CC BY 4.0)» / «Copyright (c) 2026 NEUU».
+- **Fichas actualizadas:** RV1909 y WEB — marcados «⚠️ pendiente: archivar el texto literal» cerrados con referencia al nuevo documento; TSK — citas literales de OpenBible y del agregador referenciadas (secciones 4-5). **El paso 1 del plan queda sin pendientes.**
+- **Plan actualizado:** paso 3 pasa de «traducción del piloto (Henry) pendiente» a «**traducción del piloto Henry-JUAN COMPLETA y pulida (21/21 caps, 2064/2064 párrafos, 0 residuales)** — queda revisión humana 100 % doctrinal (paso 4 ⟡, requiere decisión del usuario)».
+- Desplegado (`97c11236`). Verificado en producción: lector 200 (alias), **JUAN 2064/2064**. Commit y push.
+
+**Posición exacta:** pasos 0-1-2-5 completos; paso 3 completo salvo la revisión humana doctrinal; Juan traducido y pulido. No queda ninguna tarea ejecutable del plan sin decisión del usuario:
+- **Bloqueado en usuario:** paso 4 ⟡ (puerta de calidad de la traducción), paso 6 (cierre del núcleo — SBLGNT, JFB, Barnes, Nave's, con sus fichas legales), licencia de las traducciones propias (ficha Matthew Henry lo exige «antes del primer párrafo publicado» — ya publicado, decisión urgente), modelo de sostenimiento, nombre/dominio, puertas ⟡.

@@ -13,12 +13,12 @@
 | Idioma | Inglés |
 | Formato de ingesta | USFM 3 → JSON propio (`scripts/ingesta.mjs web`) |
 | URL de origen | https://ebible.org/Scriptures/eng-web_usfm.zip |
-| `verified_at` | 2026-09-17 (ingesta directa del sitio oficial) · **⚠️ pendiente: archivar el texto literal de la página de copyright** |
+| `verified_at` | 2026-09-17 (ingesta directa del sitio oficial) · 2026-09-19 (texto literal de copyright archivado) |
 | Jurisdicción | PD en EUA (dedicación explícita del proyecto) · mundial |
 
 ## Licencia
 
-- Licencia exacta: **Dominio público** — la WEB está dedicada explícitamente al dominio público por su editor. Cita literal: ⚠️ pendiente archivar de https://ebible.org/Scriptures/copyright.php (tarea 1.2).
+- Licencia exacta: **Dominio público** — la WEB está dedicada explícitamente al dominio público por su editor. Cita literal: «is in the Public Domain. That means that it is not copyrighted.»; «copy, publish, proclaim, distribute, redistribute, sell, give away, quote»; regla de nombre tras modificación — **archivadas en `02. Legal/Licencias literales — eBible y OpenBible.md`** (secciones 1 y 3).
 - **Marca registrada (dato crítico):** el nombre «World English Bible» es una marca registrada de Michael Paul Johnson. Regla: el texto es PD, pero si usamos el *nombre* debemos cumplir sus pautas de uso (atribución y aviso de que no es una edición oficial de su editorial). Alternativa limpia: mostrar «WEB» con nuestra propia ficha de procedencia. Decisión de interfaz pendiente — hoy el lector muestra «WEB».
 - `traductor`: Michael Paul Johnson et al. (1997–presente, actualización continua).
 - Copyleft: ninguno.
