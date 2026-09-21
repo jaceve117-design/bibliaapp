@@ -56,6 +56,10 @@ export default function Lector() {
   const [texto, setTexto] = useState<ObraJson | null>(null);
   const [cargando, setCargando] = useState(true);
   const [interlineal, setInterlineal] = useState(false);
+  // morfología en español (STEPBible traducido) y temas de Nave's
+  const [morfEs, setMorfEs] = useState<Record<string, string> | null>(null);
+  const [naveTemas, setNaveTemas] = useState<string[] | null>(null);
+  const [copiado, setCopiado] = useState(false);
   const [interData, setInterData] = useState<InterJson | null>(null);
   const [griego, setGriego] = useState(false);
   const [grData, setGrData] = useState<GrJson | null>(null);
@@ -256,6 +260,26 @@ export default function Lector() {
       .catch(() => setInterData(null));
   }, [interlineal, osis]);
 
+  // morfología en español: mapa por idioma, cargado al abrir el interlineal
+  useEffect(() => {
+    if (!interlineal) return;
+    const idioma = NT.has(osis) ? "griego" : "hebreo";
+    const clave = `morf:${idioma}`;
+    const enCache = cache.get(clave) as Record<string, string> | undefined;
+    if (enCache) {
+      setMorfEs(enCache);
+      return;
+    }
+    fetch(`/data/morfologia/codigos-${idioma}-es.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: { codigos?: Record<string, string> } | null) => {
+        const mapa = json?.codigos ?? null;
+        if (mapa) cache.set(clave, mapa);
+        setMorfEs(mapa);
+      })
+      .catch(() => setMorfEs(null));
+  }, [interlineal, osis]);
+
   // texto griego (SBLGNT): carga perezosa por libro
   useEffect(() => {
     if (!griego) {
@@ -370,9 +394,61 @@ export default function Lector() {
       .catch(() => setHenryEs(null));
   }, [comentario, osis]);
 
+  // etiqueta morfológica legible: traduce el código; si falta, devuelve el código crudo.
+  // Los códigos hebreos compuestos vienen separados por "/" (prefijo/raíz/sufijo).
+  const morfLegible = (codigo: string): string => {
+    if (!codigo) return "";
+    if (!morfEs) return codigo;
+    const partes = codigo.split("/").map((c) => morfEs[c.trim()] ?? c.trim());
+    return partes.join(" + ");
+  };
+
+  // copia el versículo con su referencia bien formada: «texto» — Juan 3:16 (RV1909)
+  const copiarVerso = async (v: Verso) => {
+    const sigla = manifest?.osis_obra ?? obra.toUpperCase();
+    const libro = info?.nombre ?? v.osis.split(".")[0];
+    const texto = `\u00ab${v.t}\u00bb \u2014 ${libro} ${v.c}:${v.v} (${sigla})`;
+    try {
+      await navigator.clipboard.writeText(texto);
+    } catch {
+      // navegadores sin permiso de portapapeles: selección temporal
+      const ta = document.createElement("textarea");
+      ta.value = texto;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {
+        /* sin portapapeles disponible */
+      }
+      ta.remove();
+    }
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 1800);
+  };
+
   // referencias cruzadas (TSK): carga perezosa al primer clic en un número de verso
   const abrirReferencias = (v: Verso) => {
     setPanelRefs({ verso: v, refs: [], cargadas: false });
+    // temas de Nave's para este verso
+    setNaveTemas(null);
+    const claveNave = `nave:${osis}`;
+    const naveCache = cache.get(claveNave) as { versos: Record<string, string[]> } | undefined;
+    const usarNave = (d: { versos?: Record<string, string[]> }) =>
+      setNaveTemas(d.versos?.[`${v.c}.${v.v}`] ?? []);
+    if (naveCache) {
+      usarNave(naveCache);
+    } else {
+      fetch(`/data/nave/${osis}.json`)
+        .then((r) => (r.ok ? r.json() : { versos: {} }))
+        .then((d) => {
+          cache.set(claveNave, d);
+          usarNave(d);
+        })
+        .catch(() => setNaveTemas([]));
+    }
     const clave = `tsk:${osis}`;
     const enCache = cache.get(clave) as Record<string, string[]> | undefined;
     const usar = (datos: Record<string, string[]>) =>
@@ -850,12 +926,12 @@ export default function Lector() {
                           key={i}
                           className="palabra"
                           onClick={() => abrirLexico(p)}
-                          title={`${p.s} · ${p.m}`}
+                          title={`${p.s} · ${morfLegible(p.m)}`}
                         >
                           <span className="w">{p.g}</span>
                           <span className="gl">{p.es || p.e}</span>
                           <span className="st">
-                            {p.s} · {p.m}
+                            {p.s} · {morfLegible(p.m)}
                           </span>
                         </button>
                       ))
@@ -882,19 +958,23 @@ export default function Lector() {
                 return (
                   <span key={v.osis} style={{ display: "inline" }}>
                     <span
-                      className={`verso${nVerso?.color ? ` subrayado-${nVerso.color}` : ""}`}
+                      className={`verso versoTocable${nVerso?.color ? ` subrayado-${nVerso.color}` : ""}`}
                       data-osis={v.osis}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`${v.c}:${v.v} \u2014 ${tr.abrirVerso}`}
+                      title={tr.abrirVerso}
+                      onClick={() => abrirReferencias(v)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          abrirReferencias(v);
+                        }
+                      }}
                     >
-                      <sup
-                        className={`num ref-btn${nVerso ? " con-nota" : ""}`}
-                        onClick={() => abrirReferencias(v)}
-                        title={tr.referencias}
-                        role="button"
-                      >
-                        {v.v}
-                      </sup>
-                      {v.t}{" "}
-                    </span>
+                      <sup className={`num${nVerso ? " con-nota" : ""}`}>{v.v}</sup>
+                      {v.t}
+                    </span>{" "}
                     {secciones.map((s, i) => (
                       <ComentarioBloque key={`${v.osis}-${i}`} seccion={s} tr={tr} renderFn={renderMarcado} />
                     ))}
@@ -1008,9 +1088,19 @@ export default function Lector() {
               <span className="lex-palabra" style={{ fontSize: 20 }}>
                 {tr.referencias} · {info?.nombre} {panelRefs.verso.c}:{panelRefs.verso.v}
               </span>
-              <button className="icono-btn cerrar" onClick={() => setPanelRefs(null)} aria-label={tr.lexCerrar}>
-                ✕
-              </button>
+              <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                <button
+                  className="icono-btn"
+                  onClick={() => copiarVerso(panelRefs.verso)}
+                  aria-label={tr.copiarVerso}
+                  title={tr.copiarVerso}
+                >
+                  {copiado ? "\u2713" : "\u29c9"}
+                </button>
+                <button className="icono-btn cerrar" onClick={() => setPanelRefs(null)} aria-label={tr.lexCerrar}>
+                  ✕
+                </button>
+              </span>
             </div>
             {panelRefs.cargadas ? (
               panelRefs.refs.length ? (
@@ -1037,6 +1127,23 @@ export default function Lector() {
               )
             ) : (
               <div className="lex-meta">…</div>
+            )}
+            {naveTemas !== null && (
+              <div className="info-seccion">
+                <div className="info-titulo">{tr.temasNave}</div>
+                {naveTemas.length ? (
+                  <div className="refs-lista">
+                    {naveTemas.map((t) => (
+                      <span key={t} className="ref-item" style={{ cursor: "default" }}>
+                        {t.replace(/-/g, " ")}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="lex-meta">{tr.sinTemas}</div>
+                )}
+                <div className="lex-meta">{tr.fuenteNave}</div>
+              </div>
             )}
             {(() => {
               const clave = claveNota(panelRefs.verso);
@@ -1313,9 +1420,11 @@ export default function Lector() {
               </div>
               {interlineal && (
                 <div className="lex-def">
-                  Interlineal y léxicos: STEPBible-Data (Tyndale House), CC BY 4.0
+                  Interlineal, léxicos y etiquetas morfológicas: STEPBible-Data (Tyndale House,
+                  Cambridge), CC BY 4.0 · traducción al español de las etiquetas CC BY 4.0 (B18)
                 </div>
               )}
+              <div className="lex-def">{tr.fuenteNave}</div>
             </div>
           </div>
         </div>

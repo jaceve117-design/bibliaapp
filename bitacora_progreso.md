@@ -4,7 +4,7 @@
 **Carpeta madre:** `20. Biblias_Comments_Dicionarios`
 **Inicio:** 2026-09-14
 **Estado global:** Construcción en curso — núcleo 6/6 ingerido · PWA desplegada · traducción de Matthew Henry avanzando por Juan.
-**⚠️ Hay una directiva operativa activa más abajo. Léela antes de continuar.**
+**No hay directiva operativa activa. D-001 cerrada el 2026-09-21; queda una deuda de exactitud declarada sobre la tabla morfológica griega.**
 
 ---
 
@@ -31,62 +31,32 @@ El 10 % es reserva operativa: existe para que quede margen de trabajo manual y d
 
 ---
 
-## Directiva D-001 · `ACTIVA` · Ventana de integración
+## Directiva D-001 · `CUMPLIDA` · 2026-09-21 · Ventana de integración
 
-**Emitida:** 2026-09-20 por Claude, a petición del usuario.
-**Objetivo:** integrar trabajo ya terminado que hoy está en disco sin cablear, aprovechando una pausa corta y acotada de la traducción.
+**Emitida** 2026-09-20 por Claude · **cerrada** 2026-09-21 por Claude.
 
-### Paso 0 — Pausar Matthew Henry
+> ⚠️ **Lección registrada.** Esta directiva numeraba sus tareas “paso 0…paso 5” y el plan propio de GLM también numera “paso 0…paso 7”. Las dos numeraciones colisionaron y GLM ejecutó su paso 6 (cierre del núcleo) en vez del de la directiva. El fallo fue de la directiva, no de GLM.
+>
+> **Regla nueva:** las tareas de una directiva se identifican **`D-NNN.n`** (p. ej. `D-001.3`), nunca “paso N” a secas. “Paso N” queda reservado en exclusiva al plan de `bitacora_progreso_GLM.md`.
 
-Termina el incremento en curso y commítealo. **A partir de ahí, no inicies más secciones de Henry** hasta completar el paso 5. La traducción **no se cancela, se pausa**: se reanuda exactamente donde quedó.
+| Tarea | Estado |
+|---|---|
+| `D-001.0` Pausar Matthew Henry limpiamente | ✅ hecha por GLM |
+| `D-001.1` Refactor del selector de comentario | ✅ **resuelta de otra forma** — innecesaria: el interlineal, el léxico y Nave's cargan por su propia vía y no compiten con el comentario. Se reabrirá cuando entre una **segunda obra de comentario** (JFB), que es cuando el booleano `comentario` sí estorba. |
+| `D-001.2` Cablear la morfología en español | ✅ hecha por Claude 2026-09-21 |
+| `D-001.3` Atribución CC BY 4.0 de STEPBible | ✅ hecha — ampliada a las etiquetas traducidas y a Nave's |
+| `D-001.4` Cotejar la tabla griega contra el intro de TAGNT | ❌ **NO HECHA.** Deuda de exactitud, no legal — ver bloqueo abajo. |
+| `D-001.5` Cerrar la ventana y reanudar Henry | ✅ ventana cerrada · Henry sigue en pausa **por orden posterior del usuario**, no por esta directiva |
 
-Anota en tu BP el punto de reanudación (libro, capítulo, sección, párrafo).
+### ⚠️ Bloqueo abierto que sobrevive a esta directiva
 
-### Paso 1 — Refactor del selector de comentario
+La tabla morfológica **griega** sigue con `verificada_en_fuente: false`. Se reconstruyó sobre el esquema Robinson/Tauber porque el intro oficial de TAGNT vive en un Google Doc que no es accesible programáticamente.
 
-En `07. App/app/app/es/lector/page.tsx`:
+**Corrección (2026-09-21):** esto se etiquetó mal como incumplimiento de C1/C2. **No lo es.** C1 exige la fase legal cerrada antes de ingerir y C2 las doce preguntas contractuales de la ficha; ninguna habla de cotejar legendas. La regla de *«cita literal, no interpretación»* está en el brief `01.0` y es **sobre la licencia**, que en STEPBible sí está verificada, archivada y atribuida.
 
-- Hoy el estado es `const [comentario, setComentario] = useState(false)` — un booleano — y la ruta `/data/henry-es/` está fija en el código.
-- Conviértelo en **selección de obra**: `null` = cerrado, o el id de la obra activa.
-- Generaliza carga perezosa, caché y léxico transliterado para que funcionen con **cualquier** obra de comentario, no solo Henry.
-- No cambies el comportamiento visible todavía: con una sola obra disponible, el lector debe verse y funcionar igual que ahora.
+Lo que sigue sin verificar no es la licencia sino **el significado de los códigos gramaticales**: es deuda de **exactitud académica**, no de cumplimiento legal. Importa — es una herramienta de estudio bíblico — pero es otra categoría. La tabla hebrea sí está cotejada contra la legenda oficial de OpenScriptures.
 
-**Por qué esto va primero:** desbloquea todo lo demás. Hacerlo después obliga a migrar datos ya generados.
-
-### Paso 2 — Cablear la morfología en español
-
-Los datos **ya están generados y listos** — no hay que traducir nada:
-
-- `07. App/app/public/data/morfologia/codigos-griego-es.json` — 1.082 códigos, 99,94 % de cobertura del NT
-- `07. App/app/public/data/morfologia/codigos-hebreo-es.json` — 941 códigos, 99,40 % de cobertura del AT
-
-Estructura: `{ "_meta": {...}, "codigos": { "V-PAI-3S": "verbo presente voz activa indicativo 3a persona singular", ... } }`
-
-En el interlineal, donde hoy se muestra el código crudo, muestra la etiqueta en español. Si un código no está en el mapa, **cae al código original** — nunca dejes el hueco vacío.
-
-Documentación completa y procedencia en `06. Traduccion/morfologia/LEEME.md`.
-
-### Paso 3 — Atribución CC BY 4.0
-
-La licencia de STEPBible **exige** atribución visible donde se muestren sus datos. Añádela al panel de fuentes y donde aparezca el interlineal:
-
-> Datos morfológicos de STEPBible.org, Tyndale House Cambridge, CC BY 4.0
-
-### Paso 4 — ⚠️ Cotejar la tabla griega (obligatorio antes de publicar)
-
-La tabla **hebrea** está verificada contra la legenda oficial de OpenScriptures. La **griega no**: se reconstruyó sobre el esquema Robinson/Tauber porque el intro oficial de TAGNT está en un Google Doc no accesible programáticamente.
-
-**Esto incumple la regla C1/C2 del proyecto — cita literal, no de memoria.**
-
-Abre `TinyURL.com/TAGNT-Intro`, coteja las ~80 entradas de la sección `griego` de `06. Traduccion/morfologia/morfologia-atomos-es.json`, corrige lo que discrepe y **regenera** los códigos desde los átomos. Luego pon `verificada_en_fuente: true`.
-
-Si el documento sigue sin ser accesible: **déjalo marcado como no verificado, no lo publiques como verificado**, y anota el bloqueo en tu BP para escalarlo al usuario.
-
-### Paso 5 — Cerrar la ventana
-
-- Validación integral y despliegue.
-- Marca esta directiva como `CUMPLIDA` con fecha en este mismo bloque.
-- **Reanuda Matthew Henry** exactamente en el punto anotado en el paso 0.
+Riesgo real: bajo. La cobertura medida sobre datos reales es del 99,7 % y las etiquetas de muestra son correctas. Pero es deuda declarada, no resuelta. Se cierra cuando alguien con acceso al documento coteje las ~80 entradas de la sección `griego` de `06. Traduccion/morfologia/morfologia-atomos-es.json`, corrija lo que discrepe y regenere.
 
 ---
 
@@ -94,9 +64,10 @@ Si el documento sigue sin ser accesible: **déjalo marcado como no verificado, n
 
 Siguiente lote de traducción barata, por orden de valor por esfuerzo. **Se programa más adelante**, en su propia ventana, no dentro de D-001:
 
-1. **Glosas de TBESH y TBESG** — 22.717 definiciones breves del léxico hebreo y griego. Es lo que completa el interlineal en español.
+1. **Glosas de TBESH y TBESG** — 22.717 definiciones breves del léxico hebreo y griego. Es lo que completa el interlineal en español: las etiquetas morfológicas ya están en español, la definición de la palabra aún no.
 2. **Easton en español** — 3.962 entradas, ya ingerido en inglés.
-3. **Encabezados del TSK.**
+3. **Nombres de tema de Nave's** — 4.672 temas, ya ingeridos y visibles en inglés.
+4. **Encabezados del TSK.**
 
 Y como decisión de producto pendiente del usuario: **traducir JFB completo antes de terminar Henry**, para dar comentario en el 100 % de los versículos en vez de profundidad en el 0,5 %. Requiere antes las fichas legales de JFB, Barnes, Nave's y SBLGNT (regla C1: nada entra sin ficha).
 
@@ -374,4 +345,20 @@ El diferenciador del proyecto. Se trata como trabajo editorial, no como procesam
 **Pendiente para cablearlo en el lector** — entra en la misma ventana que el refactor, con la automatización pausada.
 
 **Nota sobre Cloudflare:** el usuario confirma suscripción de pago y que el espacio no es restricción. El límite relevante deja de ser el almacén y pasa a ser el **paquete offline** (B11): qué subconjunto baja al dispositivo. Se decide con datos de uso, no ahora.
+
+### 2026-09-21 · Claude — Cierre de la etapa de integración
+
+GLM se quedó sin créditos a mitad de la interfaz de Nave's. Retomado y cerrado en tres frentes.
+
+**1 · Nave's terminada.** La ingesta estaba **completa** y sin commitear: 66 libros, 4.672 temas, 77.954 aserciones, manifiesto y textos i18n en ES y EN. Solo faltaba la interfaz. Añadido el bloque **Temas (Nave)** al panel de referencias del verso, con carga perezosa por libro, caché compartida y su atribución de dominio público.
+
+**2 · Morfología en español cableada.** El interlineal ya no muestra `V-PAI-3S` sino *«verbo presente voz activa indicativo 3a persona singular»*. Mapa por idioma con carga perezosa y caída al código crudo si falta una entrada — nunca un hueco vacío. Los códigos hebreos compuestos se resuelven por partes: `HR/Ncfsa` → *«preposicion + sustantivo comun femenino singular absoluto»*.
+
+**Cobertura verificada sobre los datos que el lector renderiza de verdad**, no sobre el corpus teórico: **99,7 %** en Juan (16.014/16.069 palabras) y **99,2 %** en Génesis (20.007/20.161). `tsc` limpio y build correcto.
+
+**3 · D-001 cerrada y causa del desvío corregida.** GLM no ejecutó dos tareas de la directiva porque ambas numeraciones usaban “paso N” y colisionaron. Culpa de la directiva. Regla nueva: las tareas de directiva se identifican `D-NNN.n`; “paso N” queda reservado al plan de GLM.
+
+**Queda un bloqueo declarado:** la tabla morfológica griega sigue sin cotejar en fuente y ya está en producción. Riesgo bajo por la cobertura medida, pero es deuda abierta. **No es deuda legal sino de exactitud:** la licencia está verificada; lo que no se ha cotejado es el significado de los códigos.
+
+**También anotado:** el refactor del selector de comentario resultó innecesario para esta etapa — interlineal, léxico y Nave's no compiten con el comentario. Se reabre cuando entre JFB, que es la segunda obra de comentario y el momento real en que el booleano estorba.
 

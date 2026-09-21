@@ -1,0 +1,298 @@
+{
+  "obra": "Nave's Topical Bible (Orville J. Nave, 1896/1905) — dominio público",
+  "osis_obra": "NAVE",
+  "licencia": "Dominio público (texto) · extracción y normalización: topical-bible-search (MIT), referencias auditadas",
+  "fuente": "https://github.com/j86schroeder/topical-bible-search (crudo en 05. Datos/corpus_crudo/nave_data/)",
+  "fecha_ingesta": "2026-09-21",
+  "total_temas": 4672,
+  "total_aserciones": 77954,
+  "total_libros": 66,
+  "incidentes": {
+    "libros_desconocidos": [],
+    "otros": [
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata",
+      "sourceStatus=corrected_by_errata"
+    ],
+    "temas_sin_refs": 649
+  },
+  "libros": [
+    {
+      "osis": "EXO",
+      "versos_con_temas": 1222
+    },
+    {
+      "osis": "JOS",
+      "versos_con_temas": 660
+    },
+    {
+      "osis": "1CH",
+      "versos_con_temas": 951
+    },
+    {
+      "osis": "LEV",
+      "versos_con_temas": 839
+    },
+    {
+      "osis": "NUM",
+      "versos_con_temas": 1266
+    },
+    {
+      "osis": "1SA",
+      "versos_con_temas": 795
+    },
+    {
+      "osis": "PSA",
+      "versos_con_temas": 2536
+    },
+    {
+      "osis": "MIC",
+      "versos_con_temas": 107
+    },
+    {
+      "osis": "HEB",
+      "versos_con_temas": 307
+    },
+    {
+      "osis": "2CH",
+      "versos_con_temas": 823
+    },
+    {
+      "osis": "ACT",
+      "versos_con_temas": 1024
+    },
+    {
+      "osis": "DEU",
+      "versos_con_temas": 968
+    },
+    {
+      "osis": "REV",
+      "versos_con_temas": 411
+    },
+    {
+      "osis": "EST",
+      "versos_con_temas": 175
+    },
+    {
+      "osis": "2KI",
+      "versos_con_temas": 732
+    },
+    {
+      "osis": "MRK",
+      "versos_con_temas": 681
+    },
+    {
+      "osis": "ROM",
+      "versos_con_temas": 447
+    },
+    {
+      "osis": "GAL",
+      "versos_con_temas": 151
+    },
+    {
+      "osis": "1KI",
+      "versos_con_temas": 813
+    },
+    {
+      "osis": "JER",
+      "versos_con_temas": 1318
+    },
+    {
+      "osis": "JDG",
+      "versos_con_temas": 611
+    },
+    {
+      "osis": "DAN",
+      "versos_con_temas": 339
+    },
+    {
+      "osis": "GEN",
+      "versos_con_temas": 1548
+    },
+    {
+      "osis": "MAT",
+      "versos_con_temas": 1085
+    },
+    {
+      "osis": "LUK",
+      "versos_con_temas": 1155
+    },
+    {
+      "osis": "1JN",
+      "versos_con_temas": 108
+    },
+    {
+      "osis": "2SA",
+      "versos_con_temas": 696
+    },
+    {
+      "osis": "NEH",
+      "versos_con_temas": 408
+    },
+    {
+      "osis": "EZK",
+      "versos_con_temas": 1130
+    },
+    {
+      "osis": "SNG",
+      "versos_con_temas": 80
+    },
+    {
+      "osis": "JHN",
+      "versos_con_temas": 885
+    },
+    {
+      "osis": "PRO",
+      "versos_con_temas": 919
+    },
+    {
+      "osis": "ISA",
+      "versos_con_temas": 1297
+    },
+    {
+      "osis": "ZEC",
+      "versos_con_temas": 206
+    },
+    {
+      "osis": "1CO",
+      "versos_con_temas": 438
+    },
+    {
+      "osis": "2CO",
+      "versos_con_temas": 259
+    },
+    {
+      "osis": "EPH",
+      "versos_con_temas": 156
+    },
+    {
+      "osis": "TIT",
+      "versos_con_temas": 46
+    },
+    {
+      "osis": "JAS",
+      "versos_con_temas": 108
+    },
+    {
+      "osis": "2PE",
+      "versos_con_temas": 63
+    },
+    {
+      "osis": "HOS",
+      "versos_con_temas": 204
+    },
+    {
+      "osis": "2TI",
+      "versos_con_temas": 82
+    },
+    {
+      "osis": "1PE",
+      "versos_con_temas": 106
+    },
+    {
+      "osis": "EZR",
+      "versos_con_temas": 286
+    },
+    {
+      "osis": "AMO",
+      "versos_con_temas": 146
+    },
+    {
+      "osis": "JOB",
+      "versos_con_temas": 1034
+    },
+    {
+      "osis": "1TI",
+      "versos_con_temas": 113
+    },
+    {
+      "osis": "MAL",
+      "versos_con_temas": 57
+    },
+    {
+      "osis": "PHP",
+      "versos_con_temas": 104
+    },
+    {
+      "osis": "JUD",
+      "versos_con_temas": 25
+    },
+    {
+      "osis": "COL",
+      "versos_con_temas": 95
+    },
+    {
+      "osis": "1TH",
+      "versos_con_temas": 88
+    },
+    {
+      "osis": "LAM",
+      "versos_con_temas": 143
+    },
+    {
+      "osis": "JON",
+      "versos_con_temas": 52
+    },
+    {
+      "osis": "NAM",
+      "versos_con_temas": 35
+    },
+    {
+      "osis": "ECC",
+      "versos_con_temas": 220
+    },
+    {
+      "osis": "ZEP",
+      "versos_con_temas": 52
+    },
+    {
+      "osis": "HAG",
+      "versos_con_temas": 37
+    },
+    {
+      "osis": "2TH",
+      "versos_con_temas": 47
+    },
+    {
+      "osis": "JOL",
+      "versos_con_temas": 76
+    },
+    {
+      "osis": "RUT",
+      "versos_con_temas": 83
+    },
+    {
+      "osis": "HAB",
+      "versos_con_temas": 57
+    },
+    {
+      "osis": "OBA",
+      "versos_con_temas": 20
+    },
+    {
+      "osis": "3JN",
+      "versos_con_temas": 13
+    },
+    {
+      "osis": "2JN",
+      "versos_con_temas": 13
+    },
+    {
+      "osis": "PHM",
+      "versos_con_temas": 25
+    }
+  ]
+}
