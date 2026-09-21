@@ -817,3 +817,34 @@ body {
   * { transition: none !important; animation: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* ── Notas y subrayados del lector (B15: 100 % locales + export/import) ── */
+.verso.subrayado-amarillo { background: rgba(255, 214, 64, 0.32); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.verso.subrayado-verde { background: rgba(46, 184, 114, 0.24); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.verso.subrayado-rosa { background: rgba(240, 98, 146, 0.22); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.num.con-nota { color: var(--accent-strong); }
+.num.con-nota::after { content: "✍"; font-size: 0.62em; margin-left: 1px; vertical-align: super; }
+
+.nota-editor { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.nota-area {
+  width: 100%; margin-top: 8px; padding: 10px;
+  font: inherit; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line-strong); border-radius: 8px;
+  resize: vertical;
+}
+.nota-area:focus { outline: none; border-color: var(--accent); }
+.nota-colores { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.color-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: var(--bg-elev);
+  cursor: pointer; padding: 0;
+}
+.color-btn.activo { outline: 2px solid var(--accent); outline-offset: 1px; }
+.color-btn.swatch-amarillo { background: rgba(255, 214, 64, 0.55); }
+.color-btn.swatch-verde { background: rgba(46, 184, 114, 0.45); }
+.color-btn.swatch-rosa { background: rgba(240, 98, 146, 0.40); }
+
+.notas-acciones { display: flex; gap: 10px; margin-top: 12px; }
+.refs-lista .ref-item.swatch-amarillo { border-left: 4px solid rgba(234, 179, 8, 0.8); }
+.refs-lista .ref-item.swatch-verde { border-left: 4px solid rgba(22, 163, 74, 0.7); }
+.refs-lista .ref-item.swatch-rosa { border-left: 4px solid rgba(219, 39, 119, 0.65); }

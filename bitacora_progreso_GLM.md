@@ -772,3 +772,18 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 
 **Posición exacta:** pasos 0-1-2-5 completos; paso 3 completo salvo la revisión humana doctrinal; Juan traducido y pulido. No queda ninguna tarea ejecutable del plan sin decisión del usuario:
 - **Bloqueado en usuario:** paso 4 ⟡ (puerta de calidad de la traducción), paso 6 (cierre del núcleo — SBLGNT, JFB, Barnes, Nave's, con sus fichas legales), licencia de las traducciones propias (ficha Matthew Henry lo exige «antes del primer párrafo publicado» — ya publicado, decisión urgente), modelo de sostenimiento, nombre/dominio, puertas ⟡.
+
+### 2026-09-19 · GLM (vigilante) — PASO 7: notas y subrayados del lector (B15) con export/import — Juan sigue completo (2064/2064)
+
+**Feature del lector (paso 7, flujo pasaje→…→nota/subrayado).** Sin deuda de traducción ni legal pendiente, el turno fue para la feature del MVP que B15 exige «desde el día uno»: **notas y subrayados 100 % locales con exportación/importación**.
+- **Implementado** (`app/es/lector/page.tsx`, `lib/i18n.ts`, `app/globals.css`):
+  - **Editor por verso:** el panel que abre el número de verso (referencias TSK) incorpora ahora un editor de nota (textarea) + selector de subrayado (ninguno/amarillo/verde/rosa) + borrar. Todo se guarda al instante.
+  - **Persistencia 100 % local:** localStorage (`notas:v1`), nunca sale del dispositivo (B15/B14 — cero APIs en runtime). La clave es OSIS absoluto (`JHN.3.16`), estable entre ediciones.
+  - **Subrayado visible:** los versos subrayados llevan fondo de color (3 colores con `box-decoration-break` para saltos de línea) y los números de verso con nota muestran un ✍ en color de acento.
+  - **Panel «Mis notas»** (botón ✍ en la cabecera): lista de todas las notas ordenadas por fecha (clic → salta al pasaje), contador, export e import.
+  - **Export/Import JSON versionado** (`{version:1, exportado, notas}`): descarga como `notas-biblioteca-YYYY-MM-DD.json`; importación con fusión «gana el más reciente» (por `ts` ISO) y validación de formato con mensaje de error amable. i18n completo ES/EN (D7).
+  - Estilos con tokens del tema (claro/oscuro OK); swatches de color legibles en ambos.
+- Verificación: `tsc --noEmit` limpio; build OK; desplegado (`3d7c4516`); el HTML servido contiene el sistema («Mis notas y subrayados»); lector 200 (hash y alias); **JUAN 2064/2064** intacto. Commit y push.
+
+**Posición exacta:** pasos 0-1-2-5 completos · paso 3 completo salvo revisión humana doctrinal (⟡) · paso 7: **notas locales + export/import ✓** (restan en paso 7: panel Fuentes dedicado y canal de reporte de errores — mejoras menores futuras).
+- **Bloqueado en usuario (sin cambios):** paso 4 ⟡ (puerta de calidad), paso 6 (cierre del núcleo), licencia de traducciones propias (urgente: ya hay párrafos publicados), modelo de sostenimiento, nombre/dominio.

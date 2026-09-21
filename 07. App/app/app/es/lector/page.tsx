@@ -29,6 +29,11 @@ type HenryJson = { osis: string; c: Record<string, { r: string | null; s: Seccio
 type HenryEsJson = HenryJson & { estado?: string };
 type Termino = { t: string; variantes: string[]; idioma: string; sig: string };
 type PanelCita = { etiqueta: string; osis: string; c: number; versos: { v: number; t: string }[]; cargando: boolean; mas: boolean };
+type ColorSubrayado = "" | "amarillo" | "verde" | "rosa";
+type Nota = { texto: string; color: ColorSubrayado; ts: string };
+type Notas = Record<string, Nota>;
+const CLAVE_NOTAS = "notas:v1";
+const COLORES: ColorSubrayado[] = ["", "amarillo", "verde", "rosa"];
 
 const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
@@ -66,9 +71,83 @@ export default function Lector() {
   const [pasaje, setPasaje] = useState<{ osis: string; c: number } | null>(null);
   const [pasajeTexto, setPasajeTexto] = useState<ObraJson | null>(null);
   const [lexico, setLexico] = useState<Termino[] | null>(null);
+  const [notas, setNotas] = useState<Notas>({});
+  const [panelNotas, setPanelNotas] = useState(false);
+  const [msgNotas, setMsgNotas] = useState<string | null>(null);
+  const refArchivo = useRef<HTMLInputElement>(null);
   const reTerminos = useRef<RegExp | null>(null);
   const columna = useRef<HTMLDivElement>(null);
   const lexCache = useRef(cacheLex);
+
+  // notas y subrayados (B15): 100 % locales, persistidas en este dispositivo
+  useEffect(() => {
+    try {
+      const crudo = localStorage.getItem(CLAVE_NOTAS);
+      if (crudo) setNotas(JSON.parse(crudo) as Notas);
+    } catch {
+      /* almacenamiento no disponible: las notas simplemente no persisten */
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CLAVE_NOTAS, JSON.stringify(notas));
+    } catch {
+      /* cuota llena u omiso del navegador */
+    }
+  }, [notas]);
+
+  const claveNota = (v: { osis?: string; c: number; v: number }, osisActual = osis) =>
+    `${v.osis ?? osisActual}.${v.c}.${v.v}`;
+
+  const ponerNota = (clave: string, parche: Partial<Nota>) => {
+    setNotas((prev) => {
+      const base: Nota = prev[clave] ?? { texto: "", color: "", ts: new Date().toISOString() };
+      return { ...prev, [clave]: { ...base, ...parche, ts: new Date().toISOString() } };
+    });
+  };
+
+  const borrarNota = (clave: string) => {
+    setNotas((prev) => {
+      const copia = { ...prev };
+      delete copia[clave];
+      return copia;
+    });
+  };
+
+  // export/import (B15): las notas salen y entran como JSON versionado
+  const exportarNotas = () => {
+    const paquete = { version: 1, exportado: new Date().toISOString(), notas };
+    const blob = new Blob([JSON.stringify(paquete, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `notas-biblioteca-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importarNotas = async (archivo: File) => {
+    try {
+      const paquete = JSON.parse(await archivo.text()) as { version?: number; notas?: Notas };
+      if (!paquete || typeof paquete !== "object" || !paquete.notas || typeof paquete.notas !== "object") {
+        setMsgNotas(tr.notasImportError);
+        return;
+      }
+      setNotas((prev) => {
+        const fusion = { ...prev };
+        for (const [clave, nota] of Object.entries(paquete.notas!)) {
+          if (!nota || typeof nota !== "object") continue;
+          const existente = fusion[clave];
+          if (!existente || existente.ts < nota.ts) fusion[clave] = nota;
+        }
+        return fusion;
+      });
+      setMsgNotas(tr.notasImportOk);
+    } catch {
+      setMsgNotas(tr.notasImportError);
+    }
+  };
 
   // obra desde la URL al entrar
   useEffect(() => {
@@ -577,6 +656,17 @@ export default function Lector() {
             >
               Ω
             </button>
+            <button
+              className={`icono-btn${Object.keys(notas).length ? " activo" : ""}`}
+              onClick={() => {
+                setPanelNotas(true);
+                setMsgNotas(null);
+              }}
+              aria-label={tr.notas}
+              title={tr.notas}
+            >
+              ✍
+            </button>
             <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
               ←
             </button>
@@ -692,10 +782,19 @@ export default function Lector() {
                 const secciones = comentario
                   ? seccionesCom.filter((s) => s.v === v.v)
                   : [];
+                const nVerso = notas[claveNota(v)];
                 return (
                   <span key={v.osis} style={{ display: "inline" }}>
-                    <span className="verso" data-osis={v.osis}>
-                      <sup className="num ref-btn" onClick={() => abrirReferencias(v)} title={tr.referencias} role="button">
+                    <span
+                      className={`verso${nVerso?.color ? ` subrayado-${nVerso.color}` : ""}`}
+                      data-osis={v.osis}
+                    >
+                      <sup
+                        className={`num ref-btn${nVerso ? " con-nota" : ""}`}
+                        onClick={() => abrirReferencias(v)}
+                        title={tr.referencias}
+                        role="button"
+                      >
                         {v.v}
                       </sup>
                       {v.t}{" "}
@@ -843,11 +942,46 @@ export default function Lector() {
             ) : (
               <div className="lex-meta">…</div>
             )}
+            {(() => {
+              const clave = claveNota(panelRefs.verso);
+              const nota = notas[clave];
+              return (
+                <div className="nota-editor">
+                  <div className="info-titulo">
+                    {tr.nota} · {info?.nombre} {panelRefs.verso.c}:{panelRefs.verso.v}
+                  </div>
+                  <textarea
+                    className="nota-area"
+                    placeholder={tr.notaPlaceholder}
+                    value={nota?.texto ?? ""}
+                    onChange={(e) => ponerNota(clave, { texto: e.target.value })}
+                    rows={4}
+                  />
+                  <div className="nota-colores" role="group" aria-label={tr.notaColor}>
+                    {COLORES.map((c) => (
+                      <button
+                        key={c || "ninguno"}
+                        className={`color-btn${(nota?.color ?? "") === c ? " activo" : ""}${c ? ` swatch-${c}` : ""}`}
+                        onClick={() => ponerNota(clave, { color: c })}
+                        title={c ? tr.notaColor + ": " + c : tr.sinColor}
+                        aria-label={c ? tr.notaColor + ": " + c : tr.sinColor}
+                      />
+                    ))}
+                    <span style={{ flex: 1 }} />
+                    {nota && (
+                      <button className="btn btn-fantasma" onClick={() => borrarNota(clave)}>
+                        {tr.borrarNota}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
             <div className="lex-fuente">{tr.fuenteRefs}</div>
           </div>
         </div>
       )}
-
+   
       {panelCita && (
         <div className="lex-panel" role="dialog" aria-label={tr.verTexto}>
           <div className="lex-panel-inner">
@@ -900,6 +1034,77 @@ export default function Lector() {
             <div className="lex-meta">{panelTermino.idioma}</div>
             <div className="lex-def">{panelTermino.sig}</div>
             <div className="lex-fuente">Curaduría editorial · {tr.fuenteRefs}</div>
+          </div>
+        </div>
+      )}
+
+      {panelNotas && (
+        <div className="lex-panel" role="dialog" aria-label={tr.notas}>
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>
+                {tr.notas} · {Object.keys(notas).length}
+              </span>
+              <button
+                className="icono-btn cerrar"
+                onClick={() => {
+                  setPanelNotas(false);
+                  setMsgNotas(null);
+                }}
+                aria-label={tr.lexCerrar}
+              >
+                ✕
+              </button>
+            </div>
+            {msgNotas && <div className="lex-meta" style={{ color: "var(--accent-strong)" }}>{msgNotas}</div>}
+            {Object.keys(notas).length ? (
+              <div className="refs-lista">
+                {Object.entries(notas)
+                  .sort((a, b) => (b[1].ts > a[1].ts ? 1 : -1))
+                  .map(([clave, nota]) => {
+                    const [o, c, v] = clave.split(".");
+                    const libro = manifest?.libros.find((l) => l.osis === o);
+                    return (
+                      <button
+                        key={clave}
+                        className={`ref-item${nota.color ? ` swatch-${nota.color}` : ""}`}
+                        onClick={() => {
+                          setOsis(o);
+                          setCap(Number(c));
+                          setPanelNotas(false);
+                        }}
+                      >
+                        <b>
+                          {libro?.nombre ?? o} {c}:{v}
+                        </b>
+                        {nota.texto ? ` — ${nota.texto.slice(0, 60)}${nota.texto.length > 60 ? "…" : ""}` : ` — ${tr.conNota}`}
+                      </button>
+                    );
+                  })}
+              </div>
+            ) : (
+              <div className="lex-meta">{tr.notasVacias}</div>
+            )}
+            <div className="notas-acciones">
+              <button className="btn btn-fantasma" onClick={exportarNotas} disabled={!Object.keys(notas).length}>
+                ⭳ {tr.exportarNotas}
+              </button>
+              <button className="btn btn-fantasma" onClick={() => refArchivo.current?.click()}>
+                ⭱ {tr.importarNotas}
+              </button>
+              <input
+                ref={refArchivo}
+                type="file"
+                accept="application/json,.json"
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) importarNotas(f);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+            <div className="lex-fuente">{tr.fuenteNotas}</div>
           </div>
         </div>
       )}
