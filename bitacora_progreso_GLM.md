@@ -737,3 +737,22 @@ Decisiones de usuario también pendientes: licencia de nuestras traducciones · 
 **Posición exacta: la traducción de Juan está completa y pulida (21/21 caps, 2.064/2.064 párrafos, 0 párrafos bajo el 60% del EN, 0 residuales de inglés en sonda amplia).**
 - **Siguiente turno:** no queda deuda de traducción ni de pulido conocida de Juan. Opciones ejecutables sin decisión del usuario: barrido fino de estilo (75-90% del EN) o mejoras menores del lector según plan. El paso 6 (cierre del núcleo: SBLGNT, JFB, Barnes, Nave's) requiere crear fichas legales en 02. Legal/ antes de ingesta — evaluar en su momento.
 - **Bloqueado en usuario (sin cambios):** licencia de traducciones propias, modelo de sostenimiento, nombre/dominio, puertas ⟡.
+
+### 2026-09-19 · GLM (vigilante) — BARRIDO FINO DE PULIDO: 6 cortes duros completados (cap 5 y cap 6) — Juan completo (2064/2064)
+
+**Tercera pasada de pulido (barrido fino de estilo, según «Siguiente» de la BP).** Dos barridos: proporción ES/EN bajo el 90% (27 párrafos revisados) y detección de cortes duros (párrafos que acaban en «...» o palabra suelta).
+
+- **Corte real encontrado en cap 6 s4 idx15** (la voluntad soberana del Padre): el ES acababa en «…hasta la resurrección, cuando t» (corte duro a media palabra). Completado con la cola EN (2118→2528 chars, 96% del EN): «…cuando las almas y los cuerpos de los santos sean reunidos y allegados a Cristo, para que él los presente al Padre: He aquí yo, y los hijos que me diste (Heb 2:13; 2T 1:12). 4. La fuente y el original de todo esto es la voluntad soberana de Dios… al cual el Hijo siempre tuvo el ojo.» Fragmento jhn6_s4 actualizado.
+- **5 cortes duros más, todos en cap 5** (fusionado + fragmentos jhn5_s1, jhn5_s2, jhn5_s3):
+  - s1 idx18: tras la ilustración de Josué en Jericó, completada la aplicación («¿Y querrá correr el riesgo de esto, en obediencia a Cristo?… Los que han sido sanados por la palabra de Cristo han de ser gobernados por su palabra, cueste lo que les cueste»).
+  - s1 idx30: «El hospital donde él yacía era lugar melancólico; mas el infierno lo es mucho más: la sentencia de los apóstatas es peor cosa que treinta y ocho años de cojera.»
+  - s2 idx15: «La voz de Cristo ha de ser oída por nosotros, para que por ella vivamos… Oíd, y vivirá vuestra alma (Isa 55:3).»
+  - s2 idx30: «…y cuenta justamente resentidas por el príncipe que le envía las afrentas hechas a un embajador. Y por esta regla, los que verdaderamente honran al Hijo honran también al Padre; véase Flp 2:11.»
+  - s3 idx19: «…ni era de otra manera gratos con él los aplausos de los hombres sino conforme a la voluntad de su Padre, y para la dicha de aquéllos que, dando honra a él, recibían de él honra mucho mayor.»
+- **Corte fuente detectado (sin arreglo posible a nivel ES):** cap 18 s2 idx20 — el propio EN fuente acaba truncado («…he said nothing, for»); el ES lo refleja fielmente («…nada dijera, porque»). Notado como anomalía de la fuente, no de la traducción.
+- **Resultado de los barridos:** los 27 párrafos bajo el 90% del EN son condensaciones legítimas que terminan donde el EN (el español es ~10-15% más compacto); los 6 cortes duros quedan completados. **Cortes restantes: solo el de fuente (cap 18.2 idx20). JUAN 2064/2064. Sonda global = 0.**
+- Desplegado (`e0088b49`, tras intermedios `7e65adf8`). Verificado en producción: cap6.4 idx15 completo (2528 chars), cap5.1 idx30 y cap5.2 idx30 con sus colas nuevas, JUAN 2064/2064, lector 200 (alias). Commit y push.
+
+**Posición exacta: la traducción de Juan está completa y pulida en estructura (21/21 caps, 2.064/2.064 párrafos; 0 cortes duros salvo la anomalía de fuente; 0 residuales).** No queda deuda conocida de traducción ni pulido.
+- **Siguiente turno:** no hay pasos de traducción pendientes. Opciones: mejoras menores del lector según plan de la BP, o esperar decisión del usuario sobre el paso 6 (cierre del núcleo — requiere fichas legales en 02. Legal/).
+- **Bloqueado en usuario (sin cambios):** licencia de traducciones propias, modelo de sostenimiento, nombre/dominio, puertas ⟡.
