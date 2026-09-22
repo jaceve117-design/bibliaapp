@@ -1,0 +1,16 @@
+{
+ "hebreo": {
+  "entradas": 10412,
+  "cadenas_unicas": 5551,
+  "strong_en_texto": 8206,
+  "palabras_con_strong": 282812,
+  "nota": "cadenas ordenadas por frecuencia de palabra en el texto; traducir en lotes desde la cabecera de la cola"
+ },
+ "griego": {
+  "entradas": 11274,
+  "cadenas_unicas": 8685,
+  "strong_en_texto": 5410,
+  "palabras_con_strong": 141526,
+  "nota": "cadenas ordenadas por frecuencia de palabra en el texto; traducir en lotes desde la cabecera de la cola"
+ }
+}

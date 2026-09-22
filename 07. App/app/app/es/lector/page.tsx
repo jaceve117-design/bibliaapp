@@ -65,6 +65,14 @@ export default function Lector() {
   const [interlineal, setInterlineal] = useState(false);
   // morfología en español (STEPBible traducido) y temas de Nave's
   const [morfEs, setMorfEs] = useState<Record<string, string> | null>(null);
+  // glosas ES de TBESH/TBESG (traducción propia sobre la glosa EN, CC BY 4.0 — B18):
+  // texto = glosa contextual por cadena exacta (interlineal AT); lexico = por Strong canónico (ficha)
+  const [glosasEs, setGlosasEs] = useState<{
+    texto: Record<string, string>;
+    textoG: Record<string, string>;
+    lexico: Record<string, string>;
+    lexicoG: Record<string, string>;
+  } | null>(null);
   const [naveTemas, setNaveTemas] = useState<string[] | null>(null);
   const [copiado, setCopiado] = useState(false);
   const [interData, setInterData] = useState<InterJson | null>(null);
@@ -288,6 +296,39 @@ export default function Lector() {
       })
       .catch(() => setMorfEs(null));
   }, [interlineal, osis]);
+
+  // glosas ES de TBESH/TBESG (overlay propio, CC BY 4.0 — B18): cargado al abrir el interlineal
+  useEffect(() => {
+    if (!interlineal) return;
+    const clave = "glosas:es";
+    const enCache = cache.get(clave) as {
+      texto: Record<string, string>;
+      textoG: Record<string, string>;
+      lexico: Record<string, string>;
+      lexicoG: Record<string, string>;
+    } | undefined;
+    if (enCache) {
+      setGlosasEs(enCache);
+      return;
+    }
+    fetch(`/data/stepbible/glosas-es.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then(
+        (json: {
+          texto?: Record<string, string>;
+          textoG?: Record<string, string>;
+          lexico?: Record<string, string>;
+          lexicoG?: Record<string, string>;
+        } | null) => {
+          if (json?.texto && json?.textoG && json?.lexico && json?.lexicoG) {
+            const mapa = { texto: json.texto, textoG: json.textoG, lexico: json.lexico, lexicoG: json.lexicoG };
+            cache.set(clave, mapa);
+            setGlosasEs(mapa);
+          }
+        }
+      )
+      .catch(() => setGlosasEs(null));
+  }, [interlineal]);
 
   // texto griego (SBLGNT): carga perezosa por libro
   useEffect(() => {
@@ -595,6 +636,18 @@ export default function Lector() {
   }, []);
 
   // ficha léxica: busca el Strong en TBESG (griego) o TBESH (hebreo)
+  // Strong canónico (G1510_A → G1510) y glosas ES del overlay propio
+  const canonStrong = (s: string) => s.replace(/[A-Z_]*$/, "").replace(/_.*$/, "").toUpperCase();
+  const glosaTextoEs = (p: Palabra): string | null => {
+    if (!glosasEs || p.es) return null;
+    const mapa = p.s.startsWith("G") ? glosasEs.textoG : glosasEs.texto;
+    return mapa[p.e.replace(/[.,;:!?…]+$/, "")] ?? null;
+  };
+  const glosaLexicoEs = (p: Palabra): string | null => {
+    if (!glosasEs) return null;
+    const mapa = p.s.startsWith("G") ? glosasEs.lexicoG : glosasEs.lexico;
+    return mapa[canonStrong(p.s)] ?? null;
+  };
   const abrirLexico = (p: Palabra) => {
     setLex({ palabra: p });
     const esGriego = p.s.startsWith("G");
@@ -981,7 +1034,7 @@ export default function Lector() {
                           title={`${p.s} · ${morfLegible(p.m)}`}
                         >
                           <span className="w">{p.g}</span>
-                          <span className="gl">{p.es || p.e}</span>
+                          <span className="gl">{p.es || glosaTextoEs(p) || p.e}</span>
                           <span className="st">
                             {p.s} · {morfLegible(p.m)}
                           </span>
@@ -1126,7 +1179,8 @@ export default function Lector() {
                   {lex.entrada.t} · {lex.entrada.m} · {lex.palabra.s}
                 </div>
                 <div className="lex-glosa">
-                  <b>{lex.entrada.g}</b>
+                  <b>{glosaLexicoEs(lex.palabra) || lex.entrada.g}</b>
+                  {glosaLexicoEs(lex.palabra) && <span className="lex-glosa-en"> ({lex.entrada.g})</span>}
                   {lex.palabra.lex && <span> — {lex.palabra.lex}</span>}
                 </div>
                 <div className="lex-def">{limpiarDef(lex.entrada.d)}</div>
@@ -1136,6 +1190,9 @@ export default function Lector() {
             )}
             <div className="lex-fuente">
               Léxico: TBESG/TBESH — STEPBible-Data (Tyndale House), CC BY 4.0
+              {lex.entrada && glosaLexicoEs(lex.palabra)
+                ? " · Glosa ES: traducción propia, CC BY 4.0 (sin revisar)"
+                : ""}
             </div>
           </div>
         </div>

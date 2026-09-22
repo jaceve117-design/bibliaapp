@@ -633,6 +633,11 @@ body {
   color: var(--ink);
   margin-bottom: 14px;
 }
+.lex-glosa-en {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: normal;
+}
 .lex-def {
   font-size: 15.5px;
   line-height: 1.65;
