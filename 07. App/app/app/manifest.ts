@@ -4,10 +4,10 @@ export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Biblioteca — estudio bíblico",
-    short_name: "Biblioteca",
+    name: "Biblia de Estudio AION",
+    short_name: "AION",
     description:
-      "Biblioteca cristiana digital: texto bíblico, interlineal, léxicos, referencias cruzadas y notas del lector. ES principal.",
+      "Biblia de Estudio AION: texto bíblico, interlineal, léxicos, referencias cruzadas y notas del lector. ES principal.",
     start_url: "/es/lector",
     scope: "/",
     display: "standalone",

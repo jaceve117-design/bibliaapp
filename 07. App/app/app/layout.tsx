@@ -3,12 +3,12 @@ import "./globals.css";
 import RegistrarSW from "@/components/RegistrarSW";
 
 export const metadata: Metadata = {
-  title: "Biblioteca — estudio bíblico serio, en español",
+  title: "Biblia de Estudio AION — estudio bíblico serio, en español",
   description:
-    "Biblioteca cristiana digital: texto bíblico, lenguas originales, comentarios, diccionarios y notas del lector, conectados alrededor de cada pasaje. Construcción inicial sobre corpus libre verificado.",
-  applicationName: "Biblioteca",
+    "Biblia de Estudio AION: texto bíblico, lenguas originales, comentarios, diccionarios y notas del lector, conectados alrededor de cada pasaje. Construcción inicial sobre corpus libre verificado.",
+  applicationName: "Biblia de Estudio AION",
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Biblioteca" },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Biblia de Estudio AION" },
   icons: { icon: "/icons/icon-192.png", apple: "/icons/icon-192.png" },
 };
 

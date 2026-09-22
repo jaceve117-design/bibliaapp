@@ -6,9 +6,9 @@ export type Locale = "es" | "en";
 
 export const T = {
   es: {
-    marcaProvisional: "Biblioteca",
+    marcaProvisional: "Biblia de Estudio AION",
     nombreProvisional: "nombre provisional",
-    heroKicker: "Biblioteca cristiana digital · construcción inicial",
+    heroKicker: "Biblia de Estudio AION · construcción inicial",
     heroTitulo1: "Toda la Escritura.",
     heroTitulo2: "Todo el estudio.",
     heroTitulo3: "En español.",
@@ -97,9 +97,9 @@ export const T = {
     fuenteReporte: "El reporte se genera en tu dispositivo con la referencia y el texto exactos.",
   },
   en: {
-    marcaProvisional: "Library",
+    marcaProvisional: "AION Study Bible",
     nombreProvisional: "placeholder name",
-    heroKicker: "Digital Christian library · early build",
+    heroKicker: "AION Study Bible · early build",
     heroTitulo1: "All of Scripture.",
     heroTitulo2: "All of the study.",
     heroTitulo3: "In Spanish first.",

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Cabecera from "@/components/Cabecera";
 import TamTexto from "@/components/TamTexto";
 import { t } from "@/lib/i18n";
+import { morfGntEs } from "@/lib/morfgnt";
 import { parseCita, segmentarPorCitas } from "@/lib/referencias";
 
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
@@ -82,6 +83,11 @@ export default function Lector() {
   const [interData, setInterData] = useState<InterJson | null>(null);
   const [griego, setGriego] = useState(false);
   const [grData, setGrData] = useState<GrJson | null>(null);
+  // palabra del SBLGNT seleccionada. Es estado propio y no reutiliza `lex`
+  // porque el dato es distinto: MorphGNT da lema y análisis, no número Strong.
+  const [grPal, setGrPal] = useState<
+    { g: string; lemma: string; pos: string; ref: string; v: number; i: number } | null
+  >(null);
   const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex } | null>(null);
   const [panelRefs, setPanelRefs] = useState<{ verso: Verso; refs: string[]; cargadas: boolean } | null>(null);
   const [dicPanel, setDicPanel] = useState(false);
@@ -1009,7 +1015,10 @@ export default function Lector() {
       </Cabecera>
 
       <main>
-        <div className="lector-columna" ref={columna}>
+        <div
+          className={`lector-columna${lex || grPal || panelRefs ? " con-panel" : ""}`}
+          ref={columna}
+        >
           <div className="lector-titulo">
             <h1 className="serif-display">
               {info?.nombre ?? texto?.nombre ?? "…"} {cap}
@@ -1022,19 +1031,41 @@ export default function Lector() {
           {cargando ? (
             <p style={{ color: "var(--muted)" }}>…</p>
           ) : griego ? (
-            <div className="texto-biblico griego-vista" lang="el">
+            /* Griego emparejado: el griego solo no dice nada a quien no lo lee.
+               Cada versículo lleva ARRIBA su texto en la versión elegida y DEBAJO
+               el griego crítico, para que se vea de qué habla cada verso. Las
+               palabras son botones de verdad: antes tenían pinta de clicables
+               (un `title`) y no hacían nada. */
+            <div className="texto-biblico griego-par">
               {(grData?.versos ?? [])
                 .filter((gv) => gv.c === cap)
-                .map((gv) => (
-                  <span key={gv.osis} className="verso" data-osis={gv.osis}>
-                    <sup className="num">{gv.v}</sup>
-                    {gv.w.map(([g, lemma, pos], i) => (
-                      <span key={i} className="palabra-g" title={`${lemma} · ${pos}`}>
-                        {g}{" "}
-                      </span>
-                    ))}
-                  </span>
-                ))}
+                .map((gv) => {
+                  const esp = versos.find((v) => v.c === gv.c && v.v === gv.v);
+                  return (
+                    <div key={gv.osis} className="gr-par" data-osis={gv.osis}>
+                      <p className="gr-es">
+                        <sup className="num">{gv.v}</sup>
+                        {esp?.t ?? <span style={{ color: "var(--muted)" }}>—</span>}
+                      </p>
+                      <p className="gr-gr" lang="el">
+                        {gv.w.map(([g, lemma, pos], i) => (
+                          <button
+                            key={i}
+                            className={`palabra-g${
+                              grPal && grPal.ref === gv.osis && grPal.i === i ? " activa" : ""
+                            }`}
+                            onClick={() =>
+                              setGrPal({ g, lemma, pos, ref: gv.osis, v: gv.v, i })
+                            }
+                            title={`${lemma} · ${morfGntEs(pos)}`}
+                          >
+                            {g}
+                          </button>
+                        ))}
+                      </p>
+                    </div>
+                  );
+                })}
               {grData && !(grData.versos ?? []).some((gv) => gv.c === cap) && (
                 <p style={{ color: "var(--muted)" }}>…</p>
               )}
@@ -1045,7 +1076,18 @@ export default function Lector() {
                 const palabras = interData?.versos[`${v.c}.${v.v}`];
                 return (
                   <div key={v.osis} className="interlin-verso">
-                    <sup className="num">{v.v}</sup>
+                    {/* Misma mecánica que en las Biblias: tocar el número abre
+                        abajo el versículo en español con sus referencias. En el
+                        interlineal hace más falta todavía, porque la vista
+                        descompone el original y se pierde el hilo del verso. */}
+                    <button
+                      className="interlin-num"
+                      onClick={() => abrirReferencias(v)}
+                      aria-label={`${v.c}:${v.v} — ${tr.abrirVerso}`}
+                      title={tr.abrirVerso}
+                    >
+                      {v.v}
+                    </button>
                     {palabras?.length ? (
                       palabras.map((p, i) => (
                         <button
@@ -1181,6 +1223,51 @@ export default function Lector() {
                 <div className="lex-fuente">{tr.fuenteDic}</div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Tarjeta de la palabra del SBLGNT. El texto crítico trae lema y análisis
+          morfológico, pero NO número de Strong ni glosa: eso vive en el
+          interlineal (TAGNT). En vez de fingir un dato que no está, se ofrece
+          el salto al interlineal, que sí lo tiene. */}
+      {grPal && (
+        <div className="lex-panel" role="dialog" aria-label="Palabra del texto griego">
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" lang="el">{grPal.g}</span>
+              <button
+                className="icono-btn cerrar"
+                onClick={() => setGrPal(null)}
+                aria-label={tr.lexCerrar}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="lex-meta">
+              {osis} {cap}:{grPal.v} · SBLGNT
+            </div>
+            <div className="lex-glosa">
+              <b lang="el">{grPal.lemma}</b>
+              <span className="lex-glosa-en"> · forma de diccionario</span>
+            </div>
+            <div className="lex-def">{morfGntEs(grPal.pos)}</div>
+            <div className="lex-def" style={{ color: "var(--muted)", fontSize: "0.82rem" }}>
+              Código MorphGNT: <code>{grPal.pos}</code>
+            </div>
+            <button
+              className="btn-inter"
+              onClick={() => {
+                setGrPal(null);
+                setGriego(false);
+                setInterlineal(true);
+              }}
+            >
+              Ver este versículo en el interlineal →
+            </button>
+            <div className="lex-def" style={{ color: "var(--muted)", fontSize: "0.8rem" }}>
+              El interlineal añade el número de Strong y la glosa en español.
+            </div>
           </div>
         </div>
       )}
