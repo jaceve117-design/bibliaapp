@@ -33,6 +33,28 @@ const MAPA: Record<string, string> = {
   '1Jn': '1JN', '1John': '1JN', '1Jo': '1JN', '2Jn': '2JN', '2Jo': '2JN', '2John': '2JN',
   '3Jn': '3JN', '3Jo': '3JN', '3John': '3JN', Jud: 'JUD', Jude: 'JUD', Jd: 'JUD',
   Rev: 'REV', Ap: 'REV', Apoc: 'REV',
+  // — Nombres ingleses COMPLETOS —
+  // Easton cita así («Genesis 25:26», «1 Chronicles 12»), y sin estas claves
+  // ninguna de sus 504 formas de referencia era enlazable.
+  Genesis: 'GEN', Exodus: 'EXO', Leviticus: 'LEV', Numbers: 'NUM',
+  Deuteronomy: 'DEU', Joshua: 'JOS', Judges: 'JDG', Esther: 'EST',
+  Psalms: 'PSA', Psalm: 'PSA', Proverbs: 'PRO', Ecclesiastes: 'ECC',
+  Isaiah: 'ISA', Jeremiah: 'JER', Lamentations: 'LAM', Ezekiel: 'EZK',
+  Daniel: 'DAN', Hosea: 'HOS', Obadiah: 'OBA', Micah: 'MIC',
+  Nahum: 'NAM', Habakkuk: 'HAB', Zephaniah: 'ZEP', Haggai: 'HAG',
+  Zechariah: 'ZEC', Malachi: 'MAL', Nehemiah: 'NEH',
+  Matthew: 'MAT', Romans: 'ROM', Galatians: 'GAL', Ephesians: 'EPH',
+  Philippians: 'PHP', Colossians: 'COL', Philemon: 'PHM',
+  Hebrews: 'HEB', James: 'JAS', Revelation: 'REV', Luke: 'LUK', John: 'JHN',
+  'Song of Solomon': 'SNG', 'Song of Songs': 'SNG',
+  // numerados: la clave lleva el número, porque parseCita resuelve por el
+  // nombre capturado y «Chronicles» a secas es ambiguo
+  '1 Samuel': '1SA', '2 Samuel': '2SA', '1 Kings': '1KI', '2 Kings': '2KI',
+  '1 Chronicles': '1CH', '2 Chronicles': '2CH',
+  '1 Corinthians': '1CO', '2 Corinthians': '2CO',
+  '1 Thessalonians': '1TH', '2 Thessalonians': '2TH',
+  '1 Timothy': '1TI', '2 Timothy': '2TI', '1 Peter': '1PE', '2 Peter': '2PE',
+  '1 John': '1JN', '2 John': '2JN', '3 John': '3JN',
 };
 
 const CLAVES = Object.keys(MAPA).sort((a, b) => b.length - a.length).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
@@ -45,10 +67,22 @@ export const RE_CITA = new RegExp(
 
 export type Cita = { etiqueta: string; refs: RefOsis[] };
 
+/**
+ * Libros con hermanos numerados. Si la cita trae un número delante, el nombre
+ * a secas NO puede resolverla: «1 John 2:2» tiene que dar 1JN, nunca JHN.
+ */
+const AMBIGUOS = new Set([
+  'Samuel', 'Kings', 'Chronicles', 'Corinthians', 'Thessalonians',
+  'Timothy', 'Peter', 'John',
+]);
+
 /** Convierte una cita detectada (cadena completa) en coordenadas OSIS. */
 export function parseCita(match: RegExpMatchArray): Cita | null {
   const [etiqueta, prefijo, libro, capStr, vStr, extras, rangoHasta] = match;
-  const osis = MAPA[libro];
+  const pref = prefijo ? prefijo.trim() : '';
+  const osis = pref
+    ? MAPA[pref + libro] ?? MAPA[`${pref} ${libro}`] ?? (AMBIGUOS.has(libro) ? undefined : MAPA[libro])
+    : MAPA[libro];
   if (!osis) return null;
   const c = Number(capStr);
   const v = Number(vStr ?? '1');

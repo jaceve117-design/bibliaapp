@@ -1062,10 +1062,16 @@ body {
 .gr-par:last-child { border-bottom: none; }
 .gr-es {
   margin: 0 0 6px;
+  padding: 3px 4px;
+  border-radius: 5px;
   font-family: var(--serif);
   color: var(--ink);
   line-height: 1.62;
+  cursor: pointer;
+  transition: background 0.14s ease;
 }
+.gr-es:hover { background: var(--hover); }
+.gr-es:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .gr-gr {
   margin: 0;
   font-family: var(--serif);
@@ -1073,6 +1079,14 @@ body {
   line-height: 1.9;
   /* algo más pequeño que el español: el griego acompaña, no manda */
   font-size: 0.94em;
+  /* Tono propio: que se vea de un golpe que son DOS cosas distintas, no la
+     continuación del versículo. Un filete lateral en vez de una caja, para
+     no cortar la columna de lectura. */
+  background: color-mix(in srgb, var(--accent-soft) 55%, transparent);
+  border-inline-start: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 0 6px 6px 0;
+  padding: 7px 10px 7px 11px;
+  margin-top: 2px;
 }
 .palabra-g {
   font: inherit;
@@ -1152,3 +1166,15 @@ body {
 }
 .btn-inter-sec:hover { color: var(--accent-strong); text-decoration: underline; }
 .btn-inter-sec:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* referencias del diccionario: fichas tocables, no una lista muerta */
+.dic-refs { line-height: 2; }
+.dic-refs-rotulo { color: var(--muted); }
+.dic-refs-sep { color: var(--line-strong); }
+.dic-refs .cita {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 0.86em;
+}
+.dic-refs .cita:hover { border-color: var(--accent); background: var(--accent-soft); }

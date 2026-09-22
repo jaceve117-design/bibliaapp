@@ -1099,8 +1099,31 @@ export default function Lector() {
                       : [];
                   return (
                     <div key={gv.osis} className="gr-par" data-osis={gv.osis}>
-                      <p className="gr-es">
-                        <sup className="num">{gv.v}</sup>
+                      {/* La línea en español es tocable, igual que en la vista
+                          normal: abre abajo el versículo con sus referencias y
+                          el editor de notas. Sin esto las notas no funcionaban
+                          con el griego activo. */}
+                      <p
+                        className={`gr-es versoTocable${
+                          esp && notas[claveNota(esp)]?.color
+                            ? ` subrayado-${notas[claveNota(esp)].color}`
+                            : ""
+                        }`}
+                        role="button"
+                        tabIndex={0}
+                        title={tr.abrirVerso}
+                        aria-label={`${gv.c}:${gv.v} — ${tr.abrirVerso}`}
+                        onClick={() => esp && abrirReferencias(esp)}
+                        onKeyDown={(e) => {
+                          if ((e.key === "Enter" || e.key === " ") && esp) {
+                            e.preventDefault();
+                            abrirReferencias(esp);
+                          }
+                        }}
+                      >
+                        <sup className={`num${esp && notas[claveNota(esp)] ? " con-nota" : ""}`}>
+                          {gv.v}
+                        </sup>
                         {esp?.t ?? <span style={{ color: "var(--muted)" }}>—</span>}
                       </p>
                       <p className="gr-gr" lang="el">
@@ -1261,12 +1284,21 @@ export default function Lector() {
                     </span>
                   )}
                 </div>
+                {/* La definición pasa por renderMarcado: las citas que Easton
+                    intercala en la prosa —«(Ex. 6:20)»— se vuelven tocables,
+                    igual que en los comentarios. */}
                 <div className="lex-def" style={{ marginTop: 10 }}>
-                  {dicEntrada.d}
+                  {renderMarcado(dicEntrada.d)}
                 </div>
                 {dicEntrada.r?.length > 0 && (
-                  <div className="lex-meta" style={{ marginTop: 14 }}>
-                    Refs: {dicEntrada.r.slice(0, 12).join(" · ")}
+                  <div className="lex-meta dic-refs" style={{ marginTop: 14 }}>
+                    <span className="dic-refs-rotulo">Refs:</span>{" "}
+                    {dicEntrada.r.slice(0, 24).map((ref, i) => (
+                      <span key={i}>
+                        {i > 0 && <span className="dic-refs-sep"> · </span>}
+                        {renderMarcado(ref)}
+                      </span>
+                    ))}
                   </div>
                 )}
                 <div className="lex-fuente">{tr.fuenteDic}</div>
