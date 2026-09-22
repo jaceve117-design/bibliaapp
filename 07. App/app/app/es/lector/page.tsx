@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Cabecera from "@/components/Cabecera";
 import TamTexto from "@/components/TamTexto";
 import { t } from "@/lib/i18n";
+import { parejaDe } from "@/lib/alinea-gr";
 import { morfGntEs } from "@/lib/morfgnt";
 import { parseCita, segmentarPorCitas } from "@/lib/referencias";
 
@@ -94,6 +95,8 @@ export default function Lector() {
   const [dicIndice, setDicIndice] = useState<IndiceItem[] | null>(null);
   const [dicQuery, setDicQuery] = useState("");
   const [dicEntrada, setDicEntrada] = useState<EntradaDic | null>(null);
+  // si la entrada mostrada viene de la traducción propia (para la insignia)
+  const [dicEnEs, setDicEnEs] = useState(false);
   const [comentario, setComentario] = useState(false);
   const [henry, setHenry] = useState<HenryJson | null>(null);
   const [henryEs, setHenryEs] = useState<HenryEsJson | null>(null);
@@ -271,9 +274,12 @@ export default function Lector() {
     };
   }, [obra, osis]);
 
-  // carga del interlineal (TAHOT/TAGNT por libro)
+  // Carga del interlineal (TAHOT/TAGNT por libro).
+  // También se carga con el GRIEGO activo, aunque no se dibuje: es la fuente de
+  // la glosa y el número de Strong que la tarjeta del SBLGNT muestra sin sacar
+  // al lector de donde está.
   useEffect(() => {
-    if (!interlineal) {
+    if (!interlineal && !griego) {
       setInterData(null);
       return;
     }
@@ -292,7 +298,7 @@ export default function Lector() {
         setInterData(json);
       })
       .catch(() => setInterData(null));
-  }, [interlineal, osis]);
+  }, [interlineal, griego, osis]);
 
   // morfología en español: mapa por idioma, cargado al abrir el interlineal
   useEffect(() => {
@@ -312,6 +318,8 @@ export default function Lector() {
         setMorfEs(mapa);
       })
       .catch(() => setMorfEs(null));
+    // solo depende del interlineal: la vista griega descifra con lib/morfgnt.ts,
+    // que usa el esquema MorphGNT y no esta tabla.
   }, [interlineal, osis]);
 
   // glosas ES de TBESH/TBESG (overlay propio, CC BY 4.0 — B18): cargado al abrir el interlineal
@@ -586,18 +594,37 @@ export default function Lector() {
 
   const abrirEntradaDic = (item: IndiceItem) => {
     const clave = `dic:${item.l}`;
-    const usar = (data: { entradas: Record<string, EntradaDic> }) =>
-      setDicEntrada(data.entradas[item.s] ?? null);
-    const enCache = cache.get(clave) as { entradas: Record<string, EntradaDic> } | undefined;
+    // Se piden las dos ediciones a la vez: la inglesa (completa) y la propia en
+    // español. Si la entrada tiene ES, manda el ES; si no —hay 17 que el motor
+    // no pudo cerrar—, cae al inglés en vez de dejar el hueco en blanco.
+    const usar = (
+      en: { entradas: Record<string, EntradaDic> },
+      es: { entradas: Record<string, Partial<EntradaDic>> } | null
+    ) => {
+      const base = en.entradas[item.s];
+      if (!base) { setDicEntrada(null); setDicEnEs(false); return; }
+      const trad = es?.entradas?.[item.s];
+      const hayEs = !!(trad?.n || trad?.d);
+      setDicEnEs(hayEs);
+      setDicEntrada(
+        hayEs ? { ...base, n: trad?.n || base.n, d: trad?.d || base.d } : base
+      );
+    };
+    const enCache = cache.get(clave) as
+      | { en: { entradas: Record<string, EntradaDic> }; es: { entradas: Record<string, Partial<EntradaDic>> } | null }
+      | undefined;
     if (enCache) {
-      usar(enCache);
+      usar(enCache.en, enCache.es);
       return;
     }
-    fetch(`/data/easton/${item.l}.json`)
-      .then((r) => r.json())
-      .then((data) => {
-        cache.set(clave, data);
-        usar(data);
+    Promise.all([
+      fetch(`/data/easton/${item.l}.json`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`/data/easton-es/${item.l}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    ])
+      .then(([en, es]) => {
+        if (!en) { setDicEntrada(null); return; }
+        cache.set(clave, { en, es });
+        usar(en, es);
       })
       .catch(() => setDicEntrada(null));
   };
@@ -713,6 +740,15 @@ export default function Lector() {
   // catálogo: así el conmutador ES/EN aparece en cuanto exista la traducción, sin
   // tocar código, y no miente si el archivo aún no está desplegado.
   const recursoTraducido = comFuente === "henry" ? !!henryEs : false;
+
+  // Pareja de la palabra del SBLGNT en el interlineal (glosa + Strong).
+  // Se calcula al vuelo: alinear un versículo son unas decenas de comparaciones.
+  const grParejaInter = (() => {
+    if (!grPal || !interData) return null;
+    const gv = (grData?.versos ?? []).find((x) => x.osis === grPal.ref);
+    if (!gv) return null;
+    return parejaDe(gv.w, interData.versos[`${gv.c}.${gv.v}`], grPal.i);
+  })();
   const capCom = henry?.c[capClave];
   const rCom = idiomaEfectivo === "es" && esCapDisp ? (capEs?.r ?? null) : (capCom?.r ?? null);
   const seccionesCom = (capCom?.s ?? []).map((sEn, i) => {
@@ -1037,10 +1073,30 @@ export default function Lector() {
                palabras son botones de verdad: antes tenían pinta de clicables
                (un `title`) y no hacían nada. */
             <div className="texto-biblico griego-par">
+              {/* El comentario también vive aquí: texto + griego + comentario a
+                  la vez es justo la mesa de trabajo de quien estudia el original.
+                  Antes solo aparecía en la vista sin capas. */}
+              {comentario && comFuente === "henry" && rCom && (
+                <div className="com-resumen">
+                  <div className="com-titulo">{tr.resumenCapitulo}</div>
+                  {renderMarcado(rCom)}
+                </div>
+              )}
+              {comentario && comFuente === "jfb" && parrafosJfb.length > 0 && (
+                <ComentarioBloque
+                  seccion={{ t: `${tr.jfbTitulo} — ${tr.jfbModo}`, v: null, p: parrafosJfb, sinTraducir: false }}
+                  tr={tr}
+                  renderFn={renderMarcado}
+                />
+              )}
               {(grData?.versos ?? [])
                 .filter((gv) => gv.c === cap)
                 .map((gv) => {
                   const esp = versos.find((v) => v.c === gv.c && v.v === gv.v);
+                  const secciones =
+                    comentario && comFuente === "henry"
+                      ? seccionesCom.filter((s) => s.v === gv.v)
+                      : [];
                   return (
                     <div key={gv.osis} className="gr-par" data-osis={gv.osis}>
                       <p className="gr-es">
@@ -1063,6 +1119,14 @@ export default function Lector() {
                           </button>
                         ))}
                       </p>
+                      {secciones.map((sec, i) => (
+                        <ComentarioBloque
+                          key={`${gv.osis}-${i}`}
+                          seccion={sec}
+                          tr={tr}
+                          renderFn={renderMarcado}
+                        />
+                      ))}
                     </div>
                   );
                 })}
@@ -1183,8 +1247,19 @@ export default function Lector() {
             </div>
             {dicEntrada ? (
               <>
-                <div className="lex-palabra" style={{ fontSize: 24 }}>
+                <div
+                  className="lex-palabra"
+                  style={{ fontSize: 24, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}
+                >
                   {dicEntrada.n}
+                  {/* La política exige que el lector sepa siempre en qué estado
+                      está el texto que lee. Esta traducción es del motor y no
+                      ha pasado por revisión humana. */}
+                  {dicEnEs && (
+                    <span className="badge-revision" title={tr.estadoNota}>
+                      {tr.sinRevisar}
+                    </span>
+                  )}
                 </div>
                 <div className="lex-def" style={{ marginTop: 10 }}>
                   {dicEntrada.d}
@@ -1247,27 +1322,42 @@ export default function Lector() {
             <div className="lex-meta">
               {osis} {cap}:{grPal.v} · SBLGNT
             </div>
-            <div className="lex-glosa">
-              <b lang="el">{grPal.lemma}</b>
-              <span className="lex-glosa-en"> · forma de diccionario</span>
+            {/* La glosa y el Strong vienen del interlineal, alineados aquí
+                mismo: mandar al lector a otra vista le rompía la secuencia de
+                palabras que venía descubriendo. */}
+            {grParejaInter ? (
+              <div className="lex-glosa">
+                <b>{glosaLexicoEs(grParejaInter as never) || grParejaInter.es || grParejaInter.e}</b>
+                {grParejaInter.es && grParejaInter.e && grParejaInter.es !== grParejaInter.e && (
+                  <span className="lex-glosa-en"> ({grParejaInter.e})</span>
+                )}
+              </div>
+            ) : (
+              <div className="lex-glosa" style={{ color: "var(--muted)" }}>
+                <i>sin glosa alineada para esta palabra</i>
+              </div>
+            )}
+
+            <div className="lex-def">
+              <b lang="el">{grPal.lemma}</b> · forma de diccionario
             </div>
             <div className="lex-def">{morfGntEs(grPal.pos)}</div>
             <div className="lex-def" style={{ color: "var(--muted)", fontSize: "0.82rem" }}>
-              Código MorphGNT: <code>{grPal.pos}</code>
+              {grParejaInter?.s ? `Strong ${grParejaInter.s} · ` : ""}
+              MorphGNT <code>{grPal.pos}</code>
             </div>
+
             <button
-              className="btn-inter"
+              className="btn-inter-sec"
               onClick={() => {
                 setGrPal(null);
                 setGriego(false);
                 setInterlineal(true);
               }}
+              title="Cambia de vista: perderás el punto donde estabas leyendo el griego"
             >
-              Ver este versículo en el interlineal →
+              ↓ Ver el versículo entero en el interlineal
             </button>
-            <div className="lex-def" style={{ color: "var(--muted)", fontSize: "0.8rem" }}>
-              El interlineal añade el número de Strong y la glosa en español.
-            </div>
           </div>
         </div>
       )}
