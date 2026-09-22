@@ -18,7 +18,7 @@ const MAPA: Record<string, string> = {
   Eccl: 'ECC', Ecc: 'ECC', Ecl: 'ECC', Sng: 'SNG', Song: 'SNG', Cant: 'SNG', Isa: 'ISA', Is: 'ISA',
   Jer: 'JER', Lam: 'LAM', Lm: 'LAM', Eze: 'EZK', Ezek: 'EZK', Ezk: 'EZK', Ez: 'EZK', Dan: 'DAN',
   Dn: 'DAN', Hos: 'HOS', Os: 'HOS', Joe: 'JOL', Joel: 'JOL', Jl: 'JOL', Amo: 'AMO', Amos: 'AMO',
-  Am: 'AMO', Oba: 'OBA', Obad: 'OBA', Jon: 'JON', Jonah: 'JON', Mic: 'MIC', Miq: 'MIC',
+  Am: 'AMO', Oba: 'OBA', Obad: 'OBA', Abd: 'OBA', Jon: 'JON', Jonah: 'JON', Mic: 'MIC', Miq: 'MIC',
   Nam: 'NAM', Nah: 'NAM', Hab: 'HAB', Zep: 'ZEP', Zeph: 'ZEP', Sof: 'ZEP', Hag: 'HAG', Hg: 'HAG',
   Zec: 'ZEC', Zech: 'ZEC', Zac: 'ZEC', Mal: 'MAL', Ml: 'MAL',
   // — NT —

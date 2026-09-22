@@ -40,12 +40,16 @@ const COLORES: ColorSubrayado[] = ["", "amarillo", "verde", "rosa"];
 
 const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
+  // Versión Biblia Libre: español contemporáneo desde Nestle-Aland. Está para el
+  // lector al que la RV1909 («á», «fué», «crió») se le hace cuesta arriba.
+  { id: "vbl", etiqueta: "VBL" },
   { id: "web", etiqueta: "WEB" },
 ];
-// comentaristas disponibles en el desplegable de la barra del comentario
+// Recursos del desplegable de la barra inferior. Añadir una obra nueva al núcleo
+// es añadir una línea aquí: `traducido` enciende solo el conmutador ES/EN.
 const COMENTARIOS = [
-  { id: "henry", etiqueta: "Matthew Henry · 1706" },
-  { id: "jfb", etiqueta: "Jamieson, Fausset y Brown · 1871" },
+  { id: "henry", etiqueta: "Matthew Henry", anio: "1706", traducido: true },
+  { id: "jfb", etiqueta: "Jamieson, Fausset y Brown", anio: "1871", traducido: false },
 ] as const;
 type ComFuente = (typeof COMENTARIOS)[number]["id"];
 const OSIS_INICIAL = "JHN";
@@ -692,6 +696,10 @@ export default function Lector() {
   const capEs = henryEs?.c[capClave];
   const esCapDisp = !!capEs;
   const idiomaEfectivo: "es" | "en" = esCapDisp && comIdioma === "es" ? "es" : "en";
+  // ¿Este recurso ofrece ES? Se deriva de los datos cargados, no de la bandera del
+  // catálogo: así el conmutador ES/EN aparece en cuanto exista la traducción, sin
+  // tocar código, y no miente si el archivo aún no está desplegado.
+  const recursoTraducido = comFuente === "henry" ? !!henryEs : false;
   const capCom = henry?.c[capClave];
   const rCom = idiomaEfectivo === "es" && esCapDisp ? (capEs?.r ?? null) : (capCom?.r ?? null);
   const seccionesCom = (capCom?.s ?? []).map((sEn, i) => {
@@ -917,71 +925,67 @@ export default function Lector() {
             </button>
           </div>
         </div>
+        {/* Barra de recursos: [obra ▾] · [ES|EN si hay traducción] · [☑ mostrar]
+            Nada de una zona de clic a lo ancho: cada control es suyo, y así el
+            desplegable y el conmutador de idioma no quedan tapados. */}
         <div className="com-strip-fila">
-          <div
-            className={`com-strip${comentario ? " activa" : ""}`}
-            role="button"
-            tabIndex={0}
-            onClick={() => setComentario(!comentario)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") setComentario(!comentario);
-            }}
-            aria-pressed={comentario}
-            title={tr.comentario}
-          >
-            <span className="com-strip-izq">
-              <span className="com-strip-icono">✎</span>
-              <select
-                className="sel com-sel"
-                aria-label={tr.comentario}
-                value={comFuente}
-                onChange={(e) => setComFuente(e.target.value as ComFuente)}
-              >
-                {COMENTARIOS.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.etiqueta}
-                  </option>
-                ))}
-              </select>
-            </span>
-            <span
-              className="com-strip-der"
-              onClick={(e) => e.stopPropagation()}
-              onKeyDown={(e) => e.stopPropagation()}
-              role="group"
+          <div className={`rec-barra${comentario ? " activa" : ""}`}>
+            <span className="rec-icono" aria-hidden="true">✎</span>
+
+            <select
+              className="rec-sel"
               aria-label={tr.comentario}
+              value={comFuente}
+              onChange={(e) => setComFuente(e.target.value as ComFuente)}
             >
-              {comFuente === "henry" ? (
-                henryEs && (
-                  <>
-                    {idiomaEfectivo === "es" && esCapDisp && (
-                      <span className="badge-revision" title={tr.estadoNota}>
-                        {tr.sinRevisar}
-                      </span>
-                    )}
-                    <span className="obras-toggle">
-                      <button
-                        className={`obras-tab${comIdioma === "es" ? " activa" : ""}`}
-                        onClick={() => setComIdioma("es")}
-                        aria-label="Comentario en español"
-                      >
-                        ES
-                      </button>
-                      <button
-                        className={`obras-tab${comIdioma === "en" ? " activa" : ""}`}
-                        onClick={() => setComIdioma("en")}
-                        aria-label="Commentary in English"
-                      >
-                        EN
-                      </button>
-                    </span>
-                  </>
-                )
-              ) : (
-                <span className="badge-idioma" title={tr.comentarioEN}>
-                  EN
+              {COMENTARIOS.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.etiqueta} · {c.anio}
+                </option>
+              ))}
+            </select>
+
+            <span className="rec-der">
+              {comentario && recursoTraducido && idiomaEfectivo === "es" && esCapDisp && (
+                <span className="badge-revision" title={tr.estadoNota}>
+                  {tr.sinRevisar}
                 </span>
               )}
+
+              {recursoTraducido ? (
+                <span className="rec-idioma" role="group" aria-label="Idioma del recurso">
+                  <button
+                    type="button"
+                    className={`rec-idioma-tab${comIdioma === "es" ? " activa" : ""}`}
+                    onClick={() => setComIdioma("es")}
+                    aria-pressed={comIdioma === "es"}
+                    aria-label="Recurso en español"
+                  >
+                    ES
+                  </button>
+                  <button
+                    type="button"
+                    className={`rec-idioma-tab${comIdioma === "en" ? " activa" : ""}`}
+                    onClick={() => setComIdioma("en")}
+                    aria-pressed={comIdioma === "en"}
+                    aria-label="Resource in English"
+                  >
+                    EN
+                  </button>
+                </span>
+              ) : (
+                <span className="rec-idioma-fijo" title={tr.comentarioEN}>EN</span>
+              )}
+
+              <label className="rec-check" title={comentario ? tr.comentario : tr.comentario}>
+                <input
+                  type="checkbox"
+                  checked={comentario}
+                  onChange={(e) => setComentario(e.target.checked)}
+                  aria-label={tr.comentario}
+                />
+                <span className="rec-check-caja" aria-hidden="true" />
+              </label>
             </span>
           </div>
         </div>
@@ -1380,6 +1384,14 @@ export default function Lector() {
             <div className="fuente-item">
               <b>{manifest?.obra}</b> · {manifest?.licencia}
               <div className="lex-meta">{manifest?.fuente} · {tr.fuentesEstadoNucleo}</div>
+              {obra === "vbl" && (
+                // CC BY-SA obliga a indicar si el texto se modificó. Mientras se
+                // sirva íntegro, hay que declararlo: no es adorno, es la licencia.
+                <div className="lex-meta">
+                  Traducción desde Nestle-Aland · <b>texto sin modificar</b> ·
+                  freebibleversion.org · ShareAlike: ver ficha legal
+                </div>
+              )}
             </div>
             <div className="fuente-item">
               <b>Interlineal y léxicos</b> — STEPBible-Data (Tyndale House), CC BY 4.0

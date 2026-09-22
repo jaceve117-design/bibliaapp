@@ -191,43 +191,131 @@ body {
 .com-strip-fila {
   border-top: 1px solid var(--line);
 }
-.com-strip {
+/* ── Barra de recursos ──────────────────────────────────────────────────────
+   [✎] [obra ▾] ............ [sin revisar] [ES|EN] [☑]
+   Sin zona de clic a lo ancho: cada control responde por sí mismo, para que el
+   desplegable y el idioma nunca queden tapados por una superficie invisible. */
+.rec-barra {
   display: flex;
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
   align-items: center;
   gap: 8px;
-  padding: 6px 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  padding: 5px 10px;
   font-family: var(--sans);
   font-size: 12.5px;
   color: var(--muted);
-  text-align: left;
-  transition: background 0.15s ease;
+  transition: background 0.18s ease, box-shadow 0.18s ease;
 }
-.com-strip:hover { background: var(--hover); }
-.com-strip.activa,
-.com-strip.activa:hover { background: var(--accent-soft); }
-.com-strip:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.com-strip-izq { display: inline-flex; align-items: center; gap: 7px; min-width: 0; }
-.com-strip-icono {
+.rec-barra.activa {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.rec-icono {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border-radius: 6px;
-  border: 1px solid var(--line-strong); color: var(--ink-soft);
-  font-size: 12px; flex-shrink: 0;
+  width: 21px; height: 21px; border-radius: 6px; flex-shrink: 0;
+  border: 1px solid var(--line-strong); color: var(--muted);
+  font-size: 11.5px;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
-.com-strip.activa .com-strip-icono {
-  background: var(--accent); border-color: var(--accent); color: #14161e;
+.rec-barra.activa .rec-icono {
+  background: var(--accent); border-color: var(--accent); color: var(--bg);
 }
-.com-strip .autor {
-  font-weight: 600; color: var(--ink-soft);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+
+/* desplegable: se funde con la barra hasta que lo tocas */
+.rec-sel {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 3px 24px 3px 7px;
+  min-width: 0;
+  max-width: 320px;
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
 }
-.com-strip.activa .autor { color: var(--accent-strong); }
-.com-strip-der { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.rec-sel:hover { border-color: var(--line-strong); background-color: var(--hover); }
+.rec-sel:focus-visible { outline: none; border-color: var(--accent); }
+.rec-barra.activa .rec-sel { color: var(--accent-strong); }
+.rec-sel option { background: var(--bg-elev); color: var(--ink); font-weight: 500; }
+
+.rec-der { margin-left: auto; display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+
+/* conmutador ES/EN — solo si el recurso tiene traducción */
+.rec-idioma {
+  display: inline-flex;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-elev);
+}
+.rec-idioma-tab {
+  font-family: var(--sans);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  padding: 3px 9px;
+  border: none; background: transparent; color: var(--muted);
+  cursor: pointer; line-height: 1.4;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.rec-idioma-tab:hover { color: var(--ink-soft); background: var(--hover); }
+.rec-idioma-tab.activa { background: var(--accent); color: var(--bg); }
+.rec-idioma-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* recurso sin traducir: insignia pasiva, no un botón que no hace nada */
+.rec-idioma-fijo {
+  font-family: var(--sans);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  color: var(--muted);
+  border: 1px dashed var(--line-strong); border-radius: 999px;
+  padding: 2px 9px; cursor: help;
+}
+
+/* casilla de visibilidad — dibujada a mano para no heredar el gris de Windows */
+.rec-check { display: inline-flex; align-items: center; cursor: pointer; padding: 2px; }
+.rec-check input {
+  position: absolute; opacity: 0; width: 0; height: 0;
+}
+.rec-check-caja {
+  display: inline-block; position: relative;
+  width: 17px; height: 17px; border-radius: 5px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--bg-elev);
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.rec-check-caja::after {
+  content: ""; position: absolute;
+  left: 5.5px; top: 2px; width: 4px; height: 8.5px;
+  border: solid var(--bg); border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0.4);
+  opacity: 0;
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+.rec-check:hover .rec-check-caja { border-color: var(--accent); }
+.rec-check input:checked + .rec-check-caja {
+  background: var(--accent); border-color: var(--accent);
+}
+.rec-check input:checked + .rec-check-caja::after {
+  opacity: 1; transform: rotate(45deg) scale(1);
+}
+.rec-check input:focus-visible + .rec-check-caja {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .rec-sel { max-width: 170px; }
+  .rec-der { gap: 7px; }
+}
+
 .badge-revision {
   font-family: var(--sans);
   font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
@@ -884,23 +972,38 @@ body {
 .griego-vista .palabra-g { cursor: help; }
 .griego-vista .palabra-g:hover { color: var(--accent-strong); }
 
-/* ── Desplegable de comentarista + insignia de idioma (barra del comentario) ── */
-.com-sel {
-  max-width: 56vw;
-  padding: 4px 8px;
-  font-size: 0.9rem;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--ink);
-  font-family: var(--serif);
+/* (el desplegable y la insignia de idioma viven ahora en .rec-sel / .rec-idioma) */
+
+/* ── Barras de desplazamiento ───────────────────────────────────────────────
+   La barra nativa de Windows 11 rompe la sobriedad de la página: gris de
+   sistema, ancha y con flechas. Se sustituye por una delgada, sin flechas y
+   teñida con los tokens del tema, que se oscurece al pasar el ratón.
+   `scrollbar-color` cubre Firefox; `::-webkit-scrollbar`, el resto. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
-.com-sel:hover, .com-sel:focus { border-color: var(--line-strong); outline: none; }
-.badge-idioma {
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  border: 1px solid var(--line-strong);
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
   border-radius: 999px;
-  padding: 2px 9px;
-  white-space: nowrap;
+  /* el borde transparente adelgaza el pulgar sin estrechar la zona de agarre */
+  border: 3px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
+::-webkit-scrollbar-thumb:active { background: var(--accent); background-clip: content-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+/* las flechas de Windows fuera */
+::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
+
+/* Quien prefiera menos movimiento, no lo tiene. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

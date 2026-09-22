@@ -47,3 +47,28 @@ La revisión editorial humana (B2) es irreplaceable: el lector muestra la etique
 ## 5. Criterios para cruzar la puerta
 
 La puerta se cruza cuando el revisor humano declara, capítulo a capítulo: «fiel al original, sin errores doctrinales, terminología consistente». Entonces: (a) se retira la etiqueta «sin revisar» por capítulo revisado; (b) el método queda aprobado para escalar (paso 10: más libros de Henry, Easton, Nave's, JFB, Barnes).
+
+## 6. Quién revisa y con qué respaldo
+
+Esta guía dice **qué** revisar en Juan. **Quién** revisa, con qué formación, con qué
+revisor doctrinal externo y bajo qué criterios se declara todo ello está en el documento
+general — aplica a todo el corpus, no solo a Juan:
+
+→ **`06. Traduccion/Política de revisión humana y respaldo editorial.md`**
+
+Resumen de lo que allí se establece, y que condiciona esta puerta:
+
+- La revisión humana no es solo control de calidad: es **el acto que crea la autoría**.
+  Una traducción salida del motor sin tocar puede carecer de protección legal.
+- **No se exige título académico** al revisor; sí se exige **declarar con honestidad**
+  quién revisa y con qué formación.
+- Se recomienda **al menos un revisor doctrinal externo nombrado** sobre el núcleo
+  doctrinal de esta guía — en Juan: capítulos **1, 3, 6, 10, 17 y 19** (sección 4 de la
+  política). No hace falta que lea los 21 capítulos.
+- **Ningún veredicto automático retira la etiqueta «sin revisar»**: solo una persona
+  nombrada, capítulo a capítulo.
+- Los pasajes de polémica de época (p. ej. Jn 21 contra la supremacía papal) **se
+  traducen fieles, sin suavizar**, con `[N. del T.]` solo si hay ambigüedad real.
+
+Mientras la política tenga secciones sin completar (⟡), la etiqueta «sin revisar»
+permanece: el lector ve el estado real del texto.

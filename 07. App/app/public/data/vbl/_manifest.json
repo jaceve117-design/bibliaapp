@@ -1,0 +1,608 @@
+{
+  "obra": "Versión Biblia Libre",
+  "osis_obra": "VBL",
+  "idioma": "es",
+  "licencia": "CC BY-SA 4.0 — © 2018-2020 Jonathan Gallagher y Shelly Barrios de Avila",
+  "fuente": "eBible.org — https://ebible.org/Scriptures/spavbl_usfm.zip",
+  "crudo_en": "05. Datos/corpus_crudo/vbl_usfm",
+  "fecha_ingesta": "2026-09-22",
+  "formato_entrada": "USFM (con marcado \\w|strong preservado en el crudo)",
+  "canon": "Protestante, 66 libros (D3). Los archivos no canónicos del crudo quedan preservados para la decisión pendiente del canon.",
+  "total_versos": 31102,
+  "incidentes": [
+    {
+      "ref": "MAT.17.21",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "MAT.18.11",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "MAT.23.14",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "MRK.7.16",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "MRK.9.44",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "MRK.9.46",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "MRK.11.26",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "MRK.15.28",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "LUK.17.36",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "LUK.23.17",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "JHN.5.4",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "ACT.8.37",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "ACT.15.34",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "ACT.24.7",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "ACT.28.29",
+      "tipo": "verso_vacio_en_fuente"
+    },
+    {
+      "ref": "ROM.16.24",
+      "tipo": "verso_vacio_en_fuente"
+    }
+  ],
+  "libros": [
+    {
+      "osis": "GEN",
+      "nombre": "Génesis",
+      "caps": 50,
+      "versos": 1533,
+      "versos_vacios": 0,
+      "marcadores": 1533
+    },
+    {
+      "osis": "EXO",
+      "nombre": "Éxodo",
+      "caps": 40,
+      "versos": 1213,
+      "versos_vacios": 0,
+      "marcadores": 1213
+    },
+    {
+      "osis": "LEV",
+      "nombre": "Levítico",
+      "caps": 27,
+      "versos": 859,
+      "versos_vacios": 0,
+      "marcadores": 859
+    },
+    {
+      "osis": "NUM",
+      "nombre": "Números",
+      "caps": 36,
+      "versos": 1288,
+      "versos_vacios": 0,
+      "marcadores": 1288
+    },
+    {
+      "osis": "DEU",
+      "nombre": "Deuteronomio",
+      "caps": 34,
+      "versos": 959,
+      "versos_vacios": 0,
+      "marcadores": 959
+    },
+    {
+      "osis": "JOS",
+      "nombre": "Josué",
+      "caps": 24,
+      "versos": 658,
+      "versos_vacios": 0,
+      "marcadores": 658
+    },
+    {
+      "osis": "JDG",
+      "nombre": "Jueces",
+      "caps": 21,
+      "versos": 618,
+      "versos_vacios": 0,
+      "marcadores": 618
+    },
+    {
+      "osis": "RUT",
+      "nombre": "Rut",
+      "caps": 4,
+      "versos": 85,
+      "versos_vacios": 0,
+      "marcadores": 85
+    },
+    {
+      "osis": "1SA",
+      "nombre": "1 Samuel",
+      "caps": 31,
+      "versos": 810,
+      "versos_vacios": 0,
+      "marcadores": 810
+    },
+    {
+      "osis": "2SA",
+      "nombre": "2 Samuel",
+      "caps": 24,
+      "versos": 695,
+      "versos_vacios": 0,
+      "marcadores": 695
+    },
+    {
+      "osis": "1KI",
+      "nombre": "1 Reyes",
+      "caps": 22,
+      "versos": 816,
+      "versos_vacios": 0,
+      "marcadores": 816
+    },
+    {
+      "osis": "2KI",
+      "nombre": "2 Reyes",
+      "caps": 25,
+      "versos": 719,
+      "versos_vacios": 0,
+      "marcadores": 719
+    },
+    {
+      "osis": "1CH",
+      "nombre": "1 Crónicas",
+      "caps": 29,
+      "versos": 942,
+      "versos_vacios": 0,
+      "marcadores": 942
+    },
+    {
+      "osis": "2CH",
+      "nombre": "2 Crónicas",
+      "caps": 36,
+      "versos": 822,
+      "versos_vacios": 0,
+      "marcadores": 822
+    },
+    {
+      "osis": "EZR",
+      "nombre": "Esdras",
+      "caps": 10,
+      "versos": 280,
+      "versos_vacios": 0,
+      "marcadores": 280
+    },
+    {
+      "osis": "NEH",
+      "nombre": "Nehemías",
+      "caps": 13,
+      "versos": 406,
+      "versos_vacios": 0,
+      "marcadores": 406
+    },
+    {
+      "osis": "EST",
+      "nombre": "Ester",
+      "caps": 10,
+      "versos": 167,
+      "versos_vacios": 0,
+      "marcadores": 167
+    },
+    {
+      "osis": "JOB",
+      "nombre": "Job",
+      "caps": 42,
+      "versos": 1070,
+      "versos_vacios": 0,
+      "marcadores": 1070
+    },
+    {
+      "osis": "PSA",
+      "nombre": "Salmos",
+      "caps": 150,
+      "versos": 2461,
+      "versos_vacios": 0,
+      "marcadores": 2461
+    },
+    {
+      "osis": "PRO",
+      "nombre": "Proverbios",
+      "caps": 31,
+      "versos": 915,
+      "versos_vacios": 0,
+      "marcadores": 915
+    },
+    {
+      "osis": "ECC",
+      "nombre": "Eclesiastés",
+      "caps": 12,
+      "versos": 222,
+      "versos_vacios": 0,
+      "marcadores": 222
+    },
+    {
+      "osis": "SNG",
+      "nombre": "Cantares",
+      "caps": 8,
+      "versos": 117,
+      "versos_vacios": 0,
+      "marcadores": 117
+    },
+    {
+      "osis": "ISA",
+      "nombre": "Isaías",
+      "caps": 66,
+      "versos": 1292,
+      "versos_vacios": 0,
+      "marcadores": 1292
+    },
+    {
+      "osis": "JER",
+      "nombre": "Jeremías",
+      "caps": 52,
+      "versos": 1364,
+      "versos_vacios": 0,
+      "marcadores": 1364
+    },
+    {
+      "osis": "LAM",
+      "nombre": "Lamentaciones",
+      "caps": 5,
+      "versos": 154,
+      "versos_vacios": 0,
+      "marcadores": 154
+    },
+    {
+      "osis": "EZK",
+      "nombre": "Ezequiel",
+      "caps": 48,
+      "versos": 1273,
+      "versos_vacios": 0,
+      "marcadores": 1273
+    },
+    {
+      "osis": "DAN",
+      "nombre": "Daniel",
+      "caps": 12,
+      "versos": 357,
+      "versos_vacios": 0,
+      "marcadores": 357
+    },
+    {
+      "osis": "HOS",
+      "nombre": "Oseas",
+      "caps": 14,
+      "versos": 197,
+      "versos_vacios": 0,
+      "marcadores": 197
+    },
+    {
+      "osis": "JOL",
+      "nombre": "Joel",
+      "caps": 3,
+      "versos": 73,
+      "versos_vacios": 0,
+      "marcadores": 73
+    },
+    {
+      "osis": "AMO",
+      "nombre": "Amós",
+      "caps": 9,
+      "versos": 146,
+      "versos_vacios": 0,
+      "marcadores": 146
+    },
+    {
+      "osis": "OBA",
+      "nombre": "Obadías",
+      "caps": 1,
+      "versos": 21,
+      "versos_vacios": 0,
+      "marcadores": 21
+    },
+    {
+      "osis": "JON",
+      "nombre": "Jonás",
+      "caps": 4,
+      "versos": 48,
+      "versos_vacios": 0,
+      "marcadores": 48
+    },
+    {
+      "osis": "MIC",
+      "nombre": "Miqueas",
+      "caps": 7,
+      "versos": 105,
+      "versos_vacios": 0,
+      "marcadores": 105
+    },
+    {
+      "osis": "NAM",
+      "nombre": "Nahúm",
+      "caps": 3,
+      "versos": 47,
+      "versos_vacios": 0,
+      "marcadores": 47
+    },
+    {
+      "osis": "HAB",
+      "nombre": "Habacuc",
+      "caps": 3,
+      "versos": 56,
+      "versos_vacios": 0,
+      "marcadores": 56
+    },
+    {
+      "osis": "ZEP",
+      "nombre": "Sofonías",
+      "caps": 3,
+      "versos": 53,
+      "versos_vacios": 0,
+      "marcadores": 53
+    },
+    {
+      "osis": "HAG",
+      "nombre": "Hageo",
+      "caps": 2,
+      "versos": 38,
+      "versos_vacios": 0,
+      "marcadores": 38
+    },
+    {
+      "osis": "ZEC",
+      "nombre": "Zacarías",
+      "caps": 14,
+      "versos": 211,
+      "versos_vacios": 0,
+      "marcadores": 211
+    },
+    {
+      "osis": "MAL",
+      "nombre": "Malaquías",
+      "caps": 4,
+      "versos": 55,
+      "versos_vacios": 0,
+      "marcadores": 55
+    },
+    {
+      "osis": "MAT",
+      "nombre": "Mateo",
+      "caps": 28,
+      "versos": 1068,
+      "versos_vacios": 3,
+      "marcadores": 1071
+    },
+    {
+      "osis": "MRK",
+      "nombre": "Marcos",
+      "caps": 16,
+      "versos": 673,
+      "versos_vacios": 5,
+      "marcadores": 678
+    },
+    {
+      "osis": "LUK",
+      "nombre": "Lucas",
+      "caps": 24,
+      "versos": 1149,
+      "versos_vacios": 2,
+      "marcadores": 1151
+    },
+    {
+      "osis": "JHN",
+      "nombre": "Juan",
+      "caps": 21,
+      "versos": 878,
+      "versos_vacios": 1,
+      "marcadores": 879
+    },
+    {
+      "osis": "ACT",
+      "nombre": "Hechos",
+      "caps": 28,
+      "versos": 1003,
+      "versos_vacios": 4,
+      "marcadores": 1007
+    },
+    {
+      "osis": "ROM",
+      "nombre": "Romanos",
+      "caps": 16,
+      "versos": 432,
+      "versos_vacios": 1,
+      "marcadores": 433
+    },
+    {
+      "osis": "1CO",
+      "nombre": "1 Corintios",
+      "caps": 16,
+      "versos": 437,
+      "versos_vacios": 0,
+      "marcadores": 437
+    },
+    {
+      "osis": "2CO",
+      "nombre": "2 Corintios",
+      "caps": 13,
+      "versos": 257,
+      "versos_vacios": 0,
+      "marcadores": 257
+    },
+    {
+      "osis": "GAL",
+      "nombre": "Gálatas",
+      "caps": 6,
+      "versos": 149,
+      "versos_vacios": 0,
+      "marcadores": 149
+    },
+    {
+      "osis": "EPH",
+      "nombre": "Efesios",
+      "caps": 6,
+      "versos": 155,
+      "versos_vacios": 0,
+      "marcadores": 155
+    },
+    {
+      "osis": "PHP",
+      "nombre": "Filipenses",
+      "caps": 4,
+      "versos": 104,
+      "versos_vacios": 0,
+      "marcadores": 104
+    },
+    {
+      "osis": "COL",
+      "nombre": "Colosenses",
+      "caps": 4,
+      "versos": 95,
+      "versos_vacios": 0,
+      "marcadores": 95
+    },
+    {
+      "osis": "1TH",
+      "nombre": "1 Tesalonicenses",
+      "caps": 5,
+      "versos": 89,
+      "versos_vacios": 0,
+      "marcadores": 89
+    },
+    {
+      "osis": "2TH",
+      "nombre": "2 Tesalonicenses",
+      "caps": 3,
+      "versos": 47,
+      "versos_vacios": 0,
+      "marcadores": 47
+    },
+    {
+      "osis": "1TI",
+      "nombre": "1 Timoteo",
+      "caps": 6,
+      "versos": 113,
+      "versos_vacios": 0,
+      "marcadores": 113
+    },
+    {
+      "osis": "2TI",
+      "nombre": "2 Timoteo",
+      "caps": 4,
+      "versos": 83,
+      "versos_vacios": 0,
+      "marcadores": 83
+    },
+    {
+      "osis": "TIT",
+      "nombre": "Tito",
+      "caps": 3,
+      "versos": 46,
+      "versos_vacios": 0,
+      "marcadores": 46
+    },
+    {
+      "osis": "PHM",
+      "nombre": "Filemón",
+      "caps": 1,
+      "versos": 25,
+      "versos_vacios": 0,
+      "marcadores": 25
+    },
+    {
+      "osis": "HEB",
+      "nombre": "Hebreos",
+      "caps": 13,
+      "versos": 303,
+      "versos_vacios": 0,
+      "marcadores": 303
+    },
+    {
+      "osis": "JAS",
+      "nombre": "Santiago",
+      "caps": 5,
+      "versos": 108,
+      "versos_vacios": 0,
+      "marcadores": 108
+    },
+    {
+      "osis": "1PE",
+      "nombre": "1 Pedro",
+      "caps": 5,
+      "versos": 105,
+      "versos_vacios": 0,
+      "marcadores": 105
+    },
+    {
+      "osis": "2PE",
+      "nombre": "2 Pedro",
+      "caps": 3,
+      "versos": 61,
+      "versos_vacios": 0,
+      "marcadores": 61
+    },
+    {
+      "osis": "1JN",
+      "nombre": "1 Juan",
+      "caps": 5,
+      "versos": 105,
+      "versos_vacios": 0,
+      "marcadores": 105
+    },
+    {
+      "osis": "2JN",
+      "nombre": "2 Juan",
+      "caps": 1,
+      "versos": 13,
+      "versos_vacios": 0,
+      "marcadores": 13
+    },
+    {
+      "osis": "3JN",
+      "nombre": "3 Juan",
+      "caps": 1,
+      "versos": 14,
+      "versos_vacios": 0,
+      "marcadores": 14
+    },
+    {
+      "osis": "JUD",
+      "nombre": "Judas",
+      "caps": 1,
+      "versos": 25,
+      "versos_vacios": 0,
+      "marcadores": 25
+    },
+    {
+      "osis": "REV",
+      "nombre": "Apocalipsis",
+      "caps": 22,
+      "versos": 404,
+      "versos_vacios": 0,
+      "marcadores": 404
+    }
+  ]
+}

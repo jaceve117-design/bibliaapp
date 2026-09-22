@@ -1,0 +1,5 @@
+estado/*.jsonl
+estado/*.json
+estado/*.log
+node_modules/
+.env

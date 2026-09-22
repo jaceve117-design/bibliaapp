@@ -4,7 +4,7 @@
   "traductor": "GLM (ZCode), asistido",
   "glosario": "06. Traduccion/Glosario teologico maestro v1.md",
   "estado_revision": "sin_revisar — pendiente de revisión editorial humana (B2) y puerta D20",
-  "fecha": "2026-09-20",
+  "fecha": "2026-09-22",
   "cobertura": {
     "JHN": {
       "capitulos": [
@@ -36,11 +36,21 @@
       "capitulo_completo": true,
       "parrafos_traducidos": 64,
       "parrafos_total": 64
+    },
+    "MAT": {
+      "capitulos": [
+        "1"
+      ],
+      "parrafos_traducidos": 43,
+      "parrafos_total": 3020,
+      "revisado_humano": false,
+      "origen": "motor automático (sin revisar)"
     }
   },
   "notas": [
     "Muestra de piloto para la puerta D20: resumen + sección 1 de Juan 1 («La divinidad de Cristo»), la de mayor densidad doctrinal.",
     "Trazabilidad: cada sección ES corresponde por índice a la sección EN; el original está siempre a un clic (B3).",
     "Citas bíblicas internas alineadas a RV1909 cuando el argumento no depende del KJV (B5)."
-  ]
+  ],
+  "licencia": "Traducción propia CC BY 4.0 (B18) · obra original de dominio público"
 }

@@ -907,3 +907,108 @@ Consecuencia directa para la cola de traducción: las **glosas de TBESH/TBESG so
 - Estilos con tokens (serif en el desplegable, insignia pill); `tsc` limpio; desplegado (`6c2edc95`); producción: lector 200, jfb 200, **JUAN ES 2064/2064**. Commit y push.
 
 **Estado sin otros cambios:** paso 6 con SBLGNT ✓ · Nave's ✓ · JFB ✓ (restan Barnes) · MH en pausa · revisión doctrinal abierta al usuario · bloqueado en usuario: sostenimiento y nombre/dominio.
+
+### 2026-09-21 · GLM — Punto de recuperación 2026-09-21 + GLOSAS ES DEL LÉXICO (lote 1) — petición del usuario («continuar mejorando»: eligió punto de recuperación + glosas)
+
+1. **PUNTO DE RECUPERACIÓN (tag `recuperacion-2026-09-21`, commit `9242de0`).** Validación integral previa: checks programáticos de todo el corpus (rv1909/web 66 · Juan ES 2064/2064 + paridad 1:1 · jfb 66 · nave 66+5.321 temas · sblgnt 27/7.927 · tbesh 8.623 · tbesg 10.689 · tsk 66 · easton por letras · léxico 235 · morfología), build limpio y barrido de 18 endpoints en producción → TODO VERDE. La batería destapó y corrigió 2 deudas: **(a) 63 códigos morfológicos griegos del texto sin cobertura ES** (parche `scripts/parche-morfologia-63.mjs` → cobertura 100%: 1.141/1.141 códigos usados); **(b) 8 duplicados no-OSIS en tsk/** (EZE/JAM/JDE/JOE/JOH/MAR/NAH/SOS — el lector sirve por manifest, eran peso muerto; eliminados). Tag anotado + push.
+
+2. **GLOSAS ES DEL LÉXICO STRONG (paso 6, lote 1; commit `d1b1f1d`, deploys `35a3b3a9`/`efc8f77a`).** No existe traducción ES oficial de TBESH/TBESG (revisado el repo STEPBible-Data: solo EN + TFLSJ) → obra derivada propia CC BY 4.0 (B18). **Arquitectura**: overlay único `public/data/stepbible/glosas-es.json` con 4 mapas — `texto`/`textoG` (glosa contextual del campo `e` por cadena EXACTA, con puntuación final normalizada: «Him.»=«Him») y `lexico`/`lexicoG` (por Strong canónico para la ficha). Empaquetado según convención (1 archivo, no 19k). **Lector**: al abrir el interlineal carga el overlay; interlineal AT renderiza `p.es || glosaTextoEs(p) || p.e`; ficha léxica muestra glosa ES en negrita + EN original entre paréntesis + atribución «Glosa ES: traducción propia, CC BY 4.0 (sin revisar)». El NT interlineal ya estaba 100% ES de antes (campo `es`); el AT estaba 0% (283.734 palabras caían a EN).
+   **Cobertura del lote 1**: hebreo 71,78% de palabras del AT interlineal (203.003/282.812; 724 cadenas de texto); griego 87,88% (124.371/141.526; 894 cadenas); mapas léxico 1.738 Strong (H) + 1.541 (G).
+   **Pipelines reproducibles** (`scripts/`): `genera-colas-glosas.mjs` (colas priorizadas por frecuencia), `fusiona-glosas-es.mjs` (portón: cada EN del TSV contra su dominio de referencia — cola léxico o glosas del texto —, ES no vacío, stats), `lista-faltantes-texto.mjs` (siguientes faltantes por frecuencia). Lotes TSV `EN<TAB>ES` en `06. Traduccion/glosas-es/`.
+   **⚠️ BUG DE INGESTA PREEXISTENTE descubierto**: el `indice` interno de tbesh.json/tbesg.json arrastra referencias cruzadas (indice["H0430"] apuntaba a la entrada "Peace" de Salem) y la entrada de YHWH (id "H3068G") lleva glosa "Peace" — la ficha léxica viene resolviendo Elohim/YHWH a entradas equivocadas desde la ingesta original. El overlay nuevo elude el índice (agrupa por prefijo de id y prioriza la glosa real del texto), pero **la resolución interna del lector (abrirLexico) sigue usando el índice contaminado**: revisar la ingesta de tbesh/tbesg (entrada pendiente).
+   **Cola de continuación (siguientes turnos)**: `node scripts/lista-faltantes-texto.mjs` → traducir el top como `lote2-*.tsv` (mismo formato EN<TAB>ES) → `node scripts/fusiona-glosas-es.mjs` → build/deploy. También quedan las glosas del léxico TBESH/TBESG por orden de la cola (cola-hebreo/cola-griego, top 1.000 hecho).
+
+**Estado:** pasos 0-1-2-5-7 ✓ · paso 3 completo salvo revisión humana · paso 4: revisión abierta al usuario · **paso 6: SBLGNT ✓ · Nave's ✓ · JFB ✓ · glosas ES lote 1 ✓ (continúa con lote 2) — restan Barnes** · MH en pausa. Bloqueado en usuario: sostenimiento y nombre/dominio.
+
+### 2026-09-22 · Claude — MOTOR DE TRADUCCIÓN CONSTRUIDO Y VALIDADO · modelo elegido por medición · Política de revisión humana v1.0 · barra de recursos en el lector
+
+**Petición del usuario:** diseñar y construir un motor de traducción y auditoría por lotes fuera de tiempo real, para dejar de traducir desde la conversación (los tokens del chat son los caros).
+
+#### 1. Motor construido — `11. Motor de Traducción/` (30 archivos, sin dependencias externas)
+
+Unidad atómica de estado: **el párrafo**, no el capítulo. Reanudable e idempotente (hash del original). Cuatro capas de calidad, de gratis a cara: validadores deterministas → auditor calibrado → juez LLM sobre lo marcado → revisión humana.
+
+- **Superficie medida del corpus Henry:** 1.189 capítulos · 3.366 secciones · **30.449 unidades** (25.913 párrafos + 3.366 títulos + 1.170 resúmenes) · 34,3 M chars. Cola real sin Juan: **28.268 unidades · 32,2 M chars**. 645 duplicados exactos que la memoria de traducción resuelve gratis.
+- **Contrato de salida idéntico** al de `fusiona-henry-es.mjs`: el lector no cambia ni una línea.
+- **Generalizado a varias obras** (`lib/obras.mjs`): Henry y Easton implementados; añadir una obra es añadir un objeto con `unidades()` y `ensambla()`.
+- **Consola local** (`bin/consola.mjs` → :4317) con tres pestañas: Proceso (avance por libro, gasto, motivos de rechazo), **Revisión humana** (cola ordenada por confianza ASCENDENTE — lo peor primero; A/C/R con teclado; las correcciones entran en la memoria de traducción), y **Cotejo** (dos capítulos enfrentados, con conmutador humano/motor para Juan).
+
+#### 2. Modelo de traducción elegido POR MEDICIÓN, no por intuición
+
+Método: 100 párrafos de Juan con traducción humana, retraducidos por cada candidato, y **enfrentamiento por pares sobre el mismo párrafo** con Jev de juez.
+
+| modelo | USD corpus | fidelidad | fluidez | vs humano (G-P-E) |
+|---|---|---|---|---|
+| **@cf/mistralai/mistral-small-3.1-24b-instruct** | **29** | 2,66 | 2,79 | **30-21-48** (empate estadístico, p≈0,21) |
+| @cf/meta/llama-3.3-70b-instruct-fp8-fast | 44 | 2,65 | 2,69 | 26-40-34 (peor, p≈0,085) |
+| @cf/meta/llama-4-scout-17b-16e-instruct | 25 | 2,65 | 2,68 | 24-40-36 (peor, p≈0,046) |
+| *traducción humana* | — | 2,62 | 2,78 | — |
+
+**Hallazgo de método:** las medias de los tres primeros son casi idénticas (2,65/2,65/2,66) y **no distinguen nada**. Solo el enfrentamiento por pares los separa. Los promedios mezclan párrafos distintos y esconden la diferencia real.
+
+**Modelos de razonamiento descartados** (GLM-5.3 $684, DeepSeek-V4-Pro $451): gastan 13.000–19.000 chars de cadena de pensamiento **por párrafo** en una tarea donde razonar no aporta.
+
+#### 3. Jev como auditor censal
+
+`typesafe/jev` vía **Cloudflare Workers AI** (sin lista de espera; requiere saldo en AI Gateway porque es modelo de terceros). No genera texto: devuelve valores tipados con probabilidad calibrada. Como la salida no se cobra, **auditar el 100% del corpus cuesta 1,91 USD** — el control de calidad pasa de muestral a censal.
+
+Piloto contra Juan: precisión **97,2%**, sensibilidad **84,0%**, falsos positivos 12% → **discrimina**. Para llegar ahí hubo que corregir la RÚBRICA, no el umbral: Jev marcaba como «literalidad» la sintaxis periódica que el glosario manda conservar. Se resolvió metiendo el **ENCARGO** dentro del `state`.
+
+#### 4. Validación end-to-end y bugs reales encontrados
+
+Mateo 1 completo (43/43, 0 fallos) y Easton letra Z (236/236). La corrida real destapó cinco defectos, todos corregidos:
+
+- **Jev cobrado a precio de Sonnet** (`jev-1.13.0` no coincidía con la clave `jev-1`): 100× de más. Precio resuelto ahora por prefijo, con aviso si no reconoce el modelo.
+- **Límite de ritmo del AI Gateway**: 429 en cadena pasadas ~200 peticiones. Medido: de 400 auditorías pasaron 201 y fallaron TODAS las demás. **Habría reventado la auditoría censal del corpus entero.** `lib/ritmo.mjs` abre una pausa GLOBAL creciente al primer 429.
+- **Referencias muertas**: los modelos inventan `He 4:2`, `Da 9:24`, `Tt 2:13`, `Nú 24:17`, `Ga 3:13` — abreviaturas que el lector NO enlaza. `lib/referencias.mjs` las normaliza leyendo la tabla del **propio lector** (una sola fuente de verdad). De paso: **`Abd` (Abdías) faltaba en la tabla del lector** — toda cita española a Abdías era enlace muerto. Corregido en `07. App/app/lib/referencias.ts`.
+- **Bake-off fuera del presupuesto**: `comparar.mjs` no registraba su gasto en el contador y escapaba al tope. Cerrado.
+- **Glosario demasiado severo**: exigir el término fijo generaba 35,7% de falsos positivos contra la traducción humana (el traductor reformula legítimamente: `faith`→«creer»). Ahora solo es GRAVE la variante **vetada** por el propio glosario. Falsos positivos: **0 sobre 1.565 párrafos**.
+
+#### 5. Política de revisión humana y respaldo editorial — v1.0 VIGENTE
+
+Nuevo documento `06. Traduccion/Política de revisión humana y respaldo editorial.md`, enlazado desde la guía de Juan. Aplica a **todo** el corpus.
+
+- **Hallazgo jurídico que condiciona el proyecto:** una traducción salida del motor sin intervención humana **puede carecer de autoría y, con ella, de protección legal**. La revisión humana no es control de calidad añadido: **es el acto que constituye la obra**. Sin ella no hay nada que licenciar, se ponga la licencia que se ponga.
+- **Revisor principal identificado:** Jacob Guzmán Villarreal. Sin formación académica en teología (declarado con honestidad); tradición evangélica protestante, bajo cobertura de Ministerios Ebenezer Costa Rica. El respaldo no es un título: son el glosario fijado antes del primer párrafo, el original a un clic y el registro público de decisiones.
+- **Tres niveles de revisión.** Regla dura: **ningún veredicto automático retira la etiqueta «sin revisar»**. Solo una persona nombrada, capítulo a capítulo.
+- **Sección 7 — texto íntegro y notas del traductor:** el texto se conserva íntegro, sí o sí. Cuando el concepto exige un matiz, se permite **con la condición de declararlo**: `[N. del T.]` o explicación desplegable al pulsar la palabra o el párrafo. **Nunca un cambio silencioso.** El principio es la trazabilidad, no la literalidad.
+- **Pendientes declarados, ninguno bloqueante:** revisor doctrinal externo, registro de la obra en Costa Rica, compuerta «Reportar un error», notas desplegables, errata pública.
+
+#### 6. Lector — barra de recursos (petición del usuario)
+
+La barra del comentario era una superficie de clic a lo ancho que tapaba los controles. Rediseñada: **[✎] [obra ▾] ···· [sin revisar] [ES|EN] [☑]**. Cada control responde por sí mismo. El conmutador ES/EN **solo aparece si el recurso tiene traducción**, derivado de los datos cargados y no de una bandera estática. Casilla de visibilidad dibujada a mano. Añadir una obra al desplegable es añadir una línea a `COMENTARIOS`.
+
+**Barras de desplazamiento** sustituidas en toda la app: delgadas, sin flechas, teñidas con los tokens del tema, en vez del gris ancho de Windows 11. Más `prefers-reduced-motion`.
+
+`tsc --noEmit` limpio · `npm run build` correcto.
+
+#### 7. Coste proyectado de traducirlo todo
+
+Tarifa medida: **~1 USD por millón de caracteres**, traducido y auditado al 100%.
+
+| obra | Mchars | total |
+|---|---|---|
+| Matthew Henry (resto) | 32,22 | **$30,87** |
+| JFB | 10,43 | **$10,00** |
+| Easton | 2,39 | **$2,29** |
+| Glosas TBESH/TBESG (resto) | 1,75 | **$1,67** |
+| Nave's (nombres de tema) | 0,01 | $0,01 |
+| | **46,8** | **≈ $45** |
+
+Con Barnes (sin ingerir aún, ~18 Mchars): **≈ $62 el proyecto completo**. La biblioteca clásica PD entera (Pulpit, Calvino, Gill, Clarke, ISBE, Spurgeon, Smith's) añadiría ~154 Mchars ≈ **$148**.
+
+**El cómputo es lo barato.** Solo Henry son ~470 horas de revisión humana a 60 párrafos por hora. Ahí está el cuello de botella y el valor real.
+
+#### 8. Orden de trabajo acordado: de menor a mayor coste
+
+Nave's → glosas → **Easton (en marcha, piloto letra Z ✓)** → JFB → Henry.
+
+**Gasto real de la sesión:** ~1,8 USD, bake-offs incluidos (reconstruido tras cerrar el agujero de contabilidad).
+
+#### 9. Abierto para el siguiente turno
+
+**Biblias en español de licencia abierta**, por si la RV1909 resulta dura de leer. Candidata localizada: **Versión Biblia Libre (VBL)**, eBible.org `spavbl`, © 2018-2020 Jonathan Gallagher y Shelly Barrios de Avila, **CC BY-SA 4.0**, español contemporáneo desde Nestle-Aland. Dos cosas que verificar antes de ingerirla: (a) si el alcance es Biblia completa o solo NT —la página de copyright dice «Nuevo Testamento» y el índice sugiere ambos Testamentos—, y (b) el **ShareAlike**, que B18 evitó a propósito: servirla junto al corpus propio es mera agregación y no contamina, pero cualquier obra **derivada** de ella sí heredaría CC BY-SA.
+
+**Estado:** pasos 0-1-2-5-7 ✓ · paso 3 completo salvo revisión humana · **paso 4: política v1.0 vigente, revisor principal identificado, revisión abierta** · paso 6: SBLGNT ✓ Nave's ✓ JFB ✓ glosas lote 1 ✓ **Easton ES en marcha** — resta Barnes · **motor de traducción operativo**. Bloqueado en usuario: modelo de sostenimiento, nombre/dominio.
+
+**En el árbol sin commitear:** `11. Motor de Traducción/` completo · `lib/referencias.ts` (Abd) · `henry-es/MAT.json` (Mateo 1 por motor, sin revisar) · `easton-es/z.json` · política y guía de Juan actualizadas · `globals.css` y `lector/page.tsx` (barra de recursos).

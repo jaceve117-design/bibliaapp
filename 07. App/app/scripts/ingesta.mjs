@@ -74,6 +74,26 @@ const EDICIONES = {
     totalEsperado: 31103,
     anclas: { ...ANCLAS_OT, ...ANCLAS_NT, ROM: 434 },
   },
+  vbl: {
+    obra: 'Versión Biblia Libre',
+    osis_obra: 'VBL',
+    idioma: 'es',
+    // ⚠ ÚNICA obra del corpus con ShareAlike. B18 evitó el copyleft a propósito.
+    // Servirla junto a las traducciones propias es MERA AGREGACIÓN y no las
+    // contamina; una obra DERIVADA de ella sí heredaría CC BY-SA 4.0.
+    // Ver 02. Legal/Ficha - VBL.md
+    licencia: 'CC BY-SA 4.0 — © 2018-2020 Jonathan Gallagher y Shelly Barrios de Avila',
+    fuente: 'eBible.org — https://ebible.org/Scriptures/spavbl_usfm.zip',
+    crudo: 'vbl_usfm',
+    sufijo: 'spavbl.usfm',
+    salida: 'vbl',
+    // Traducción moderna desde Nestle-Aland: su versificación NO sigue el linaje
+    // TR de RV1909 (faltan los versículos que el texto crítico omite). No se le
+    // exige el total de RV1909 ni sus anclas: el portón validaría una diferencia
+    // que es correcta. Se valida canon completo y secuencia sin lagunas.
+    totalEsperado: null,
+    anclas: {},
+  },
 };
 
 const stripInline = (s) =>

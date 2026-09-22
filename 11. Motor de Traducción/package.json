@@ -1,0 +1,16 @@
+{
+  "name": "motor-traduccion-mh",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Motor de traduccion y auditoria por lotes del corpus Matthew Henry EN -> ES",
+  "scripts": {
+    "extraer": "node bin/extraer.mjs",
+    "traducir": "node bin/traducir.mjs",
+    "auditar": "node bin/auditar.mjs",
+    "ensamblar": "node bin/ensamblar.mjs",
+    "piloto": "node bin/piloto.mjs",
+    "informe": "node bin/informe.mjs"
+  },
+  "engines": { "node": ">=22" }
+}

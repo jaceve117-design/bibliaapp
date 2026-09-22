@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Motor de traducción · Matthew Henry</title>
+<style>
+  :root{
+    --fondo:#faf8f4; --panel:#fff; --borde:#e3ddd2; --texto:#1f1b16; --suave:#6d655a;
+    --acento:#7c4a2d; --ok:#2f6b46; --alerta:#9a6b1a; --mal:#a33326; --sombra:0 1px 2px rgba(0,0,0,.05);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--fondo:#16130f; --panel:#1e1a15; --borde:#332c23; --texto:#ece5da; --suave:#9d9285;
+          --acento:#d09a6e; --ok:#5fb383; --alerta:#d6a441; --mal:#e0705f; --sombra:none;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fondo);color:var(--texto);font-family:var(--sans);font-size:15px;line-height:1.5}
+  header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--borde);padding:14px 22px}
+  .fila{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  h1{font-family:var(--serif);font-size:19px;margin:0;font-weight:600;letter-spacing:.01em}
+  .sub{color:var(--suave);font-size:12.5px}
+  nav{display:flex;gap:4px;margin-left:auto}
+  nav button{font:inherit;font-size:13.5px;padding:6px 14px;border:1px solid transparent;border-radius:7px;
+    background:transparent;color:var(--suave);cursor:pointer}
+  nav button.on{background:var(--fondo);border-color:var(--borde);color:var(--texto);font-weight:600}
+  main{padding:22px;max-width:1400px;margin:0 auto}
+  .rej{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:22px}
+  .baldosa{background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:13px 15px;box-shadow:var(--sombra)}
+  .baldosa .n{font-size:26px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .baldosa .e{font-size:11.5px;color:var(--suave);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+  .barra{height:7px;border-radius:4px;background:var(--borde);overflow:hidden;display:flex}
+  .barra i{display:block;height:100%}
+  .b-rev{background:var(--ok)} .b-aud{background:var(--acento)} .b-trad{background:var(--suave);opacity:.45}
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--borde);border-radius:10px;overflow:hidden}
+  th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--borde);font-size:13.5px}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--suave);font-weight:600}
+  tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .envoltorio{overflow-x:auto}
+  .pastilla{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;border:1px solid var(--borde);color:var(--suave)}
+  .pastilla.humano{border-color:var(--ok);color:var(--ok)}
+  .controles{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  select,input[type=search]{font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--borde);
+    border-radius:7px;background:var(--panel);color:var(--texto)}
+  .tarjeta{background:var(--panel);border:1px solid var(--borde);border-radius:11px;margin-bottom:14px;overflow:hidden;box-shadow:var(--sombra)}
+  .tarjeta.foco{border-color:var(--acento);box-shadow:0 0 0 2px color-mix(in srgb,var(--acento) 22%,transparent)}
+  .cab{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 15px;border-bottom:1px solid var(--borde);
+    background:color-mix(in srgb,var(--fondo) 55%,var(--panel))}
+  .ref{font-family:var(--serif);font-weight:600;font-size:14.5px}
+  .id{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--suave)}
+  .marca{font-size:11px;padding:1px 8px;border-radius:99px;font-weight:600}
+  .m-ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+  .m-al{background:color-mix(in srgb,var(--alerta) 18%,transparent);color:var(--alerta)}
+  .m-mal{background:color-mix(in srgb,var(--mal) 15%,transparent);color:var(--mal)}
+  .par{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  @media (max-width:900px){.par{grid-template-columns:1fr}}
+  .lado{padding:14px 16px;font-family:var(--serif);font-size:14.5px;line-height:1.62}
+  .lado.en{border-right:1px solid var(--borde);color:var(--suave)}
+  @media (max-width:900px){.lado.en{border-right:none;border-bottom:1px solid var(--borde)}}
+  .etq{font-family:var(--sans);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--suave);margin-bottom:6px}
+  textarea{width:100%;min-height:150px;font-family:var(--serif);font-size:14.5px;line-height:1.62;color:var(--texto);
+    background:transparent;border:1px solid transparent;border-radius:7px;padding:6px;resize:vertical}
+  textarea:focus{outline:none;border-color:var(--acento);background:var(--fondo)}
+  .acciones{display:flex;gap:8px;padding:11px 15px;border-top:1px solid var(--borde);flex-wrap:wrap;align-items:center}
+  .btn{font:inherit;font-size:13px;font-weight:600;padding:6px 14px;border-radius:7px;border:1px solid var(--borde);
+    background:var(--panel);color:var(--texto);cursor:pointer}
+  .btn:hover{border-color:var(--acento)}
+  .btn.ok{border-color:var(--ok);color:var(--ok)} .btn.mal{border-color:var(--mal);color:var(--mal)}
+  .btn.pri{background:var(--acento);border-color:var(--acento);color:#fff}
+  kbd{font:inherit;font-size:10.5px;padding:0 4px;border:1px solid var(--borde);border-radius:4px;color:var(--suave)}
+  .vacio{padding:50px;text-align:center;color:var(--suave);font-family:var(--serif);font-style:italic}
+  .oculto{display:none}
+  .aviso{background:color-mix(in srgb,var(--alerta) 12%,var(--panel));border:1px solid var(--alerta);
+    border-radius:9px;padding:10px 14px;font-size:13px;margin-bottom:18px}
+  h2{font-family:var(--serif);font-size:16px;margin:26px 0 10px;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="fila">
+    <div>
+      <h1>Motor de traducción · Matthew Henry <span style="color:var(--suave);font-weight:400">EN → ES</span></h1>
+      <div class="sub" id="cfg">cargando…</div>
+    </div>
+    <nav>
+      <button id="t-proceso" class="on" onclick="pestana('proceso')">Proceso</button>
+      <button id="t-revision" onclick="pestana('revision')">Revisión humana</button>
+      <button id="t-cotejo" onclick="pestana('cotejo')">Cotejo</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ─────────── PROCESO ─────────── -->
+  <section id="proceso">
+    <div class="rej" id="baldosas"></div>
+    <div id="avisoTope"></div>
+
+    <h2>Avance por libro</h2>
+    <div class="envoltorio">
+      <table>
+        <thead><tr>
+          <th>Libro</th><th style="width:230px">Avance</th>
+          <th class="num">Unidades</th><th class="num">Traducidas</th>
+          <th class="num">Auditadas</th><th class="num">Marcadas</th>
+          <th class="num">Revisadas</th><th class="num">Fallidas</th>
+        </tr></thead>
+        <tbody id="tablaLibros"></tbody>
+      </table>
+    </div>
+
+    <h2>Gasto y defectos</h2>
+    <div class="rej">
+      <div class="baldosa"><div class="n" id="gUsd">—</div><div class="e">USD gastados</div>
+        <div class="barra" style="margin-top:9px"><i class="b-aud" id="gBarra" style="width:0"></i></div></div>
+      <div class="baldosa"><div class="n" id="gLlam">—</div><div class="e">llamadas a la API</div></div>
+      <div class="baldosa"><div class="n" id="gCache">—</div><div class="e">% entrada desde caché</div></div>
+      <div class="baldosa"><div class="n" id="gUnit">—</div><div class="e">USD por 1.000 unidades</div></div>
+    </div>
+    <div class="envoltorio" style="margin-top:12px">
+      <table><thead><tr><th>Defecto dominante (auditor)</th><th class="num">Unidades</th></tr></thead>
+      <tbody id="tablaFallos"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ─────────── COTEJO ─────────── -->
+  <section id="cotejo" class="oculto">
+    <div class="aviso" style="background:color-mix(in srgb,var(--acento) 10%,var(--panel));border-color:var(--borde)">
+      Lee un capítulo del motor junto a uno de <b>Juan</b>, que está traducido a mano.
+      Ninguna puntuación contesta la pregunta que importa: <i>¿suena a la misma voz?</i>
+      Eso se juzga leyendo.
+    </div>
+    <div class="par" style="gap:14px;align-items:start">
+      <div id="panelA"></div>
+      <div id="panelB"></div>
+    </div>
+  </section>
+
+  <!-- ─────────── REVISIÓN ─────────── -->
+  <section id="revision" class="oculto">
+    <div class="controles">
+      <select id="fLibro" onchange="cargarCola()"><option value="">Todos los libros</option></select>
+      <select id="fFiltro" onchange="cargarCola()">
+        <option value="marcadas">Marcadas por el auditor (peor primero)</option>
+        <option value="pendientes">Sin revisar</option>
+        <option value="revisadas">Ya revisadas</option>
+        <option value="todas">Todas las traducidas</option>
+      </select>
+      <input type="search" id="fBuscar" placeholder="buscar texto…" onchange="cargarCola()">
+      <select id="fLimite" onchange="cargarCola()">
+        <option>20</option><option selected>40</option><option>80</option>
+      </select>
+      <span class="sub" id="contadorCola"></span>
+      <span class="sub" style="margin-left:auto">
+        <kbd>J</kbd>/<kbd>K</kbd> mover · <kbd>A</kbd> aprobar · <kbd>C</kbd> guardar corrección · <kbd>R</kbd> rechazar
+      </span>
+    </div>
+    <div id="cola"></div>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let datos = null, items = [], foco = 0;
+
+function pestana(p){
+  for(const k of ['proceso','revision','cotejo']){
+    $('#'+k).classList.toggle('oculto', p!==k);
+    $('#t-'+k).classList.toggle('on', p===k);
+  }
+  if(p==='revision' && !items.length) cargarCola();
+  if(p==='cotejo' && !document.getElementById('panelA').innerHTML){
+    panelCotejo('A','JHN',1,true); panelCotejo('B','JHN',1,false);
+  }
+}
+
+const pct = (a,b) => b ? (a/b*100) : 0;
+const fmt = (n) => (n??0).toLocaleString('es');
+
+// ─────────── COTEJO ───────────
+let librosCotejo = null;
+
+async function cargarLibros(){
+  if(!librosCotejo) librosCotejo = await (await fetch('/api/libros')).json();
+  return librosCotejo;
+}
+
+async function panelCotejo(lado, osis, cap, motor){
+  const libros = await cargarLibros();
+  const d = await (await fetch(`/api/capitulo?libro=${osis}&cap=${cap}&motor=${motor?1:0}`)).json();
+  const el = document.getElementById('panel'+lado);
+  const opLib = libros.map(l=>`<option value="${l.osis}" ${l.osis===d.osis?'selected':''}>${l.nombre}${l.humano?' ✋':''}</option>`).join('');
+  const opCap = d.caps.map(c=>`<option value="${c}" ${c===d.cap?'selected':''}>${c}</option>`).join('');
+  el.innerHTML = `
+    <div class="tarjeta">
+      <div class="cab" style="position:sticky;top:76px;z-index:5">
+        <select onchange="panelCotejo('${lado}', this.value, 1, false)">${opLib}</select>
+        <select onchange="panelCotejo('${lado}','${d.osis}', this.value, ${!!motor})">${opCap}</select>
+        <span class="marca ${d.humano?'m-ok':'m-al'}">${d.humano?'traducción humana':'motor · sin revisar'}</span>
+        ${d.hayMotor||d.verMotor ? `<button class="btn" style="padding:2px 10px;font-size:11.5px"
+            onclick="panelCotejo('${lado}','${d.osis}',${d.cap},${!d.verMotor})">ver ${d.verMotor?'la humana':'la del motor'}</button>` : ''}
+        <span class="sub">${d.cobertura} unidades</span>
+      </div>
+      ${d.items.map(i=>`
+        <div style="border-top:1px solid var(--borde)">
+          <div class="lado" style="padding:11px 15px">
+            <div class="etq">${i.tipo==='r'?'resumen del capítulo':i.tipo==='t'?'título':'párrafo'} ·
+              <span class="id">${i.id}</span>${i.modelo?' · '+i.modelo:''}
+              ${i.auditoria?` · fid ${i.auditoria.fidelidad?.toFixed(2)} flu ${i.auditoria.fluidez?.toFixed(2)}`:''}</div>
+            ${i.es ? esc(i.es) : '<i style="color:var(--suave)">— sin traducir —</i>'}
+            <details style="margin-top:8px">
+              <summary class="sub" style="cursor:pointer;font-size:11.5px">ver original inglés</summary>
+              <div style="color:var(--suave);margin-top:6px">${esc(i.en)}</div>
+            </details>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+async function cargarResumen(){
+  datos = await (await fetch('/api/resumen')).json();
+  const g = datos.global;
+
+  $('#cfg').textContent =
+    `traductor: ${datos.config.traductor} · auditor: ${datos.config.auditor}` +
+    ` · autocorrección doctrinal: ${datos.config.autoDoctrinal?'SÍ':'no (revisión humana)'}`;
+
+  $('#baldosas').innerHTML = `
+    <div class="baldosa"><div class="n">${pct(g.traducidas,g.total).toFixed(1)}%</div>
+      <div class="e">corpus traducido</div>
+      <div class="barra" style="margin-top:9px">
+        <i class="b-rev" style="width:${pct(g.revisadas,g.total)}%"></i>
+        <i class="b-aud" style="width:${pct(g.auditadas-g.marcadas,g.total)}%"></i>
+        <i class="b-trad" style="width:${pct(g.traducidas-g.auditadas,g.total)}%"></i>
+      </div>
+      <div class="sub" style="margin-top:6px;font-size:11px">
+        verde revisado · ocre auditado ok · gris sin auditar</div></div>
+    <div class="baldosa"><div class="n">${fmt(g.traducidas)}</div><div class="e">de ${fmt(g.total)} unidades</div></div>
+    <div class="baldosa"><div class="n">${fmt(g.auditadas)}</div><div class="e">auditadas</div></div>
+    <div class="baldosa"><div class="n" style="color:var(--alerta)">${fmt(g.marcadas)}</div><div class="e">marcadas → revisar</div></div>
+    <div class="baldosa"><div class="n" style="color:var(--ok)">${fmt(g.revisadas)}</div><div class="e">aprobadas por humano</div></div>
+    <div class="baldosa"><div class="n" style="color:${g.fallidas?'var(--mal)':'var(--suave)'}">${fmt(g.fallidas)}</div><div class="e">fallidas</div></div>`;
+
+  const q = datos.gasto;
+  $('#gUsd').textContent = q.usd.toFixed(2);
+  $('#gBarra').style.width = Math.min(100, pct(q.usd,q.tope)) + '%';
+  $('#gLlam').textContent = fmt(q.llamadas);
+  const tin = q.tokens.in||0, tcr = q.tokens.cacheRead||0;
+  $('#gCache').textContent = (tin+tcr) ? (tcr/(tin+tcr)*100).toFixed(0)+'%' : '—';
+  $('#gUnit').textContent = g.traducidas ? (q.usd/g.traducidas*1000).toFixed(2) : '—';
+
+  $('#avisoTope').innerHTML = q.usd >= q.tope*0.8
+    ? `<div class="aviso"><b>Aviso de presupuesto:</b> ${q.usd.toFixed(2)} USD de ${q.tope} (${pct(q.usd,q.tope).toFixed(0)}%).
+       El motor para en seco al llegar al tope; el estado queda guardado y la corrida se reanuda subiendo <code>MT_TOPE_USD</code>.</div>` : '';
+
+  $('#tablaLibros').innerHTML = datos.libros.map(l => `
+    <tr>
+      <td><b>${l.nombre}</b> <span class="id">${l.osis}</span>
+        ${l.humano?'<span class="pastilla humano">traducción humana</span>':''}</td>
+      <td><div class="barra">
+        <i class="b-rev" style="width:${pct(l.revisadas,l.total)}%"></i>
+        <i class="b-aud" style="width:${pct(Math.max(0,l.auditadas-l.marcadas-l.revisadas),l.total)}%"></i>
+        <i class="b-trad" style="width:${pct(Math.max(0,l.traducidas-Math.max(l.auditadas,l.revisadas)),l.total)}%"></i>
+      </div></td>
+      <td class="num">${fmt(l.total)}</td>
+      <td class="num">${fmt(l.traducidas)}</td>
+      <td class="num">${fmt(l.auditadas)}</td>
+      <td class="num" style="color:${l.marcadas?'var(--alerta)':'inherit'}">${fmt(l.marcadas)}</td>
+      <td class="num" style="color:${l.revisadas?'var(--ok)':'inherit'}">${fmt(l.revisadas)}</td>
+      <td class="num" style="color:${l.fallidas?'var(--mal)':'inherit'}">${fmt(l.fallidas)}</td>
+    </tr>`).join('');
+
+  const ff = Object.entries(datos.fallosPorTipo).sort((a,b)=>b[1]-a[1]);
+  $('#tablaFallos').innerHTML = ff.length
+    ? ff.map(([k,v])=>`<tr><td>${k}</td><td class="num">${fmt(v)}</td></tr>`).join('')
+    : '<tr><td colspan="2" style="color:var(--suave)">Sin auditoría todavía.</td></tr>';
+
+  const sel = $('#fLibro');
+  if(sel.options.length<=1){
+    for(const l of datos.libros){
+      if(l.humano) continue;
+      const o=document.createElement('option'); o.value=l.osis; o.textContent=l.nombre; sel.appendChild(o);
+    }
+  }
+}
+
+function marcaAud(a){
+  if(!a) return '<span class="marca m-al">sin auditar</span>';
+  const c = a.confianza ?? 0;
+  const cls = a.aprobada ? 'm-ok' : (c<0.5 ? 'm-mal' : 'm-al');
+  const bits = [
+    `fid ${a.fidelidad ?? '?'}`, `flu ${a.fluidez ?? '?'}`,
+    a.omision?'omite':null, a.adicion?'añade':null, a.maquina?'suena a máquina':null,
+    (a.fallo && a.fallo!=='ninguno') ? a.fallo : null,
+  ].filter(Boolean).join(' · ');
+  return `<span class="marca ${cls}">${a.aprobada?'aprobada':'marcada'} · ${bits}</span>
+          <span class="sub">confianza ${(c*100).toFixed(0)}% · ${a.proveedor??''}</span>`;
+}
+
+async function cargarCola(){
+  const p = new URLSearchParams({
+    libro: $('#fLibro').value, filtro: $('#fFiltro').value,
+    limite: $('#fLimite').value, buscar: $('#fBuscar').value,
+  });
+  const r = await (await fetch('/api/cola?'+p)).json();
+  items = r.items; foco = 0;
+  $('#contadorCola').textContent = `${r.items.length} de ${r.total} en cola`;
+  $('#cola').innerHTML = items.length ? items.map((u,i)=>`
+    <article class="tarjeta${i===0?' foco':''}" id="c${i}" data-id="${u.id}">
+      <div class="cab">
+        <span class="ref">${u.nombre} ${u.cap}</span>
+        <span class="id">${u.id}</span>
+        <span class="pastilla">${u.tipo==='p'?'párrafo':u.tipo==='t'?'título':'resumen'}</span>
+        ${marcaAud(u.auditoria)}
+        ${u.revision?`<span class="marca m-ok">revisada: ${u.revision.decision}</span>`:''}
+        <span class="sub" style="margin-left:auto">${u.modelo}</span>
+      </div>
+      <div class="par">
+        <div class="lado en"><div class="etq">Original · inglés</div>${esc(u.en)}</div>
+        <div class="lado"><div class="etq">Traducción · español (editable)</div>
+          <textarea id="t${i}">${esc(u.es)}</textarea></div>
+      </div>
+      <div class="acciones">
+        <button class="btn ok" onclick="decidir(${i},'aprobada')">Aprobar <kbd>A</kbd></button>
+        <button class="btn pri" onclick="decidir(${i},'corregida')">Guardar corrección <kbd>C</kbd></button>
+        <button class="btn mal" onclick="decidir(${i},'rechazada')">Rechazar <kbd>R</kbd></button>
+        <input class="btn" style="flex:1;min-width:180px;font-weight:400" id="n${i}" placeholder="nota del revisor (opcional)">
+        <span class="sub" id="e${i}"></span>
+      </div>
+    </article>`).join('')
+    : '<div class="vacio">Nada en esta cola. Cambia el filtro o traduce más.</div>';
+}
+
+const esc = (s)=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+async function decidir(i, decision){
+  const u = items[i]; if(!u) return;
+  const es = document.getElementById('t'+i).value;
+  const nota = document.getElementById('n'+i).value;
+  const r = await (await fetch('/api/revision',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({id:u.id, decision, es: decision==='corregida'?es:null, nota})})).json();
+  const e = document.getElementById('e'+i);
+  e.textContent = r.ok ? '✓ guardado' : ('✗ '+(r.error||'error'));
+  e.style.color = r.ok ? 'var(--ok)' : 'var(--mal)';
+  if(r.ok){ mueve(1); cargarResumen(); }
+}
+
+function mueve(d){
+  document.getElementById('c'+foco)?.classList.remove('foco');
+  foco = Math.max(0, Math.min(items.length-1, foco+d));
+  const el = document.getElementById('c'+foco);
+  if(el){ el.classList.add('foco'); el.scrollIntoView({block:'center',behavior:'smooth'}); }
+}
+
+document.addEventListener('keydown',(e)=>{
+  if(e.target.matches('textarea,input,select')) return;
+  if($('#revision').classList.contains('oculto')) return;
+  const k = e.key.toLowerCase();
+  if(k==='j'){ mueve(1); e.preventDefault(); }
+  if(k==='k'){ mueve(-1); e.preventDefault(); }
+  if(k==='a'){ decidir(foco,'aprobada'); e.preventDefault(); }
+  if(k==='c'){ decidir(foco,'corregida'); e.preventDefault(); }
+  if(k==='r'){ decidir(foco,'rechazada'); e.preventDefault(); }
+});
+
+cargarResumen();
+setInterval(cargarResumen, 10000);   // el panel de proceso se refresca solo
+</script>
+</body>
+</html>
