@@ -111,6 +111,13 @@ export default function Lector() {
   const columna = useRef<HTMLDivElement>(null);
   const lexCache = useRef(cacheLex);
 
+  // El SBLGNT son 27 libros. Si el lector lo tiene activo y navega al AT, la
+  // capa se apaga sola: quedarse encendida sin datos dejaría la vista vacía
+  // sin explicar por qué.
+  useEffect(() => {
+    if (griego && !NT.has(osis)) setGriego(false);
+  }, [osis, griego]);
+
   // notas y subrayados (B15): 100 % locales, persistidas en este dispositivo
   useEffect(() => {
     try {
@@ -882,30 +889,9 @@ export default function Lector() {
             >
               ≣
             </button>
-            <button
-              className={`icono-btn${interlineal ? " activo" : ""}`}
-              onClick={() => {
-                setInterlineal(!interlineal);
-                if (!interlineal) setGriego(false);
-              }}
-              aria-label={tr.interlineal}
-              title={tr.interlineal}
-              style={interlineal ? { borderColor: "var(--accent)", color: "var(--accent-strong)" } : undefined}
-            >
-              Ω
-            </button>
-            <button
-              className={`icono-btn${griego ? " activo" : ""}`}
-              onClick={() => {
-                setGriego(!griego);
-                if (!griego) setInterlineal(false);
-              }}
-              aria-label={tr.griegoSblgnt}
-              title={tr.griegoSblgnt}
-              style={griego ? { borderColor: "var(--accent)", color: "var(--accent-strong)" } : undefined}
-            >
-              Ξ
-            </button>
+            {/* Ω (interlineal) y Ξ (griego SBLGNT) ya no viven aquí: eran dos
+                símbolos que no decían qué hacían. Ahora son el desplegable
+                «Original» de la barra de recursos, con las opciones nombradas. */}
             <button
               className={`icono-btn${Object.keys(notas).length ? " activo" : ""}`}
               onClick={() => {
@@ -930,6 +916,37 @@ export default function Lector() {
             desplegable y el conmutador de idioma no quedan tapados. */}
         <div className="com-strip-fila">
           <div className={`rec-barra${comentario ? " activa" : ""}`}>
+            {/* Capa del texto original. Es un control APARTE del comentario a
+                propósito: el comentario se muestra DEBAJO del texto, el
+                interlineal TRANSFORMA el texto. Mezclarlos haría ambiguo el
+                checkbox y quitaría la combinación más útil de estudio
+                (interlineal arriba + comentario abajo). */}
+            <span className={`rec-original${interlineal || griego ? " activa" : ""}`}>
+              <span className="rec-icono rec-icono-orig" aria-hidden="true">
+                {griego ? "Ξ" : "Ω"}
+              </span>
+              <select
+                className="rec-sel rec-sel-orig"
+                aria-label="Capa del texto original"
+                value={interlineal ? "inter" : griego ? "sblgnt" : "ninguno"}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setInterlineal(v === "inter");
+                  setGriego(v === "sblgnt");
+                }}
+              >
+                <option value="ninguno">Solo el texto</option>
+                <option value="inter">
+                  Interlineal ({NT.has(osis) ? "griego" : "hebreo"})
+                </option>
+                {/* El SBLGNT son 27 libros: en el AT la opción ni se ofrece.
+                    Antes el icono Ξ se mostraba en Oseas y no podía hacer nada. */}
+                {NT.has(osis) && <option value="sblgnt">Griego SBLGNT</option>}
+              </select>
+            </span>
+
+            <span className="rec-sep" aria-hidden="true" />
+
             <span className="rec-icono" aria-hidden="true">✎</span>
 
             <select

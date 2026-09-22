@@ -251,6 +251,27 @@ body {
 
 .rec-der { margin-left: auto; display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
 
+/* capa del texto original — control propio, no mezclado con el comentario */
+.rec-original { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.rec-icono-orig {
+  font-family: var(--serif);
+  font-size: 13px;
+  /* se enciende con su propia capa, no con la del comentario */
+  border-color: var(--line-strong);
+}
+.rec-sel-orig { max-width: 190px; font-weight: 500; }
+.rec-original.activa .rec-icono-orig {
+  background: var(--accent); border-color: var(--accent); color: var(--bg);
+}
+.rec-original.activa .rec-sel-orig { color: var(--accent-strong); font-weight: 600; }
+
+/* separador fino entre los dos controles: dice que son cosas distintas */
+.rec-sep {
+  width: 1px; height: 16px; flex-shrink: 0;
+  background: var(--line-strong); opacity: 0.6;
+  margin: 0 2px;
+}
+
 /* conmutador ES/EN — solo si el recurso tiene traducción */
 .rec-idioma {
   display: inline-flex;
@@ -311,9 +332,17 @@ body {
   outline: 2px solid var(--accent); outline-offset: 2px;
 }
 
-@media (max-width: 560px) {
-  .rec-sel { max-width: 170px; }
-  .rec-der { gap: 7px; }
+@media (max-width: 860px) {
+  .rec-sel { max-width: 180px; }
+  .rec-sel-orig { max-width: 130px; }
+}
+@media (max-width: 620px) {
+  /* en móvil la barra se parte en dos filas antes que apretujar los controles */
+  .rec-barra { flex-wrap: wrap; row-gap: 6px; }
+  .rec-der { width: 100%; margin-left: 0; justify-content: flex-end; }
+  .rec-sep { display: none; }
+  .rec-sel { max-width: 46vw; }
+  .rec-sel-orig { max-width: 40vw; }
 }
 
 .badge-revision {
