@@ -158,6 +158,10 @@ REGLAS:
 5. «LORD» en versalitas del AT es el Nombre divino: da «Jehova».
 6. Sin comillas, sin corchetes, sin punto final si el original no lo lleva.
 7. Si la glosa inglesa es ambigua, elige el sentido mas comun en el AT/NT.
+8. La glosa es SIEMPRE ingles, aunque parezca una palabra espanola. FALSOS AMIGOS:
+   «sin» = pecado (nunca «sin» ni «sin embargo»); «come» = venir/ven (nunca «comer»);
+   «once» = una vez; «son» = hijo; «ten» = diez; «pan» = sarten; «dice» = dados;
+   «mar» = estropear; «fin» = aleta; «pie» = pastel; «vale» = valle; «red» = rojo.
 
 SALIDA: solo el JSON {"u":[{"id":"...","es":"..."}]}, mismos id, mismo orden.
 JSON COMPACTO en una sola linea, sin sangrias ni saltos: cada espacio cuesta.`,

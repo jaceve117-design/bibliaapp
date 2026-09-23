@@ -133,9 +133,10 @@ export const tieneGraves = (fallos) => fallos.some((f) => f.grave);
  * sin traducir no es un cognado feliz, es un error de sentido.
  */
 const FALSOS_AMIGOS = new Set([
-  'sin', 'come', 'once', 'red', 'pan', 'dice', 'mar', 'son', 'ten', 'salt',
-  'pie', 'vale', 'fin', 'ha', 'la', 'me', 'no', 'os', 'sed', 'ser', 'sue',
-  'tan', 'van', 'ver', 'copa', 'cola', 'dado', 'mole', 'paso', 'rope',
+  // Sólo palabras que EXISTEN en español con otro sentido. La primera versión
+  // incluía «no», «me», «la», «ha»: en una glosa inglesa esas sí se escriben
+  // igual en español, y marcarlas habría rechazado glosas correctas.
+  'sin', 'come', 'once', 'son', 'ten', 'pan', 'dice', 'mar', 'fin', 'pie', 'vale', 'red', 'tan',
 ]);
 
 const RE_ANDAMIO = /^\s*(la traducci[óo]n|traducci[óo]n|en espa[ñn]ol|esto significa|significa)(?![a-záéíóú])/i;
