@@ -337,12 +337,10 @@ body {
   .rec-sel-orig { max-width: 130px; }
 }
 @media (max-width: 620px) {
-  /* en móvil la barra se parte en dos filas antes que apretujar los controles */
-  .rec-barra { flex-wrap: wrap; row-gap: 6px; }
-  .rec-der { width: 100%; margin-left: 0; justify-content: flex-end; }
-  .rec-sep { display: none; }
-  .rec-sel { max-width: 46vw; }
-  .rec-sel-orig { max-width: 40vw; }
+  /* Con «Original» ya en la fila de navegación, la barra del comentario cabe
+     en UNA línea: [✎ obra ▾] ··· [ES|EN] [☑]. Antes se partía en dos y el
+     idioma y la casilla quedaban sueltos en un renglón propio. */
+  .rec-sel { max-width: none; }
 }
 
 .badge-revision {
@@ -1254,3 +1252,56 @@ body {
 
 /* el nombre inglés detrás del español en los resultados del diccionario */
 .ref-item-en { color: var(--muted); font-size: 0.86em; font-weight: 400; }
+
+
+/* ── Cabecera del lector en móvil ───────────────────────────────────────────
+   Tres filas fijas, sin depender de dónde caiga el ancho:
+     1  [RV1909|VBL|WEB] [Libro ▾]
+     2  [cap] [Ω Solo el texto ▾] [⌕] [✍] [←] [→]
+     3  [✎ Matthew Henry · 1706 ▾] ········ [ES|EN] [☑]
+   Información y fuentes subieron a la cabecera, junto al tema. */
+.nav-fila {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* el capítulo tiene como mucho tres cifras: no necesita el ancho de un libro */
+.cabecera-sub-inner .sel.sel-cap {
+  flex: 0 0 58px;
+  width: 58px;
+  padding-left: 9px;
+  padding-right: 4px;
+}
+/* «Original» en la fila de navegación: toma lo que sobra y recorta con … */
+.rec-original-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 5px;
+}
+.rec-original-nav .rec-sel-orig {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  height: 34px;
+  border: 1px solid var(--line);
+  background-color: var(--bg-elev);
+  border-radius: 9px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rec-original-nav .rec-icono { width: 24px; height: 34px; border-radius: 9px; }
+/* el selector del comentario toma el resto de su fila; idioma y casilla a ras */
+.rec-barra > .rec-sel { flex: 1 1 auto; min-width: 0; text-overflow: ellipsis; }
+
+@media (max-width: 620px) {
+  .nav-fila { flex-basis: 100%; }
+  .cabecera-sub-inner > .sel { flex: 1 1 auto; }
+}
+@media (max-width: 360px) {
+  /* pantallas muy estrechas: el icono Ω cede su sitio al texto del selector */
+  .rec-original-nav .rec-icono { display: none; }
+}

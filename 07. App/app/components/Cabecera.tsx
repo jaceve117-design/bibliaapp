@@ -2,14 +2,21 @@ import Link from "next/link";
 import Tema from "./Tema";
 import { t, type Locale } from "@/lib/i18n";
 
-/** Cabecera fija (sticky). `children` se renderiza como filas extra, también fijas. `extra` va junto al botón de tema. */
+/**
+ * Cabecera fija (sticky). `children` se renderiza como filas extra, también fijas.
+ * `extra` va junto al botón de tema.
+ * `enLector`: dentro del lector el enlace «Lector» sobra (ya estás ahí) y en
+ * móvil robaba el sitio que ahora ocupa el botón de información.
+ */
 export default function Cabecera({
   locale,
   extra,
+  enLector = false,
   children,
 }: {
   locale: Locale;
   extra?: React.ReactNode;
+  enLector?: boolean;
   children?: React.ReactNode;
 }) {
   const tr = t(locale);
@@ -21,6 +28,7 @@ export default function Cabecera({
           {tr.marcaProvisional}
         </Link>
         <div className="lector-acciones">
+          {!enLector && (
           <Link
             href={`/${locale}/lector`}
             style={{
@@ -33,6 +41,7 @@ export default function Cabecera({
           >
             {tr.lector}
           </Link>
+          )}
           {extra}
           <Tema etiqueta={tr.tema} />
         </div>

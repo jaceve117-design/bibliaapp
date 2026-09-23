@@ -432,7 +432,10 @@ export default function Lector() {
   useEffect(() => {
     if (cargando) return;
     window.history.replaceState(null, "", `/es/lector?obra=${obra}&ref=${osis}.${cap}`);
-    columna.current?.scrollIntoView({ block: "start" });
+    // Al tope de la VENTANA, no de la columna: `scrollIntoView` pegaba la
+    // columna al borde superior de la pantalla, justo debajo de la cabecera
+    // fija (183px en móvil), y el título del capítulo quedaba siempre tapado.
+    window.scrollTo({ top: 0 });
   }, [obra, osis, cap, cargando]);
 
   // comentario de Matthew Henry: carga perezosa por libro (EN + traducción ES si existe)
@@ -922,7 +925,23 @@ export default function Lector() {
 
   return (
     <>
-      <Cabecera locale="es">
+      <Cabecera
+        locale="es"
+        enLector
+        extra={
+          // Información y fuentes del corpus en UN botón, arriba junto al tema.
+          // Antes eran dos iconos (ⓘ y ≣) en la fila de navegación, y en móvil
+          // empujaban «Solo el texto» a una línea propia.
+          <button
+            className="icono-btn"
+            onClick={() => setPanelInfo(true)}
+            aria-label={`${tr.info} · ${tr.fuentes}`}
+            title={`${tr.info} · ${tr.fuentes}`}
+          >
+            ⓘ
+          </button>
+        }
+      >
         <div className="cabecera-sub-inner">
           <div className="obras-toggle" role="tablist" aria-label="Obra">
             {OBRAS.map((o) => (
@@ -952,62 +971,78 @@ export default function Lector() {
               </option>
             ))}
           </select>
-          <select
-            className="sel"
-            aria-label={tr.capitulo}
-            value={cap}
-            onChange={(e) => setCap(Number(e.target.value))}
-          >
-            {Array.from({ length: caps }, (_, i) => i + 1).map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-          <div className="lector-acciones">
-            <button
-              className="icono-btn"
-              onClick={abrirDic}
-              aria-label={tr.diccionario}
-              title={tr.diccionario}
+          {/* Fila de navegación: capítulo · capa del original · acciones.
+              Agrupada para que en móvil ocupe SIEMPRE su propia línea en vez de
+              partirse donde caiga el ancho. */}
+          <div className="nav-fila">
+            <select
+              className="sel sel-cap"
+              aria-label={tr.capitulo}
+              value={cap}
+              onChange={(e) => setCap(Number(e.target.value))}
             >
-              ⌕
-            </button>
-            <button className="icono-btn" onClick={() => setPanelInfo(true)} aria-label={tr.info} title={tr.info}>
-              ⓘ
-            </button>
-            <button
-              className="icono-btn"
-              onClick={() => {
-                setPanelFuentes(true);
-                setReporteTexto("");
-                setReporteCopiado(false);
-              }}
-              aria-label={tr.fuentes}
-              title={tr.fuentes}
-            >
-              ≣
-            </button>
-            {/* Ω (interlineal) y Ξ (griego SBLGNT) ya no viven aquí: eran dos
-                símbolos que no decían qué hacían. Ahora son el desplegable
-                «Original» de la barra de recursos, con las opciones nombradas. */}
-            <button
-              className={`icono-btn${Object.keys(notas).length ? " activo" : ""}`}
-              onClick={() => {
-                setPanelNotas(true);
-                setMsgNotas(null);
-              }}
-              aria-label={tr.notas}
-              title={tr.notas}
-            >
-              ✍
-            </button>
-            <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
-              ←
-            </button>
-            <button className="icono-btn" onClick={() => adelante(1)} aria-label={tr.siguiente} title={tr.siguiente}>
-              →
-            </button>
+              {Array.from({ length: caps }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+              {/* Capa del texto original. Es un control APARTE del comentario a
+                  propósito: el comentario se muestra DEBAJO del texto, el
+                  interlineal TRANSFORMA el texto. Mezclarlos haría ambiguo el
+                  checkbox y quitaría la combinación más útil de estudio
+                  (interlineal arriba + comentario abajo). */}
+              <span className={`rec-original rec-original-nav${interlineal || griego ? " activa" : ""}`}>
+                <span className="rec-icono rec-icono-orig" aria-hidden="true">
+                  {griego ? "Ξ" : "Ω"}
+                </span>
+                <select
+                  className="rec-sel rec-sel-orig"
+                  aria-label="Capa del texto original"
+                  value={interlineal ? "inter" : griego ? "sblgnt" : "ninguno"}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setInterlineal(v === "inter");
+                    setGriego(v === "sblgnt");
+                  }}
+                >
+                  <option value="ninguno">Solo el texto</option>
+                  <option value="inter">
+                    Interlineal ({NT.has(osis) ? "griego" : "hebreo"})
+                  </option>
+                  {/* El SBLGNT son 27 libros: en el AT la opción ni se ofrece.
+                      Antes el icono Ξ se mostraba en Oseas y no podía hacer nada. */}
+                  {NT.has(osis) && <option value="sblgnt">Griego SBLGNT</option>}
+                </select>
+              </span>
+
+            <div className="lector-acciones">
+              <button
+                className="icono-btn"
+                onClick={abrirDic}
+                aria-label={tr.diccionario}
+                title={tr.diccionario}
+              >
+                ⌕
+              </button>
+              <button
+                className={`icono-btn${Object.keys(notas).length ? " activo" : ""}`}
+                onClick={() => {
+                  setPanelNotas(true);
+                  setMsgNotas(null);
+                }}
+                aria-label={tr.notas}
+                title={tr.notas}
+              >
+                ✍
+              </button>
+              <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
+                ←
+              </button>
+              <button className="icono-btn" onClick={() => adelante(1)} aria-label={tr.siguiente} title={tr.siguiente}>
+                →
+              </button>
+            </div>
           </div>
         </div>
         {/* Barra de recursos: [obra ▾] · [ES|EN si hay traducción] · [☑ mostrar]
@@ -1015,36 +1050,6 @@ export default function Lector() {
             desplegable y el conmutador de idioma no quedan tapados. */}
         <div className="com-strip-fila">
           <div className={`rec-barra${comentario ? " activa" : ""}`}>
-            {/* Capa del texto original. Es un control APARTE del comentario a
-                propósito: el comentario se muestra DEBAJO del texto, el
-                interlineal TRANSFORMA el texto. Mezclarlos haría ambiguo el
-                checkbox y quitaría la combinación más útil de estudio
-                (interlineal arriba + comentario abajo). */}
-            <span className={`rec-original${interlineal || griego ? " activa" : ""}`}>
-              <span className="rec-icono rec-icono-orig" aria-hidden="true">
-                {griego ? "Ξ" : "Ω"}
-              </span>
-              <select
-                className="rec-sel rec-sel-orig"
-                aria-label="Capa del texto original"
-                value={interlineal ? "inter" : griego ? "sblgnt" : "ninguno"}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setInterlineal(v === "inter");
-                  setGriego(v === "sblgnt");
-                }}
-              >
-                <option value="ninguno">Solo el texto</option>
-                <option value="inter">
-                  Interlineal ({NT.has(osis) ? "griego" : "hebreo"})
-                </option>
-                {/* El SBLGNT son 27 libros: en el AT la opción ni se ofrece.
-                    Antes el icono Ξ se mostraba en Oseas y no podía hacer nada. */}
-                {NT.has(osis) && <option value="sblgnt">Griego SBLGNT</option>}
-              </select>
-            </span>
-
-            <span className="rec-sep" aria-hidden="true" />
 
             <span className="rec-icono" aria-hidden="true">✎</span>
 
@@ -1809,6 +1814,20 @@ export default function Lector() {
                 ✕
               </button>
             </div>
+            {/* Fuentes del corpus vive ahora dentro de Información: un solo botón
+                arriba en vez de dos iconos en la fila de navegación. Se abre
+                encima (baraja) y la información queda como pestaña detrás. */}
+            <button
+              className="btn-inter"
+              style={{ marginTop: 4 }}
+              onClick={() => {
+                setPanelFuentes(true);
+                setReporteTexto("");
+                setReporteCopiado(false);
+              }}
+            >
+              ≣ {tr.fuentes} →
+            </button>
             <div className="info-seccion">
               <div className="info-titulo">{tr.infoReferencia}</div>
               <div className="lex-def">
