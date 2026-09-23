@@ -721,33 +721,52 @@ body {
               box-shadow 0.3s ease;
 }
 
-/* ── Pila de paneles ────────────────────────────────────────────────────────
-   Todos los paneles son fixed al fondo, así que el último abierto tapaba al
-   anterior: al pulsar una cita dentro del diccionario, la tarjeta del
-   versículo se comía la del diccionario entera.
+/* ── Pila de paneles (baraja) ───────────────────────────────────────────────
+   Primer intento: el panel de atrás subía al 50% y se encogía. Quedaba
+   flotando a media página, con texto asomando entre las dos tarjetas: ruido
+   visual, no ayuda.
 
-   Ahora el más reciente se queda abajo y el anterior SUBE y se encoge, pero
-   sigue visible y utilizable. Pulsando sobre él vuelve al frente y el otro se
-   agacha. La profundidad 2 se repliega a una pestaña: sigue ahí, alcanzable,
-   sin robar sitio a la lectura. */
-.lex-panel.prof-0 { bottom: 0; max-height: 50vh; }
-.lex-panel.prof-1 {
-  bottom: calc(50vh + 6px);
-  max-height: 30vh;
-  box-shadow: 0 -2px 0 var(--line-strong), var(--shadow);
-}
-.lex-panel.prof-2 {
-  bottom: calc(80vh + 12px);
-  max-height: 52px;
+   Ahora es una baraja. SOLO UNA tarjeta abierta a la vez, abajo; las demás se
+   repliegan a una pestaña justo encima, con su título. Pulsas una pestaña y
+   pasa al frente mientras la anterior se agacha a pestaña. Sin solapes, sin
+   huecos, sin adivinar qué tapa a qué.
+
+   La del frente toma ALTURA FIJA cuando hay pila: así las pestañas encajan
+   siempre a ras, sin depender de cuánto contenido tenga. */
+.lex-panel.prof-0 { bottom: 0; }
+
+.lex-panel.apilado.prof-0 { height: 50vh; max-height: 50vh; }
+.lex-panel.apilado.pestana {
+  height: 40px;
+  max-height: 40px;
+  min-height: 40px;
   overflow: hidden;
   cursor: pointer;
-  opacity: 0.85;
+  border-top-width: 1px;
+  box-shadow: none;
 }
-.lex-panel.prof-2:hover { opacity: 1; }
-/* el panel de atrás avisa de que se puede traer al frente */
-.lex-panel.prof-1 .lex-cabecera::after,
-.lex-panel.prof-2 .lex-cabecera::after {
-  content: "↑ traer al frente";
+.lex-panel.apilado.prof-1 { bottom: 50vh; }
+.lex-panel.apilado.prof-2 { bottom: calc(50vh + 41px); }
+/* a partir de la cuarta no cabe: se mantiene montada pero fuera de la vista */
+.lex-panel.apilado.prof-3 { display: none; }
+
+/* la pestaña muestra su título en una línea y nada más */
+.lex-panel.apilado.pestana .lex-panel-inner { padding: 0 24px; }
+.lex-panel.apilado.pestana .lex-cabecera {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  margin-bottom: 0;
+  box-shadow: none;
+}
+.lex-panel.apilado.pestana .lex-cabecera > :first-child {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lex-panel.apilado.pestana:hover { background: var(--hover); }
+.lex-panel.apilado.pestana .lex-cabecera::after {
+  content: "↑ abrir";
   font-family: var(--sans);
   font-size: 10.5px;
   color: var(--muted);
@@ -755,13 +774,13 @@ body {
   margin-inline-end: 10px;
   white-space: nowrap;
 }
+/* la ✕ de una pestaña estorba: se cierra desde el frente */
+.lex-panel.apilado.pestana .cerrar { display: none; }
 
 @media (max-width: 620px) {
-  .lex-panel.prof-0 { max-height: 56vh; }
-  .lex-panel.prof-1 { bottom: calc(56vh + 6px); max-height: 24vh; }
-  .lex-panel.prof-2 { bottom: calc(80vh + 12px); }
-  .lex-panel.prof-1 .lex-cabecera::after,
-  .lex-panel.prof-2 .lex-cabecera::after { content: "↑"; }
+  .lex-panel.apilado.prof-0 { height: 58vh; max-height: 58vh; }
+  .lex-panel.apilado.prof-1 { bottom: 58vh; }
+  .lex-panel.apilado.prof-2 { bottom: calc(58vh + 41px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .lex-panel { transition: none; }
@@ -1195,11 +1214,12 @@ body {
    Los paneles son `position: fixed` sobre el texto. Al abrirse, la columna
    gana hueco al final para que la última línea siga siendo alcanzable. */
 /* el hueco crece con la pila: dos tarjetas ocupan más que una */
-.lector-columna.con-panel.pila-1 { padding-bottom: 56vh; }
-.lector-columna.con-panel.pila-2 { padding-bottom: 88vh; }
+/* el hueco cubre la tarjeta del frente más las pestañas de las de atrás */
+.lector-columna.con-panel.pila-1 { padding-bottom: 62vh; }
+.lector-columna.con-panel.pila-2 { padding-bottom: calc(50vh + 60px); }
 @media (max-width: 620px) {
-  .lector-columna.con-panel.pila-1 { padding-bottom: 62vh; }
-  .lector-columna.con-panel.pila-2 { padding-bottom: 86vh; }
+  .lector-columna.con-panel.pila-1 { padding-bottom: 66vh; }
+  .lector-columna.con-panel.pila-2 { padding-bottom: calc(58vh + 60px); }
 }
 
 /* salto secundario al interlineal: es una salida, no la acción principal —

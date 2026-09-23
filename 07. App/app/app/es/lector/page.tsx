@@ -735,10 +735,14 @@ export default function Lector() {
   const propsPanel = (id: string) => {
     const i = pila.indexOf(id);
     const prof = i === -1 ? 0 : pila.length - 1 - i;
+    const enPila = pila.length > 1;
     return {
-      className: `lex-panel prof-${Math.min(prof, 2)}`,
+      className:
+        `lex-panel prof-${Math.min(prof, 3)}` +
+        (enPila ? " apilado" : "") +
+        (enPila && prof > 0 ? " pestana" : ""),
       style: { zIndex: 60 + Math.max(0, i) },
-      // pulsar un panel de atrás lo trae al frente
+      // pulsar una pestaña la trae al frente; la que estaba se agacha
       onPointerDown: () => {
         if (prof > 0) setPila((p) => [...p.filter((x) => x !== id), id]);
       },

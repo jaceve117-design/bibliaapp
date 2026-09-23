@@ -130,6 +130,29 @@ export const tieneGraves = (fallos) => fallos.some((f) => f.grave);
  */
 const RE_ANDAMIO = /^\s*(la traducci[óo]n|traducci[óo]n|en espa[ñn]ol|esto significa|significa)(?![a-záéíóú])/i;
 
+/**
+ * Normalización determinista de una glosa.
+ *
+ * El modelo devuelve con frecuencia la glosa entrecomillada («"paz"») o con un
+ * punto final que el original no tenía. Rechazarlo era un error de criterio:
+ * 211 de las 232 glosas fallidas de la primera corrida cayeron por comillas, y
+ * el freno de emergencia paró el motor por algo que un regex arregla con
+ * certeza. Regla de la casa: lo que se puede corregir, se corrige; no se
+ * rechaza ni se le vuelve a pedir al modelo.
+ */
+export function normalizaGlosa(es, en = '') {
+  let t = String(es ?? '').trim().replace(/\s+/g, ' ');
+  // comillas o corchetes que envuelven la glosa entera
+  for (let i = 0; i < 3; i++) {
+    const m = t.match(/^["'«“”‘’\[(]\s*(.+?)\s*["'»“”‘’\])]$/s);
+    if (!m) break;
+    t = m[1].trim();
+  }
+  // punto final que el original no llevaba
+  if (t.endsWith('.') && !String(en).trim().endsWith('.')) t = t.slice(0, -1).trim();
+  return t;
+}
+
 export function validaGlosa(u, es) {
   const fallos = [];
   if (!es || !es.trim()) return [{ tipo: 'vacia', grave: true, detalle: 'glosa vacía' }];
@@ -141,9 +164,6 @@ export function validaGlosa(u, es) {
   }
   if (RE_ANDAMIO.test(t)) {
     fallos.push({ tipo: 'andamio', grave: true, detalle: 'la glosa empieza explicándose' });
-  }
-  if (/^["'«»\[]|["'«»\]]$/.test(t)) {
-    fallos.push({ tipo: 'comillas', grave: true, detalle: 'la glosa viene entrecomillada o entre corchetes' });
   }
   // devolver el inglés sin tocar solo es fallo si el original tiene letras
   if (t.toLowerCase() === u.en.trim().toLowerCase() && /[a-z]{3}/i.test(u.en)) {

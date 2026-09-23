@@ -19,7 +19,7 @@ import { Estado } from '../lib/estado.mjs';
 import { Contador, ParadaEnSeco } from '../lib/costos.mjs';
 import { cargaGlosario } from '../lib/glosario.mjs';
 import { prefijoFijo, ejemplosDeOro, cuerpoLote } from '../lib/prompt.mjs';
-import { validaUnidad, validaGlosa, tieneGraves } from '../lib/validadores.mjs';
+import { validaUnidad, validaGlosa, normalizaGlosa, tieneGraves } from '../lib/validadores.mjs';
 import { normalizaReferencias } from '../lib/referencias.mjs';
 import { agrupa } from '../lib/lotes.mjs';
 import { conLimite, extraeJson, dormir, barra } from '../lib/util.mjs';
@@ -135,7 +135,9 @@ async function reintentaUnidad(u, fallos, intento) {
     });
     contador.cobra(config.traductor.modelo, r.uso);
     const crudo2 = extraeJson(r.texto)?.u?.[0]?.es;
-    const es2 = crudo2 ? normalizaReferencias(crudo2).texto : crudo2;
+    const es2 = crudo2
+      ? (obraId === 'glosas' ? normalizaGlosa(crudo2, u.en) : normalizaReferencias(crudo2).texto)
+      : crudo2;
     const f2 = es2 ? valida(u, es2) : [{ tipo: 'ausente', grave: true, detalle: 'sin respuesta' }];
     if (es2 && !tieneGraves(f2)) {
       estado.anotaTraduccion({ id: u.id, h: u.h, es: es2, modelo: config.traductor.modelo, intentos: intento + 1 });
@@ -172,7 +174,9 @@ async function traduceLote(lote, intento = 1) {
     if (!bruto) { mal.push({ u, fallos: [{ tipo: 'ausente', grave: true, detalle: 'el modelo no devolvió esta unidad' }] }); continue; }
     // paso determinista: las abreviaturas biblicas se normalizan a las formas que
     // el lector sabe enlazar. No se le pide al modelo que acierte; se corrige.
-    const { texto: es, cambios } = obraId === 'glosas' ? { texto: bruto, cambios: [] } : normalizaReferencias(bruto);
+    const { texto: es, cambios } = obraId === 'glosas'
+      ? { texto: normalizaGlosa(bruto, u.en), cambios: [] }
+      : normalizaReferencias(bruto);
     if (cambios.length) normalizadas += cambios.length;
     const fallos = valida(u, es);
     if (tieneGraves(fallos)) mal.push({ u, fallos, es });
@@ -194,8 +198,12 @@ async function traduceLote(lote, intento = 1) {
     }
   }
 
-  contador.anotaLote(mal.length > lote.length / 2);
-  return { ok: ok.length + recuperadas, mal: mal.length - recuperadas };
+  // El freno mide el resultado FINAL del lote, no el primer intento: antes
+  // contaba como rechazado un lote cuyas unidades el reintento había
+  // recuperado, y paró el motor con un 93% de acierto real.
+  const fallanDeVerdad = mal.length - recuperadas;
+  contador.anotaLote(fallanDeVerdad > lote.length / 2);
+  return { ok: ok.length + recuperadas, mal: fallanDeVerdad };
 }
 
 // ── bucle principal ────────────────────────────────────────────────────────
