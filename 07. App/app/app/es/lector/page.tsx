@@ -26,7 +26,10 @@ type InterJson = { osis: string; dir: "ltr" | "rtl"; versos: Record<string, Pala
 type GrVerso = { c: number; v: number; osis: string; t: string; w: [string, string, string][] };
 type GrJson = { osis: string; versos: GrVerso[] };
 type EntradaLex = { w: string; t: string; m: string; g: string; d: string };
-type IndiceItem = { s: string; n: string; l: string };
+// `e` es el titular en español de la traducción propia. El índice se construyó
+// con el titular INGLÉS, así que sin esto «Marta» no encontraba nada y había que
+// escribir «Martha» para llegar a una entrada cuyo contenido ya estaba en español.
+type IndiceItem = { s: string; n: string; l: string; e?: string };
 type EntradaDic = { n: string; d: string; r: string[] };
 type SeccionHenry = { t: string; v: number | null; p: string[] };
 type HenryJson = { osis: string; c: Record<string, { r: string | null; s: SeccionHenry[] }> };
@@ -584,9 +587,12 @@ export default function Lector() {
     const empiezan: IndiceItem[] = [];
     const contiene: IndiceItem[] = [];
     for (const item of dicIndice) {
-      const n = normalizar(item.n);
-      if (n.startsWith(q)) empiezan.push(item);
-      else if (n.includes(q)) contiene.push(item);
+      // se busca en ES y en EN a la vez: el lector escribe «Marta» o «Martha»
+      // y llega a la misma entrada
+      const formas = [normalizar(item.n)];
+      if (item.e) formas.push(normalizar(item.e));
+      if (formas.some((n) => n.startsWith(q))) empiezan.push(item);
+      else if (formas.some((n) => n.includes(q))) contiene.push(item);
       if (empiezan.length >= 30) break;
     }
     return [...empiezan, ...contiene].slice(0, 40);
@@ -1323,7 +1329,12 @@ export default function Lector() {
                 <div className="refs-lista">
                   {resultadosDic.map((item) => (
                     <button key={item.s + item.l} className="ref-item" onClick={() => abrirEntradaDic(item)}>
-                      {item.n}
+                      {/* manda el título en español cuando existe; el inglés
+                          queda detrás, tenue, para quien busque por él */}
+                      {item.e ?? item.n}
+                      {item.e && item.e !== item.n && (
+                        <span className="ref-item-en"> · {item.n}</span>
+                      )}
                     </button>
                   ))}
                 </div>

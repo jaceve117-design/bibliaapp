@@ -31,6 +31,20 @@ export function validaUnidad(u, es, glosario) {
     fallos.push({ tipo: 'inflada', grave: false, detalle: `ratio ${ratio.toFixed(2)} — posible paráfrasis o comentario añadido` });
   }
 
+  // 1b. DESBORDE de unidad corta.
+  //     El ratio de arriba sólo mira originales de más de 150 chars, y ahí se
+  //     coló un fallo real: en un lote de Easton donde alternan titulares («Jacob»,
+  //     5 chars) y definiciones, el modelo metió la definición ENTERA en el
+  //     titular — 5.125 chars — y ningún validador lo vio. El lector lo pintó
+  //     como titular a 24px y sin enlaces. Medido: 2 de 3.962 titulares.
+  if (en.length <= 150 && es.length > Math.max(120, en.length * 6)) {
+    fallos.push({
+      tipo: 'desborde',
+      grave: true,
+      detalle: `original de ${en.length} chars y traducción de ${es.length}: el modelo metió aquí contenido de otra unidad`,
+    });
+  }
+
   // 2. Referencias bíblicas. El regex no es perfecto entre dos idiomas (abreviaturas,
   //    rangos, "cap. 3"), así que la paridad exacta es AVISO, no rechazo: medido contra
   //    la traducción humana de Juan, exigirla generaba falsos positivos. Sólo es grave
@@ -98,3 +112,45 @@ export function validaUnidad(u, es, glosario) {
 }
 
 export const tieneGraves = (fallos) => fallos.some((f) => f.grave);
+
+
+/**
+ * VALIDACIÓN DE GLOSAS (unidades cortas: 1-6 palabras).
+ *
+ * Los validadores de prosa no valen aquí y harían daño: el ratio de longitud
+ * no significa nada en dos palabras, la paridad de referencias no aplica, y
+ * «the» o «and» —marcadores de inglés sin traducir en un párrafo— son parte
+ * legítima de muchas glosas inglesas del interlineal («and he said»).
+ *
+ * Lo que sí importa en una glosa:
+ *  · que no venga vacía;
+ *  · que no sea una frase explicativa (una glosa no se explica, se da);
+ *  · que no devuelva el inglés tal cual;
+ *  · que no traiga comillas, corchetes ni andamiaje del modelo.
+ */
+const RE_ANDAMIO = /^\s*(la traducci[óo]n|traducci[óo]n|en espa[ñn]ol|esto significa|significa)(?![a-záéíóú])/i;
+
+export function validaGlosa(u, es) {
+  const fallos = [];
+  if (!es || !es.trim()) return [{ tipo: 'vacia', grave: true, detalle: 'glosa vacía' }];
+
+  const t = es.trim();
+
+  if (t.length > Math.max(60, u.en.length * 3)) {
+    fallos.push({ tipo: 'explicacion', grave: true, detalle: `${t.length} chars para una glosa de ${u.en.length}: parece explicación, no glosa` });
+  }
+  if (RE_ANDAMIO.test(t)) {
+    fallos.push({ tipo: 'andamio', grave: true, detalle: 'la glosa empieza explicándose' });
+  }
+  if (/^["'«»\[]|["'«»\]]$/.test(t)) {
+    fallos.push({ tipo: 'comillas', grave: true, detalle: 'la glosa viene entrecomillada o entre corchetes' });
+  }
+  // devolver el inglés sin tocar solo es fallo si el original tiene letras
+  if (t.toLowerCase() === u.en.trim().toLowerCase() && /[a-z]{3}/i.test(u.en)) {
+    fallos.push({ tipo: 'sin-traducir', grave: true, detalle: 'devuelve el inglés idéntico' });
+  }
+  if (/[\r\n]/.test(t) || t.split(/\s+/).length > 12) {
+    fallos.push({ tipo: 'larga', grave: true, detalle: 'más de 12 palabras: no es una glosa' });
+  }
+  return fallos;
+}

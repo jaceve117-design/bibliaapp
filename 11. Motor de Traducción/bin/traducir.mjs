@@ -19,7 +19,7 @@ import { Estado } from '../lib/estado.mjs';
 import { Contador, ParadaEnSeco } from '../lib/costos.mjs';
 import { cargaGlosario } from '../lib/glosario.mjs';
 import { prefijoFijo, ejemplosDeOro, cuerpoLote } from '../lib/prompt.mjs';
-import { validaUnidad, tieneGraves } from '../lib/validadores.mjs';
+import { validaUnidad, validaGlosa, tieneGraves } from '../lib/validadores.mjs';
 import { normalizaReferencias } from '../lib/referencias.mjs';
 import { agrupa } from '../lib/lotes.mjs';
 import { conLimite, extraeJson, dormir, barra } from '../lib/util.mjs';
@@ -35,16 +35,24 @@ const limite = Number(valor('--limite', Infinity));
 const libro = valor('--libro', null);
 const capArg = valor('--cap', null);
 const obraId = valor('--obra', 'henry');
+const dominio = valor('--dominio', null);
 const letra = valor('--letra', null);
 
 verifica();
 const glosario = cargaGlosario();
-const PREFIJO = prefijoFijo(glosario, ejemplosDeOro(config.patronOro, 2));
+const OBRA_TMP = obraDe(obraId);
+// Cada obra puede traer su propio prompt y su propio tamaño de lote. Las glosas
+// son unidades de 1-6 palabras: el prefijo de prosa (glosario + ejemplos de
+// Henry) no les sirve y además se pagaría en cada una de las ~1.500 llamadas.
+const PREFIJO = OBRA_TMP.prompt ?? prefijoFijo(glosario, ejemplosDeOro(config.patronOro, 2));
+const LOTE = { ...config.traductor, ...(OBRA_TMP.lote ?? {}) };
+// las glosas se validan con el perfil corto, no con el de párrafo
+const valida = (u, es) => (obraId === 'glosas' ? validaGlosa(u, es) : validaUnidad(u, es, glosario));
 const { impl, nombre: proveedorReal } = traductor(config.traductor.modelo);
 
 // ── cola ───────────────────────────────────────────────────────────────────
-const OBRA = obraDe(obraId);
-const cola = await OBRA.unidades({ libro, cap: capArg, letra });
+const OBRA = OBRA_TMP;
+const cola = await OBRA.unidades({ libro, cap: capArg, letra, dominio });
 
 const estado = new Estado();
 const contador = new Contador();
@@ -70,7 +78,7 @@ if (!simular) {
   }
 }
 
-const lotes = agrupa(aTraducir.map((u) => ({ ...u, osis: u.osis ?? u.obra, cap: u.cap ?? u.letra ?? '' })), config.traductor).slice(0, limite);
+const lotes = agrupa(aTraducir.map((u) => ({ ...u, osis: u.osis ?? u.dominio ?? u.obra, cap: u.cap ?? u.letra ?? '' })), LOTE).slice(0, limite);
 const charsTotal = aTraducir.reduce((a, u) => a + u.chars, 0);
 const tokIn = Math.round(charsTotal / 3.7);
 const tokOut = Math.round((charsTotal * 1.18) / 3.4);
@@ -86,7 +94,7 @@ const estUSD = esCF
     ((lotes.length * prefTok) / 1e6) * p.cacheRead +
     (prefTok / 1e6) * p.cacheWrite;
 
-console.log(`  lotes:        ${lotes.length} (≤${config.traductor.charsPorLote} chars c/u)`);
+console.log(`  lotes:        ${lotes.length} (≤${LOTE.charsPorLote} chars, ≤${LOTE.maxUnidadesPorLote} unidades c/u)`);
 console.log(esCF
   ? `  facturación: Workers AI · ~${Math.round(neuronasEst).toLocaleString('es')} neuronas (${config.workersAI.gratisPorDia.toLocaleString('es')}/día gratis)`
   : `  prefijo fijo: ${prefTok} tok cacheados × ${lotes.length} llamadas`);
@@ -128,7 +136,7 @@ async function reintentaUnidad(u, fallos, intento) {
     contador.cobra(config.traductor.modelo, r.uso);
     const crudo2 = extraeJson(r.texto)?.u?.[0]?.es;
     const es2 = crudo2 ? normalizaReferencias(crudo2).texto : crudo2;
-    const f2 = es2 ? validaUnidad(u, es2, glosario) : [{ tipo: 'ausente', grave: true, detalle: 'sin respuesta' }];
+    const f2 = es2 ? valida(u, es2) : [{ tipo: 'ausente', grave: true, detalle: 'sin respuesta' }];
     if (es2 && !tieneGraves(f2)) {
       estado.anotaTraduccion({ id: u.id, h: u.h, es: es2, modelo: config.traductor.modelo, intentos: intento + 1 });
       return true;
@@ -164,9 +172,9 @@ async function traduceLote(lote, intento = 1) {
     if (!bruto) { mal.push({ u, fallos: [{ tipo: 'ausente', grave: true, detalle: 'el modelo no devolvió esta unidad' }] }); continue; }
     // paso determinista: las abreviaturas biblicas se normalizan a las formas que
     // el lector sabe enlazar. No se le pide al modelo que acierte; se corrige.
-    const { texto: es, cambios } = normalizaReferencias(bruto);
+    const { texto: es, cambios } = obraId === 'glosas' ? { texto: bruto, cambios: [] } : normalizaReferencias(bruto);
     if (cambios.length) normalizadas += cambios.length;
-    const fallos = validaUnidad(u, es, glosario);
+    const fallos = valida(u, es);
     if (tieneGraves(fallos)) mal.push({ u, fallos, es });
     else ok.push({ u, es, fallos });
   }

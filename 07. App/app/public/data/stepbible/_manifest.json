@@ -1,7 +1,7 @@
 {
   "fuente": "STEPBible-Data — Tyndale House, Cambridge · https://github.com/STEPBible/STEPBible-Data",
   "licencia": "CC BY 4.0 (atribución obligatoria — ver 02. Legal/Ficha - STEPBible-Data.md)",
-  "fecha_ingesta": "2026-09-19",
+  "fecha_ingesta": "2026-09-23",
   "crudo_en": "05. Datos/corpus_crudo/stepbible_data",
   "tagnt": {
     "palabras": 141720,
@@ -23,12 +23,12 @@
   },
   "tbesg": {
     "filas": 11034,
-    "ids": 10689,
+    "ids": 11034,
     "simples": 10846
   },
   "tbesh": {
     "filas": 10258,
-    "ids": 8623,
+    "ids": 10258,
     "simples": 8181
   },
   "porton": {

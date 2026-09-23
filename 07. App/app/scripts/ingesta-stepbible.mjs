@@ -130,14 +130,32 @@ function procesarLexicon({ archivo, patron, salida }) {
     if (!RE.test(linea)) continue;
     const col = linea.split('\t');
     if (col.length < 8 || !col[6].trim()) continue;
-    const id = (col[2] || '').trim() || (col[0] || '').trim();
+    // ⚠ El id de la entrada está en col[1], NO en col[2].
+    //
+    // Formato real de TBESH/TBESG:
+    //   col[0]  Strong simple            H0001
+    //   col[1]  id extendido + relación  «H0001H = a Part of»
+    //   col[2]  DESTINO de esa relación  «H2438H»   ← con quién se relaciona
+    //
+    // Tomar col[2] como id guardaba cada entrada bajo el número de OTRA, y el
+    // índice quedaba envenenado: `indice["H0430"]` (Elohim) y `indice["H3068"]`
+    // (YHWH) —las dos palabras más frecuentes del AT— resolvían a
+    // «Jehovah-shalom». El lector llevaba mostrando la ficha equivocada desde
+    // la ingesta original.
+    const idExt = (col[1] || '').split('=')[0].trim();
     const simple = (col[0] || '').trim();
+    const id = idExt || simple;
+    const relacion = (col[1] || '').split('=').slice(1).join('=').trim();
+    const relacionados = (col[2] || '').trim().replace(/,\s*$/, '');
     entradas[id] = {
       w: (col[3] || '').trim(),
       t: (col[4] || '').trim(),
       m: (col[5] || '').trim(),
       g: (col[6] || '').trim(),
       d: (col[7] || '').trim(),
+      // la relación se conserva en vez de confundirse con la identidad
+      ...(relacion ? { rel: relacion } : {}),
+      ...(relacionados ? { relId: relacionados } : {}),
     };
     (porIdSimple[simple] ??= []).push(id);
     filas++;

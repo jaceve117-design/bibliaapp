@@ -1178,3 +1178,6 @@ body {
   font-size: 0.86em;
 }
 .dic-refs .cita:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+/* el nombre inglés detrás del español en los resultados del diccionario */
+.ref-item-en { color: var(--muted); font-size: 0.86em; font-weight: 400; }
