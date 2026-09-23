@@ -143,7 +143,9 @@ function procesarLexicon({ archivo, patron, salida }) {
     // «Jehovah-shalom». El lector llevaba mostrando la ficha equivocada desde
     // la ingesta original.
     const idExt = (col[1] || '').split('=')[0].trim();
-    const simple = (col[0] || '').trim();
+    // «H1254a» y «H1254b» agrupan bajo el mismo Strong canónico «H1254», que
+    // es como el lector busca la glosa (canonStrong).
+    const simple = (col[0] || '').trim().replace(/[a-z]$/, '');
     const id = idExt || simple;
     const relacion = (col[1] || '').split('=').slice(1).join('=').trim();
     const relacionados = (col[2] || '').trim().replace(/,\s*$/, '');
@@ -182,7 +184,10 @@ const tahot = procesarCorriente({
   conGlosaEs: false,
 });
 const tbesg = procesarLexicon({ archivo: 'TBESG.txt', patron: '^G\\d+\\t', salida: 'tbesg.json' });
-const tbesh = procesarLexicon({ archivo: 'TBESH.txt', patron: '^H\\d+\\t', salida: 'tbesh.json' });
+// `[a-z]?`: TBESH marca con letra minúscula los Strong que se dividen en varios
+// lemas («H1254a» = bara, crear). El patrón sin letra descartaba 1.424 filas,
+// entre ellas bara de Gn 1:1, que quedaba sin ficha.
+const tbesh = procesarLexicon({ archivo: 'TBESH.txt', patron: '^H\\d+[a-z]?\\t', salida: 'tbesh.json' });
 
 const manifest = {
   fuente: 'STEPBible-Data — Tyndale House, Cambridge · https://github.com/STEPBible/STEPBible-Data',
