@@ -155,18 +155,51 @@ async function reintentaUnidad(u, fallos, intento) {
 // ── traducción de un lote ──────────────────────────────────────────────────
 let normalizadas = 0;
 
+/**
+ * Rescata los pares completos {"id":..,"es":..} de una respuesta cortada.
+ * Si el modelo agota max_tokens a mitad del JSON, `extraeJson` no puede
+ * parsear NADA y el lote entero se daba por perdido; aquí se salvan todos los
+ * pares que sí llegaron enteros y sólo la cola cortada va a reintento.
+ */
+function rescataPares(texto) {
+  const salida = [];
+  const re = /\{\s*"id"\s*:\s*"([^"]+)"\s*,\s*"es"\s*:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
+  for (const m of String(texto ?? '').matchAll(re)) {
+    try { salida.push({ id: m[1], es: JSON.parse(`"${m[2]}"`) }); } catch { /* par ilegible: se ignora */ }
+  }
+  return salida;
+}
+
 async function traduceLote(lote, intento = 1) {
+  // IDs CORTOS DE LOTE ("1".."60"). Los ids reales —«texto.97f01b0089e1fd17»—
+  // tokenizan fatal: ~12 tokens cada uno, más que la propia glosa. Con 60 por
+  // lote agotaban max_tokens a mitad del JSON, no se podía parsear, las 60 se
+  // daban por perdidas y se reintentaban de UNA EN UNA: 24.698 llamadas y ~10×
+  // el coste previsto. Medido: 0 de ~450 lotes de glosas aceptados en 1ª pasada.
+  const corto = new Map(lote.map((u, k) => [String(k + 1), u]));
+  const loteCorto = lote.map((u, k) => ({ ...u, id: String(k + 1) }));
+
+  const chars = lote.reduce((a, u) => a + u.chars, 0);
+  // Presupuesto de salida por texto Y por nº de unidades: el de sólo-texto
+  // valía para párrafos, no para 60 glosas con su envoltorio JSON cada una.
+  const maxTokens = Math.min(16000, Math.max(Math.round((chars * 1.6) / 3) + 1000, lote.length * 30 + 500));
+
   const { texto, uso } = await impl.completar({
     modelo: config.traductor.modelo,
     prefijoFijo: PREFIJO,
-    cuerpo: cuerpoLote(lote),
-    maxTokens: Math.min(16000, Math.round((lote.reduce((a, u) => a + u.chars, 0) * 1.6) / 3) + 1000),
+    cuerpo: cuerpoLote(loteCorto),
+    maxTokens,
     temperatura: config.traductor.temperatura,
   });
   contador.cobra(config.traductor.modelo, uso);
 
   const j = extraeJson(texto);
-  const devueltas = new Map((j?.u ?? []).map((x) => [x.id, x.es]));
+  const pares = j?.u?.length ? j.u : rescataPares(texto);
+  const devueltas = new Map();
+  for (const x of pares) {
+    const u = corto.get(String(x.id));
+    if (u && typeof x.es === 'string') devueltas.set(u.id, x.es);
+  }
 
   const ok = [], mal = [];
   for (const u of lote) {

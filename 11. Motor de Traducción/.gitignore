@@ -3,3 +3,4 @@ estado/*.json
 estado/*.log
 node_modules/
 .env
+estado/*.bak

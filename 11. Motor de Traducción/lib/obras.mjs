@@ -159,7 +159,8 @@ REGLAS:
 6. Sin comillas, sin corchetes, sin punto final si el original no lo lleva.
 7. Si la glosa inglesa es ambigua, elige el sentido mas comun en el AT/NT.
 
-SALIDA: solo el JSON {"u":[{"id":"...","es":"..."}]}, mismos id, mismo orden.`,
+SALIDA: solo el JSON {"u":[{"id":"...","es":"..."}]}, mismos id, mismo orden.
+JSON COMPACTO en una sola linea, sin sangrias ni saltos: cada espacio cuesta.`,
 
   /** Cadenas del interlineal y glosas de diccionario que aún no tienen ES. */
   async unidades(filtro = {}) {

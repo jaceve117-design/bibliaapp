@@ -128,6 +128,16 @@ export const tieneGraves = (fallos) => fallos.some((f) => f.grave);
  *  · que no devuelva el inglés tal cual;
  *  · que no traiga comillas, corchetes ni andamiaje del modelo.
  */
+/**
+ * Palabras cuya forma idéntica existe en español con OTRO significado. Dejarlas
+ * sin traducir no es un cognado feliz, es un error de sentido.
+ */
+const FALSOS_AMIGOS = new Set([
+  'sin', 'come', 'once', 'red', 'pan', 'dice', 'mar', 'son', 'ten', 'salt',
+  'pie', 'vale', 'fin', 'ha', 'la', 'me', 'no', 'os', 'sed', 'ser', 'sue',
+  'tan', 'van', 'ver', 'copa', 'cola', 'dado', 'mole', 'paso', 'rope',
+]);
+
 const RE_ANDAMIO = /^\s*(la traducci[óo]n|traducci[óo]n|en espa[ñn]ol|esto significa|significa)(?![a-záéíóú])/i;
 
 /**
@@ -165,9 +175,20 @@ export function validaGlosa(u, es) {
   if (RE_ANDAMIO.test(t)) {
     fallos.push({ tipo: 'andamio', grave: true, detalle: 'la glosa empieza explicándose' });
   }
-  // devolver el inglés sin tocar solo es fallo si el original tiene letras
+  // Devolver el inglés idéntico suele ser CORRECTO en una glosa: nombres propios
+  // (Barnea, Enan, Horon) y cognados exactos (honor, terror, acacia, amén) se
+  // escriben igual. Rechazarlos costó 64 unidades buenas en la primera corrida.
+  // Así que es aviso... salvo en los falsos amigos, donde la forma idéntica
+  // cambia el sentido y sí hay que rehacerla.
   if (t.toLowerCase() === u.en.trim().toLowerCase() && /[a-z]{3}/i.test(u.en)) {
-    fallos.push({ tipo: 'sin-traducir', grave: true, detalle: 'devuelve el inglés idéntico' });
+    const esFalsoAmigo = FALSOS_AMIGOS.has(u.en.trim().toLowerCase());
+    fallos.push({
+      tipo: 'sin-traducir',
+      grave: esFalsoAmigo,
+      detalle: esFalsoAmigo
+        ? `"${u.en}" es falso amigo: idéntico en español significa otra cosa`
+        : 'idéntico al inglés (puede ser correcto: nombre propio o cognado)',
+    });
   }
   if (/[\r\n]/.test(t) || t.split(/\s+/).length > 12) {
     fallos.push({ tipo: 'larga', grave: true, detalle: 'más de 12 palabras: no es una glosa' });
