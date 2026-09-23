@@ -715,6 +715,56 @@ body {
   overflow: auto;
   padding-bottom: env(safe-area-inset-bottom, 0);
   animation: panel-entra 0.24s ease;
+  /* la coreografía de la pila: subir y encoger, nunca saltar */
+  transition: bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+              max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 0.3s ease;
+}
+
+/* ── Pila de paneles ────────────────────────────────────────────────────────
+   Todos los paneles son fixed al fondo, así que el último abierto tapaba al
+   anterior: al pulsar una cita dentro del diccionario, la tarjeta del
+   versículo se comía la del diccionario entera.
+
+   Ahora el más reciente se queda abajo y el anterior SUBE y se encoge, pero
+   sigue visible y utilizable. Pulsando sobre él vuelve al frente y el otro se
+   agacha. La profundidad 2 se repliega a una pestaña: sigue ahí, alcanzable,
+   sin robar sitio a la lectura. */
+.lex-panel.prof-0 { bottom: 0; max-height: 50vh; }
+.lex-panel.prof-1 {
+  bottom: calc(50vh + 6px);
+  max-height: 30vh;
+  box-shadow: 0 -2px 0 var(--line-strong), var(--shadow);
+}
+.lex-panel.prof-2 {
+  bottom: calc(80vh + 12px);
+  max-height: 52px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.85;
+}
+.lex-panel.prof-2:hover { opacity: 1; }
+/* el panel de atrás avisa de que se puede traer al frente */
+.lex-panel.prof-1 .lex-cabecera::after,
+.lex-panel.prof-2 .lex-cabecera::after {
+  content: "↑ traer al frente";
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-inline-start: auto;
+  margin-inline-end: 10px;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .lex-panel.prof-0 { max-height: 56vh; }
+  .lex-panel.prof-1 { bottom: calc(56vh + 6px); max-height: 24vh; }
+  .lex-panel.prof-2 { bottom: calc(80vh + 12px); }
+  .lex-panel.prof-1 .lex-cabecera::after,
+  .lex-panel.prof-2 .lex-cabecera::after { content: "↑"; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lex-panel { transition: none; }
 }
 @keyframes panel-entra {
   from { transform: translateY(18px); opacity: 0; }
@@ -1144,9 +1194,12 @@ body {
 /* ── Push-up: el panel de abajo no puede tapar lo que estás leyendo ─────────
    Los paneles son `position: fixed` sobre el texto. Al abrirse, la columna
    gana hueco al final para que la última línea siga siendo alcanzable. */
-.lector-columna.con-panel { padding-bottom: 62vh; }
+/* el hueco crece con la pila: dos tarjetas ocupan más que una */
+.lector-columna.con-panel.pila-1 { padding-bottom: 56vh; }
+.lector-columna.con-panel.pila-2 { padding-bottom: 88vh; }
 @media (max-width: 620px) {
-  .lector-columna.con-panel { padding-bottom: 66vh; }
+  .lector-columna.con-panel.pila-1 { padding-bottom: 62vh; }
+  .lector-columna.con-panel.pila-2 { padding-bottom: 86vh; }
 }
 
 /* salto secundario al interlineal: es una salida, no la acción principal —

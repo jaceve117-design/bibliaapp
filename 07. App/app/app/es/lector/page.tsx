@@ -698,6 +698,53 @@ export default function Lector() {
     const mapa = p.s.startsWith("G") ? glosasEs.lexicoG : glosasEs.lexico;
     return mapa[canonStrong(p.s)] ?? null;
   };
+  /**
+   * PILA DE PANELES.
+   *
+   * Los paneles del lector son todos `position: fixed; bottom: 0`, así que el
+   * último abierto tapaba al anterior: al pulsar una cita dentro del
+   * diccionario, la tarjeta del versículo se comía la del diccionario.
+   *
+   * Aquí se lleva el ORDEN de apertura. El más reciente se queda abajo del
+   * todo; el anterior sube y se encoge, pero sigue visible. Pulsando sobre él
+   * vuelve al frente y el otro se agacha. Nadie desaparece sin avisar.
+   */
+  const ABIERTOS: Record<string, boolean> = {
+    dic: !!dicPanel,
+    griego: !!grPal,
+    lex: !!lex,
+    refs: !!panelRefs,
+    cita: !!panelCita,
+    termino: !!panelTermino,
+    fuentes: !!panelFuentes,
+    notas: !!panelNotas,
+    info: !!panelInfo,
+  };
+  const firmaPila = Object.entries(ABIERTOS).filter(([, v]) => v).map(([k]) => k).join(",");
+  const [pila, setPila] = useState<string[]>([]);
+  useEffect(() => {
+    const vivos = firmaPila ? firmaPila.split(",") : [];
+    setPila((prev) => {
+      const quedan = prev.filter((id) => vivos.includes(id));
+      const nuevos = vivos.filter((id) => !quedan.includes(id));
+      return [...quedan, ...nuevos];
+    });
+  }, [firmaPila]);
+
+  /** Props de posición para un panel según su sitio en la pila. */
+  const propsPanel = (id: string) => {
+    const i = pila.indexOf(id);
+    const prof = i === -1 ? 0 : pila.length - 1 - i;
+    return {
+      className: `lex-panel prof-${Math.min(prof, 2)}`,
+      style: { zIndex: 60 + Math.max(0, i) },
+      // pulsar un panel de atrás lo trae al frente
+      onPointerDown: () => {
+        if (prof > 0) setPila((p) => [...p.filter((x) => x !== id), id]);
+      },
+    };
+  };
+
   const abrirLexico = (p: Palabra) => {
     setLex({ palabra: p });
     const esGriego = p.s.startsWith("G");
@@ -1058,7 +1105,7 @@ export default function Lector() {
 
       <main>
         <div
-          className={`lector-columna${lex || grPal || panelRefs ? " con-panel" : ""}`}
+          className={`lector-columna${pila.length ? ` con-panel pila-${Math.min(pila.length, 2)}` : ""}`}
           ref={columna}
         >
           <div className="lector-titulo">
@@ -1256,7 +1303,7 @@ export default function Lector() {
       </main>
 
       {dicPanel && (
-        <div className="lex-panel" role="dialog" aria-label={tr.diccionario}>
+        <div {...propsPanel("dic")} role="dialog" aria-label={tr.diccionario}>
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" style={{ fontSize: 20 }}>
@@ -1350,7 +1397,7 @@ export default function Lector() {
           interlineal (TAGNT). En vez de fingir un dato que no está, se ofrece
           el salto al interlineal, que sí lo tiene. */}
       {grPal && (
-        <div className="lex-panel" role="dialog" aria-label="Palabra del texto griego">
+        <div {...propsPanel("griego")} role="dialog" aria-label="Palabra del texto griego">
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" lang="el">{grPal.g}</span>
@@ -1406,7 +1453,7 @@ export default function Lector() {
       )}
 
       {lex && (
-        <div className="lex-panel" role="dialog" aria-label={tr.lexico}>
+        <div {...propsPanel("lex")} role="dialog" aria-label={tr.lexico}>
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra">{lex.palabra.g}</span>
@@ -1440,7 +1487,7 @@ export default function Lector() {
       )}
 
       {panelRefs && (
-        <div className="lex-panel" role="dialog" aria-label={tr.referencias}>
+        <div {...propsPanel("refs")} role="dialog" aria-label={tr.referencias}>
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" style={{ fontSize: 20 }}>
@@ -1544,7 +1591,7 @@ export default function Lector() {
       )}
    
       {panelCita && (
-        <div className="lex-panel" role="dialog" aria-label={tr.verTexto}>
+        <div {...propsPanel("cita")} role="dialog" aria-label={tr.verTexto}>
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" style={{ fontSize: 20 }}>
@@ -1582,7 +1629,7 @@ export default function Lector() {
       )}
 
       {panelTermino && (
-        <div className="lex-panel" role="dialog" aria-label={tr.lexico}>
+        <div {...propsPanel("termino")} role="dialog" aria-label={tr.lexico}>
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" style={{ fontSize: 20 }}>
@@ -1600,7 +1647,7 @@ export default function Lector() {
       )}
 
       {panelFuentes && (
-        <div className="lex-panel" role="dialog" aria-label={tr.fuentes}>
+        <div {...propsPanel("fuentes")} role="dialog" aria-label={tr.fuentes}>
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" style={{ fontSize: 20 }}>
@@ -1677,7 +1724,7 @@ export default function Lector() {
       )}
 
       {panelNotas && (
-        <div className="lex-panel" role="dialog" aria-label={tr.notas}>
+        <div {...propsPanel("notas")} role="dialog" aria-label={tr.notas}>
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" style={{ fontSize: 20 }}>
@@ -1748,7 +1795,7 @@ export default function Lector() {
       )}
 
       {panelInfo && (
-        <div className="lex-panel" role="dialog" aria-label={tr.info}>
+        <div {...propsPanel("info")} role="dialog" aria-label={tr.info}>
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" style={{ fontSize: 20 }}>
