@@ -143,28 +143,36 @@ const glosas = {
   // lotes cortos: 400 glosas en una peticion es pedirle al modelo que pierda el hilo
   lote: { charsPorLote: 1200, maxUnidadesPorLote: 60 },
 
-  prompt: `Eres lexicografo biblico. Traduces al espanol GLOSAS de un interlineal
+  // ⚠ Este prompt DEBE llevar ortografía española completa. Una versión anterior
+  // se escribió sin tildes (por esquivar un problema de escapes al generarlo) y
+  // el modelo imitó el estilo: 669 glosas salieron sin tilde —«despues», «asi»,
+  // «Jehova», y «creo» por «creó», que cambia persona y tiempo. El lote antiguo,
+  // con prompt acentuado, tenía cero. El modelo copia cómo le escribes.
+  prompt: `Eres lexicógrafo bíblico. Traduces al español GLOSAS de un interlineal
 hebreo/griego: NO son frases, son la equivalencia breve de una palabra del original.
 
 REGLAS:
-1. Devuelve una GLOSA, no una explicacion. «father» da «padre», nunca
+1. Devuelve una GLOSA, no una explicación. «father» da «padre», nunca
    «el progenitor masculino de alguien».
-2. Conserva la forma gramatical del ingles: «and he said» da «y dijo»;
-   «of the man» da «del hombre»; «to love» da «amar».
-3. Conserva los parentesis y su contenido: «(Jerusalem) Is There» da
-   «(Jerusalen) Esta Alli».
-4. Nombres propios en forma castellana consolidada: Aaron/Aaron,
-   Jehovah/Jehova, Moses/Moises.
-5. «LORD» en versalitas del AT es el Nombre divino: da «Jehova».
+2. Conserva la forma gramatical del inglés: «and he said» da «y dijo»;
+   «of the man» da «del hombre»; «to love» da «amar»; «he created» da «creó».
+3. Conserva los paréntesis y su contenido: «(Jerusalem) Is There» da
+   «(Jerusalén) Está Allí».
+4. Nombres propios en forma castellana consolidada: Aaron → Aarón,
+   Jehovah → Jehová, Moses → Moisés, Joseph → José, Pharaoh → Faraón.
+5. «LORD» en versalitas del AT es el Nombre divino: da «Jehová».
 6. Sin comillas, sin corchetes, sin punto final si el original no lo lleva.
-7. Si la glosa inglesa es ambigua, elige el sentido mas comun en el AT/NT.
-8. La glosa es SIEMPRE ingles, aunque parezca una palabra espanola. FALSOS AMIGOS:
+7. Si la glosa inglesa es ambigua, elige el sentido más común en el AT/NT.
+8. La glosa es SIEMPRE inglés, aunque parezca una palabra española. FALSOS AMIGOS:
    «sin» = pecado (nunca «sin» ni «sin embargo»); «come» = venir/ven (nunca «comer»);
-   «once» = una vez; «son» = hijo; «ten» = diez; «pan» = sarten; «dice» = dados;
+   «once» = una vez; «son» = hijo; «ten» = diez; «pan» = sartén; «dice» = dados;
    «mar» = estropear; «fin» = aleta; «pie» = pastel; «vale» = valle; «red» = rojo.
+9. ORTOGRAFÍA ESPAÑOLA COMPLETA, con todas sus tildes y eñes: día, así, después,
+   corazón, allí, también, Jehová, Moisés. En los verbos la tilde decide persona y
+   tiempo: «creó» (él, pasado) no es «creo» (yo, presente); «habló», «tomó», «llamó».
 
-SALIDA: solo el JSON {"u":[{"id":"...","es":"..."}]}, mismos id, mismo orden.
-JSON COMPACTO en una sola linea, sin sangrias ni saltos: cada espacio cuesta.`,
+SALIDA: sólo el JSON {"u":[{"id":"...","es":"..."}]}, mismos id, mismo orden.
+JSON COMPACTO en una sola línea, sin sangrías ni saltos: cada espacio cuesta.`,
 
   /** Cadenas del interlineal y glosas de diccionario que aún no tienen ES. */
   async unidades(filtro = {}) {

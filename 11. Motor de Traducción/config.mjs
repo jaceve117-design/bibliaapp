@@ -60,7 +60,7 @@ export const config = {
 
   // ⟡ DECISIÓN 4 — techo de gasto en USD. El motor PARA EN SECO al alcanzarlo.
   presupuesto: {
-    topeUSD: Number(process.env.MT_TOPE_USD ?? 150),
+    topeUSD: Number(process.env.MT_TOPE_USD ?? 75),   // tope acordado con el editor: 75 USD para todo el proyecto
     // freno de emergencia: si el % de lotes rechazados por el validador supera
     // esto en una ventana de 50 lotes, el motor se detiene (algo se rompió).
     maxTasaRechazo: 0.25,
