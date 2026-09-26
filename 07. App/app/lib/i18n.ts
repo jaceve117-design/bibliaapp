@@ -43,9 +43,7 @@ export const T = {
     fuenteDic: "Easton's Bible Dictionary (1897) · Dominio público · traducción ES en curso",
     comentario: "Comentario de Matthew Henry",
     comentarioDe: "Comentario de Matthew Henry",
-    resumenCapitulo: "Resumen del capítulo",
-    jfbTitulo: "Comentario de JFB — capítulo",
-    comTitulo: "Comentario de {s} — capítulo",
+    resumenCapitulo: "Resumen del capítulo",
     fuenteJfbCobertura: "toda la Biblia, comentada por anclas de versículo",
     fuenteBarnesCobertura: "NT completo + Génesis, Job, Salmos, Isaías y Daniel (Barnes no escribió los demás libros del AT; se excluyen)",
     jfbModo: "verso a verso (texto EN)",
@@ -137,9 +135,7 @@ export const T = {
     fuenteDic: "Easton's Bible Dictionary (1897) · Public domain · ES translation in progress",
     comentario: "Matthew Henry's commentary",
     comentarioDe: "Matthew Henry's commentary",
-    resumenCapitulo: "Chapter summary",
-    jfbTitulo: "JFB commentary — chapter",
-    comTitulo: "{s} commentary — chapter",
+    resumenCapitulo: "Chapter summary",
     fuenteJfbCobertura: "whole Bible, commented on key verses",
     fuenteBarnesCobertura: "complete NT + Genesis, Job, Psalms, Isaiah and Daniel (Barnes never wrote the other OT books; they are excluded)",
     jfbModo: "verse by verse (EN text)",
