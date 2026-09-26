@@ -1151,7 +1151,8 @@ export default function Lector() {
               )}
               {comentario && comFuente !== "henry" && parrafosComEn.length > 0 && (
                 <ComentarioBloque
-                  seccion={{ t: `${tr.comTitulo.replace("{s}", comSel.etiqueta)} (${comSel.anio}) — ${tr.jfbModo}`, v: null, p: parrafosComEn, sinTraducir: false }}
+                  autor={comSel.etiqueta}
+                  seccion={{ t: `${tr.comTitulo.replace("{s}", comSel.etiqueta + " (" + comSel.anio + ")")} ${cap} — ${tr.jfbModo}`, v: null, p: parrafosComEn, sinTraducir: false }}
                   tr={tr}
                   renderFn={renderMarcado}
                 />
@@ -1274,7 +1275,8 @@ export default function Lector() {
               )}
               {comentario && comFuente !== "henry" && parrafosComEn.length > 0 && (
                 <ComentarioBloque
-                  seccion={{ t: `${tr.comTitulo.replace("{s}", comSel.etiqueta)} (${comSel.anio}) — ${tr.jfbModo}`, v: null, p: parrafosComEn, sinTraducir: false }}
+                  autor={comSel.etiqueta}
+                  seccion={{ t: `${tr.comTitulo.replace("{s}", comSel.etiqueta + " (" + comSel.anio + ")")} ${cap} — ${tr.jfbModo}`, v: null, p: parrafosComEn, sinTraducir: false }}
                   tr={tr}
                   renderFn={renderMarcado}
                 />
@@ -1941,8 +1943,10 @@ function ComentarioBloque({
   seccion,
   tr,
   renderFn,
+  autor,
 }: {
   seccion: SeccionHenry & { sinTraducir?: boolean };
+  autor?: string;
   tr: ReturnType<typeof t>;
   renderFn: (texto: string) => React.ReactNode;
 }) {
@@ -1988,7 +1992,7 @@ function ComentarioBloque({
       >
         <span className="com-flecha">{abierto ? "▾" : "▸"}</span>
         <span className="com-etiqueta">
-          <span className="l1">{tr.comentarioDe}</span>
+          <span className="l1">{autor ? `Comentario de ${autor}` : tr.comentarioDe}</span>
           <span className="l2">
             <i>{seccion.t}</i> ({seccion.p.length})
             {seccion.sinTraducir && <b> · {tr.sinTraducir}</b>}
