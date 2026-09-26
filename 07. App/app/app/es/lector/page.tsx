@@ -94,6 +94,8 @@ export default function Lector() {
     lexicoG: Record<string, string>;
   } | null>(null);
   const [naveTemas, setNaveTemas] = useState<string[] | null>(null);
+  // nombres de tema de Nave's en español (motor, sin revisar): slug → nombre
+  const [naveNombresEs, setNaveNombresEs] = useState<Record<string, string> | null>(null);
   const [copiado, setCopiado] = useState(false);
   const [interData, setInterData] = useState<InterJson | null>(null);
   const [griego, setGriego] = useState(false);
@@ -511,6 +513,25 @@ export default function Lector() {
       })
       .catch(() => setJfbData(null));
   }, [comentario, comFuente, osis]);
+
+  // nombres de tema de Nave's en español: una sola descarga, cacheada
+  useEffect(() => {
+    if (naveNombresEs) return;
+    const enCache = cache.get("nave:temas-es") as Record<string, string> | undefined;
+    if (enCache) {
+      setNaveNombresEs(enCache);
+      return;
+    }
+    fetch(`/data/nave/_temas-es.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: { temas?: Record<string, string> } | null) => {
+        if (json?.temas) {
+          cache.set("nave:temas-es", json.temas);
+          setNaveNombresEs(json.temas);
+        }
+      })
+      .catch(() => setNaveNombresEs(null));
+  }, [naveNombresEs]);
 
   // etiqueta morfológica legible: traduce el código; si falta, devuelve el código crudo.
   // Los códigos hebreos compuestos vienen separados por "/" (prefijo/raíz/sufijo).
@@ -1591,7 +1612,7 @@ export default function Lector() {
                   <div className="refs-lista">
                     {naveTemas.map((t) => (
                       <span key={t} className="ref-item" style={{ cursor: "default" }}>
-                        {t.replace(/-/g, " ")}
+                        {naveNombresEs?.[t] ?? t.replace(/-/g, " ")}
                       </span>
                     ))}
                   </div>

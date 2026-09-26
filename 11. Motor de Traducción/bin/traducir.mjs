@@ -47,7 +47,8 @@ const OBRA_TMP = obraDe(obraId);
 const PREFIJO = OBRA_TMP.prompt ?? prefijoFijo(glosario, ejemplosDeOro(config.patronOro, 2));
 const LOTE = { ...config.traductor, ...(OBRA_TMP.lote ?? {}) };
 // las glosas se validan con el perfil corto, no con el de párrafo
-const valida = (u, es) => (obraId === 'glosas' ? validaGlosa(u, es) : validaUnidad(u, es, glosario));
+const esGlosa = OBRA_TMP.perfil === 'glosa';
+const valida = (u, es) => (esGlosa ? validaGlosa(u, es) : validaUnidad(u, es, glosario));
 const { impl, nombre: proveedorReal } = traductor(config.traductor.modelo);
 
 // ── cola ───────────────────────────────────────────────────────────────────
@@ -136,7 +137,7 @@ async function reintentaUnidad(u, fallos, intento) {
     contador.cobra(config.traductor.modelo, r.uso);
     const crudo2 = extraeJson(r.texto)?.u?.[0]?.es;
     const es2 = crudo2
-      ? (obraId === 'glosas' ? normalizaGlosa(crudo2, u.en) : normalizaReferencias(crudo2).texto)
+      ? (esGlosa ? normalizaGlosa(crudo2, u.en) : normalizaReferencias(crudo2).texto)
       : crudo2;
     const f2 = es2 ? valida(u, es2) : [{ tipo: 'ausente', grave: true, detalle: 'sin respuesta' }];
     if (es2 && !tieneGraves(f2)) {
@@ -207,7 +208,7 @@ async function traduceLote(lote, intento = 1) {
     if (!bruto) { mal.push({ u, fallos: [{ tipo: 'ausente', grave: true, detalle: 'el modelo no devolvió esta unidad' }] }); continue; }
     // paso determinista: las abreviaturas biblicas se normalizan a las formas que
     // el lector sabe enlazar. No se le pide al modelo que acierte; se corrige.
-    const { texto: es, cambios } = obraId === 'glosas'
+    const { texto: es, cambios } = esGlosa
       ? { texto: normalizaGlosa(bruto, u.en), cambios: [] }
       : normalizaReferencias(bruto);
     if (cambios.length) normalizadas += cambios.length;

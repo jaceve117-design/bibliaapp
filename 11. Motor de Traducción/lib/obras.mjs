@@ -137,6 +137,7 @@ const leerOverlay = () =>
 
 const glosas = {
   id: 'glosas',
+  perfil: 'glosa',
   nombre: 'Glosas ES del interlineal y el léxico (TAHOT/TAGNT · TBESH/TBESG)',
   dirEs: RUTA_STEP,
 
@@ -273,7 +274,85 @@ JSON COMPACTO en una sola línea, sin sangrías ni saltos: cada espacio cuesta.`
   },
 };
 
-export const OBRAS = { henry, easton, glosas };
+// ── Nombres de tema de Nave's ──────────────────────────────────────────────
+// 5.321 títulos de tema ("AARON", "BACKSLIDING", "JEHOVAH-JIREH"…). Unidades de
+// 1-4 palabras: perfil glosa (prompt propio, lotes cortos, validaGlosa).
+// Salida: nave/_temas-es.json (slug → nombre ES); el lector cae al slug si falta.
+const RUTA_TEMAS = path.join(DATA, 'nave', '_temas.json');
+const RUTA_TEMAS_ES = path.join(DATA, 'nave', '_temas-es.json');
+
+const naves = {
+  id: 'naves',
+  perfil: 'glosa',
+  nombre: "Nombres de tema de Nave's Topical Bible (1896)",
+  dirEs: path.join(DATA, 'nave'),
+
+  lote: { charsPorLote: 1200, maxUnidadesPorLote: 60 },
+
+  prompt: `Eres lexicógrafo bíblico. Traduces al español los NOMBRES DE TEMA de la
+Biblia topical de Nave: son títulos de tema, no frases.
+
+REGLAS:
+1. Nombres propios de persona y lugar en su forma castellana consolidada:
+   AARON → Aarón, MOSES → Moisés, JERUSALEM → Jerusalén, MOAB → Moab.
+2. El Nombre divino «JEHOVAH» (y sus compuestos con guion) es «Jehová»:
+   JEHOVAH-JIREH → Jehová-jireh, JEHOVAH-NISSI → Jehová-nisi.
+3. Temas comunes se traducen como sustantivo normal con mayúscula inicial:
+   BACKSLIDING → Apostasía, PRAYER → Oración, FEASTS → Fiestas.
+4. Conserva los guiones y su posición: CROSS, THE → Cruz, la (los temas con
+   inversión «X, THE» invierten igual: «The Cross» → «La Cruz»).
+5. Sin comillas, sin corchetes, sin punto final. Mayúscula inicial, el resto
+   en minúscula salvo nombres propios internos (Monte de Sion).
+6. Si el título trae aclaración entre paréntesis, tradúcela también.
+7. ORTOGRAFÍA ESPAÑOLA COMPLETA, con todas sus tildes y eñes.
+
+SALIDA: sólo el JSON {"u":[{"id":"...","es":"..."}]}, mismos id, mismo orden.
+JSON COMPACTO en una sola línea, sin sangrías ni saltos: cada espacio cuesta.`,
+
+  unidades(filtro = {}) {
+    const t = leer(RUTA_TEMAS).temas ?? {};
+    const es = fs.existsSync(RUTA_TEMAS_ES) ? (leer(RUTA_TEMAS_ES).temas ?? {}) : {};
+    const out = [];
+    for (const [slug, nombre] of Object.entries(t)) {
+      const n = String(nombre ?? '').trim();
+      if (!n || es[slug]) continue; // sin nombre o ya traducido
+      out.push({ id: `naves.${slug}`, obra: 'naves', clave: slug, en: n });
+    }
+    return out.map((u) => ({ ...u, h: hash(u.en), chars: u.en.length }));
+  },
+
+  ensambla(estado) {
+    const t = leer(RUTA_TEMAS).temas ?? {};
+    const previo = fs.existsSync(RUTA_TEMAS_ES) ? (leer(RUTA_TEMAS_ES).temas ?? {}) : {};
+    const temas = { ...previo };
+    let nuevas = 0, posibles = 0;
+    for (const slug of Object.keys(t)) {
+      posibles++;
+      const r = estado.resultados.get(`naves.${slug}`);
+      if (r && r.es && ['traducida', 'auditada', 'aprobada'].includes(r.estado)) {
+        temas[slug] = r.es;
+        nuevas++;
+      }
+    }
+    fs.writeFileSync(
+      RUTA_TEMAS_ES,
+      JSON.stringify({
+        _meta: {
+          obra: this.nombre,
+          licencia: 'Traducción propia CC BY 4.0 (B18) · obra original de dominio público',
+          revisado_humano: false,
+          origen: 'motor automático (sin revisar)',
+          fecha: new Date().toISOString().slice(0, 10),
+          temas: nuevas,
+        },
+        temas,
+      })
+    );
+    return { escritos: 1, unidades: nuevas, posibles };
+  },
+};
+
+export const OBRAS = { henry, easton, glosas, naves };
 
 
 export function obra(id) {
