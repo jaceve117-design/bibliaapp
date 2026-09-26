@@ -52,6 +52,10 @@ const OBRAS = [
 ];
 // Recursos del desplegable de la barra inferior. Añadir una obra nueva al núcleo
 // es añadir una línea aquí: `traducido` enciende solo el conmutador ES/EN.
+// REGLA D22 (2026-09-26, vale para TODO recurso futuro): la barra pegajosa del
+// comentario muestra el AUTOR arriba («Autor · año») y el DETALLE abajo
+// («Capítulo N — verso a verso (EN) (nº anclas)») — el nombre NUNCA dos veces.
+// Para un comentario EN nuevo: una línea en COMENTARIOS + una entrada en RUTA_COMENTARIO.
 const COMENTARIOS = [
   { id: "henry", etiqueta: "Matthew Henry", anio: "1706", traducido: true },
   { id: "jfb", etiqueta: "Jamieson, Fausset y Brown", anio: "1871", traducido: false },
