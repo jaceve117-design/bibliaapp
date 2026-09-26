@@ -20,12 +20,16 @@ const DATA = path.join(process.cwd(), "07. App", "app", "public", "data");
 const dirEn = path.join(DATA, obra === "henry" ? "henry" : obra);
 const dirEs = path.join(DATA, obra === "henry" ? "henry-es" : `${obra}-es`);
 
-// sospechosos clásicos del proyecto (bitácora: sonda de residuos) + construcciones EN puras
+// sospechosos clásicos del proyecto (bitácora: sonda de residuos) + construcciones EN puras.
+// FRONTERA ESPAÑOLA: \b de JS es ASCII y_matchea dentro de «andáis/andéis» — se usa
+// una clase explícita con acentos a ambos lados.
+const L = "A-Za-zÁÉÍÓÚÜÑáéíóúüñ";
+const borde = (w) => new RegExp(`(?<![${L}])${w}(?![${L}])`, "i");
 const SOSPECHOSOS = [
-  /\bherein\b/i, /\bappoint(ed|s|ing|ment|ó|ada|ado|an)?\b/i, /\bjustices\b/i, /\butmost\b/i,
-  /\bdenizens\b/i, /\boutlawry\b/i, /\bpeevish\b/i, /\breintegro\b/i, /\basunder\b/i,
-  /\bbaffl(ed|es|ing)\b/i, /\battest(s|ed|ation|ing)?\b/i, /\bacquainted\b/i, /\bapprehend(ed|s)?\b/i,
-  /\bthe\b/i, /\band\b/i, /\bof the\b/i, /\bwhich\b/i, /\bwith the\b/i, /\bthat the\b/i,
+  borde("herein"), borde("appoint"), borde("justices"), borde("utmost"),
+  borde("denizens"), borde("outlawry"), borde("peevish"), borde("reintegro"), borde("asunder"),
+  borde("baffl"), borde("attest"), borde("acquainted"), borde("apprehend"),
+  borde("the"), borde("and"), / of the /i, / with the /i, / that the /i,
   /[\u4e00-\u9fff]/, // caracteres CJK sueltos
 ];
 
@@ -33,7 +37,19 @@ const libros = fs.readdirSync(dirEn).filter((f) => f.endsWith(".json") && !f.sta
 // términos citados deliberadamente por el autor (fórmulas legales/latín) con glosa ES:
 // no son residuos aunque contengan palabras inglesas
 const PERMITIDOS = [/Oyer and Terminer/i];
+// fuentes del impreso que vienen truncadas en el EN original (el ES las refleja fielmente;
+// precedente: JN 18.2 idx20 de Henry). Formato: OSIS.cap.verso.párrafo
+const FUENTE_TRUNCADA = new Set(["ROM.3.28.0"]);
 let sinEs = 0, totalEn = 0, totalEs = 0, residuos = [], cortes = [], cortos = [];
+
+// ¿el match cae dentro de una cita o título citado («[Pearson, Exposition of the Creed]»,
+// «[N. del T.: «the God of this world»]»)? Son legítimos: obra citada EN se deja en EN.
+const dentroDeCita = (t, i) => {
+  const antes = t.slice(0, i);
+  const abre = (antes.match(/[\[\(«“"]/g) || []).length;
+  const cierra = (antes.match(/[\]\)»”"]/g) || []).length;
+  return abre > cierra;
+};
 for (const f of libros) {
   const rutaEs = path.join(dirEs, f);
   if (!fs.existsSync(rutaEs)) { sinEs++; continue; }
@@ -65,11 +81,29 @@ for (const f of libros) {
         if (!pEs || !String(pEs).trim()) { sinEs++; return; }
         totalEs++;
         if (PERMITIDOS.some((re) => re.test(pEs))) return;
+        // frase-ancla del comentario impreso: JFB/Barnes citan el verso KJV en EN
+        // ANTES de la raya y exponen en ES después — lo que cae antes de la primera
+        // raya es la cita, legítimo por construcción
+        const primeraRaya = pEs.indexOf("—");
+        const esAncla = primeraRaya > 0;
         for (const re of SOSPECHOSOS) {
-          if (re.test(pEs)) { residuos.push(`${f} ${cap}.${a.v}[${pi}]: ${pEs.match(re)[0]}`); break; }
+          const m = pEs.match(re);
+          if (!m) continue;
+          const i = m.index;
+          if (esAncla && i < primeraRaya) continue;           // parte citada del ancla
+          if (dentroDeCita(pEs, i)) continue;                 // título/obra citada
+          residuos.push(`${f} ${cap}.${a.v}[${pi}]: ${m[0]}`);
+          break;
         }
         const prop = pEs.length / pEn.length;
         if (prop < 0.45 && pEn.length > 350) cortos.push(`${f} ${cap}.${a.v}[${pi}]: ES ${pEs.length}/${pEn.length} chars`);
+        // corte duro REAL: el EN cierra la frase y el ES se queda en palabra suelta.
+        // Si el EN también acaba abierto (fuente truncada del impreso), el ES es fiel.
+        // Si el ES acaba en puntuación (, ) » ") es estilo o cita, no corte.
+        const enCierra = /[.!?"”’]$/.test(pEn.trim());
+        const esPalabraSuelta = /[a-záéíóúñ]$/i.test(pEs.trim());
+        if (pEs.length > 200 && esPalabraSuelta && enCierra && !FUENTE_TRUNCADA.has(`${f.replace(".json", "")}.${cap}.${a.v}.${pi}`))
+          cortos.push(`${f} ${cap}.${a.v}[${pi}]: CORTE DURO («…${pEs.trim().slice(-25)}»)`);
       });
     });
   }
