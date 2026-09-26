@@ -1274,6 +1274,15 @@ body {
   padding-left: 9px;
   padding-right: 4px;
 }
+/* capítulo pendiente tras elegir libro: se expande, se anilla en dorado y avisa — obligatorio */
+.cabecera-sub-inner .sel.sel-cap.requerido {
+  flex: 1 1 auto;
+  width: auto;
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 1px var(--accent);
+  color: var(--accent-strong);
+  font-weight: 600;
+}
 /* «Original» en la fila de navegación: toma lo que sobra y recorta con … */
 .rec-original-nav {
   flex: 1 1 auto;

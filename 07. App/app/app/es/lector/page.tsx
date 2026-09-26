@@ -72,6 +72,10 @@ export default function Lector() {
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [osis, setOsis] = useState(OSIS_INICIAL);
   const [cap, setCap] = useState(CAP_INICIAL);
+  // elección en dos pasos: al cambiar de libro el capítulo queda PENDIENTE y hay que
+  // elegirlo sí o sí antes de cargar el pasaje (petición del usuario, 2026-09-26)
+  const [pendiente, setPendiente] = useState<string | null>(null);
+  const capRef = useRef<HTMLSelectElement>(null);
   const [texto, setTexto] = useState<ObraJson | null>(null);
   const [cargando, setCargando] = useState(true);
   const [interlineal, setInterlineal] = useState(false);
@@ -246,6 +250,7 @@ export default function Lector() {
     if (!ref) return;
     const [o, c] = ref.split(".");
     if (/^[1-3]?[A-Z]{2,3}$/.test(o) && Number(c) >= 1) {
+      setPendiente(null);
       setOsis(o);
       setCap(Number(c));
     }
@@ -391,6 +396,7 @@ export default function Lector() {
 
   const ir = useCallback(
     (delta: number) => {
+      setPendiente(null);
       const nueva = cap + delta;
       if (nueva >= 1) setCap(nueva);
       else {
@@ -407,6 +413,7 @@ export default function Lector() {
 
   const adelante = useCallback(
     (delta: number) => {
+      setPendiente(null);
       const nueva = cap + delta;
       if (nueva <= caps) setCap(nueva);
       else {
@@ -964,10 +971,17 @@ export default function Lector() {
           <select
             className="sel"
             aria-label={tr.libro}
-            value={osis}
+            value={pendiente ?? osis}
             onChange={(e) => {
-              setOsis(e.target.value);
-              setCap(1);
+              const v = e.target.value;
+              if (v === osis) return;
+              setPendiente(v);
+              // el desplegable de capítulo se abre solo (el gesto del usuario ya está activo)
+              try {
+                capRef.current?.showPicker();
+              } catch {
+                /* navegadores sin showPicker: el anillo dorado basta */
+              }
             }}
           >
             {(manifest?.libros ?? []).map((l) => (
@@ -981,12 +995,29 @@ export default function Lector() {
               partirse donde caiga el ancho. */}
           <div className="nav-fila">
             <select
-              className="sel sel-cap"
+              ref={capRef}
+              className={`sel sel-cap${pendiente ? " requerido" : ""}`}
               aria-label={tr.capitulo}
-              value={cap}
-              onChange={(e) => setCap(Number(e.target.value))}
+              value={pendiente ? "" : cap}
+              onChange={(e) => {
+                const n = Number(e.target.value);
+                if (!n) return;
+                if (pendiente) {
+                  setOsis(pendiente);
+                  setPendiente(null);
+                }
+                setCap(n);
+              }}
             >
-              {Array.from({ length: caps }, (_, i) => i + 1).map((n) => (
+              {pendiente && <option value="">{tr.capituloElige}</option>}
+              {Array.from(
+                {
+                  length: pendiente
+                    ? (manifest?.libros.find((l) => l.osis === pendiente)?.caps ?? 1)
+                    : caps,
+                },
+                (_, i) => i + 1
+              ).map((n) => (
                 <option key={n} value={n}>
                   {n}
                 </option>
@@ -1776,6 +1807,7 @@ export default function Lector() {
                         key={clave}
                         className={`ref-item${nota.color ? ` swatch-${nota.color}` : ""}`}
                         onClick={() => {
+                          setPendiente(null);
                           setOsis(o);
                           setCap(Number(c));
                           setPanelNotas(false);
