@@ -55,8 +55,11 @@ const OBRAS = [
 const COMENTARIOS = [
   { id: "henry", etiqueta: "Matthew Henry", anio: "1706", traducido: true },
   { id: "jfb", etiqueta: "Jamieson, Fausset y Brown", anio: "1871", traducido: false },
+  { id: "barnes", etiqueta: "Albert Barnes", anio: "1872", traducido: false },
 ] as const;
 type ComFuente = (typeof COMENTARIOS)[number]["id"];
+// obras de comentario EN servidas de /data/{ruta}/{OSIS}.json (misma forma de JSON para todas)
+const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes" };
 const OSIS_INICIAL = "JHN";
 const CAP_INICIAL = 1;
 const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
@@ -475,20 +478,21 @@ export default function Lector() {
       .catch(() => setHenryEs(null));
   }, [comentario, osis]);
 
-  // JFB (paso 6): segunda obra de comentario — carga perezosa por libro
+  // comentarios EN (JFB, Barnes): carga perezosa por libro — misma forma de JSON para todos
   useEffect(() => {
-    if (!comentario || comFuente !== "jfb") {
+    const ruta = comentario ? RUTA_COMENTARIO[comFuente] : undefined;
+    if (!ruta) {
       setJfbData(null);
       return;
     }
-    const clave = `jfb:${osis}`;
+    const clave = `com:${ruta}:${osis}`;
     const enCache = cache.get(clave) as JfbJson | undefined;
     if (enCache) {
       setJfbData(enCache);
       return;
     }
     setJfbData(null);
-    fetch(`/data/jfb/${osis}.json`)
+    fetch(`/data/${ruta}/${osis}.json`)
       .then((r) => (r.ok ? r.json() : null))
       .then((json: JfbJson | null) => {
         if (json) cache.set(clave, json);
@@ -827,9 +831,10 @@ export default function Lector() {
     return { ...sEn, sinTraducir: false };
   });
 
-  // JFB: párrafos del capítulo, un elemento por ancla de verso («v. texto»)
-  const capJfb = jfbData?.c[capClave];
-  const parrafosJfb = (capJfb ?? []).flatMap((e) => e.p.map((x) => `${e.v}. ${x}`));
+  // comentarios EN (JFB/Barnes): párrafos del capítulo, un elemento por ancla de verso («v. texto»)
+  const comSel = COMENTARIOS.find((c) => c.id === comFuente) ?? COMENTARIOS[0];
+  const capComEn = jfbData?.c[capClave];
+  const parrafosComEn = (capComEn ?? []).flatMap((e) => e.p.map((x) => `${e.v}. ${x}`));
 
   const limpiarDef = (d: string) =>
     d
@@ -1144,9 +1149,9 @@ export default function Lector() {
                   {renderMarcado(rCom)}
                 </div>
               )}
-              {comentario && comFuente === "jfb" && parrafosJfb.length > 0 && (
+              {comentario && comFuente !== "henry" && parrafosComEn.length > 0 && (
                 <ComentarioBloque
-                  seccion={{ t: `${tr.jfbTitulo} — ${tr.jfbModo}`, v: null, p: parrafosJfb, sinTraducir: false }}
+                  seccion={{ t: `${tr.comTitulo.replace("{s}", comSel.etiqueta)} (${comSel.anio}) — ${tr.jfbModo}`, v: null, p: parrafosComEn, sinTraducir: false }}
                   tr={tr}
                   renderFn={renderMarcado}
                 />
@@ -1267,9 +1272,9 @@ export default function Lector() {
                   {renderMarcado(rCom)}
                 </div>
               )}
-              {comentario && comFuente === "jfb" && parrafosJfb.length > 0 && (
+              {comentario && comFuente !== "henry" && parrafosComEn.length > 0 && (
                 <ComentarioBloque
-                  seccion={{ t: `${tr.jfbTitulo} — ${tr.jfbModo}`, v: null, p: parrafosJfb, sinTraducir: false }}
+                  seccion={{ t: `${tr.comTitulo.replace("{s}", comSel.etiqueta)} (${comSel.anio}) — ${tr.jfbModo}`, v: null, p: parrafosComEn, sinTraducir: false }}
                   tr={tr}
                   renderFn={renderMarcado}
                 />
@@ -1712,6 +1717,12 @@ export default function Lector() {
                 tradición: evangélica escocesa-presbiteriana · {tr.fuentesEstadoEn} · texto EN · {tr.fuenteJfbCobertura}
               </div>
             </div>
+            <div className="fuente-item">
+              <b>Notes on the New / Old Testament — Albert Barnes</b> — 1832–1872 · dominio público
+              <div className="lex-meta">
+                tradición: presbiteriana americana · {tr.fuentesEstadoEn} · texto EN · {tr.fuenteBarnesCobertura}
+              </div>
+            </div>
             <div className="nota-editor">
               <div className="info-titulo">{tr.reportarError}</div>
               <textarea
@@ -1852,7 +1863,11 @@ export default function Lector() {
                       {henryEs ? tr.estadoNota : tr.comentarioEN}
                     </>
                   ) : (
-                    <>Jamieson, Fausset and Brown Commentary (1871) · Dominio público · texto EN (traducción ES en cola)</>
+                    comFuente === "barnes" ? (
+                      <>Albert Barnes, Notes on the New / Old Testament (1832–1872) · Dominio público · texto original EN (traducción ES en cola)</>
+                    ) : (
+                      <>Jamieson, Fausset and Brown Commentary (1871) · Dominio público · texto EN (traducción ES en cola)</>
+                    )
                   )}
                 </div>
               </div>

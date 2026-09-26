@@ -362,3 +362,13 @@ GLM se quedó sin créditos a mitad de la interfaz de Nave's. Retomado y cerrado
 
 **También anotado:** el refactor del selector de comentario resultó innecesario para esta etapa — interlineal, léxico y Nave's no compiten con el comentario. Se reabre cuando entre JFB, que es la segunda obra de comentario y el momento real en que el booleano estorba.
 
+
+### 2026-09-26 · GLM — Registro de los hitos 22–23 sept (motor, AION, Easton ES, glosas completas, VBL) · vigilante eliminado
+
+Narra los 13 commits (`8dbf068`→`11cccd3`) que no constaban en esta bitácora; el detalle de archivo por archivo está en `bitacora_progreso_GLM.md` (entradas 2026-09-22 de Claude y 2026-09-26 de GLM).
+
+1. **Motor de Traducción operativo** (`11. Motor de Traducción/`): traducción y auditoría por lotes fuera de tiempo real; unidad = párrafo; modelo elegido por enfrentamiento por pares contra el patrón de oro de Juan (`mistral-small-3.1-24b`, ~$29 todo Henry); Jev como auditor censal (~$2); tope de gasto $75; política de coste registrada (~$45 toda la biblioteca, ~$62 con Barnes). La revisión humana pasa a ser el acto que constituye la obra (Política v1.0, revisor principal nombrado).
+2. **Paso 6 avanza a 6/7 obras:** Easton ES completo por el motor; glosas ES del interlineal y del léxico terminadas (AT 99,62 % de palabras, léxico 8.721 H + 10.846 G Strong); quedaba ingerir VBL (66 libros, 31.102 versos, CC BY-SA 4.0 — solo agregación, las derivadas heredarían ShareAlike). **Resta Barnes.**
+3. **Marca:** la app pasa a llamarse «Biblia de Estudio AION» (manifest, i18n). Ratificación formal pendiente del usuario.
+4. **Correcciones de fondo:** bug del índice léxico (resolvía entradas equivocadas — el descubierto el 21-09) corregido; lotes de glosas que se perdían enteros (coste 10×) corregido; ortografía completa con tildes en las glosas.
+5. **El vigilante de 30 min queda ELIMINADO** (orden del usuario del 26-09: «ya con el motor de traducción no es necesario») — 56 ejecuciones, ya estaba pausado. Los incrementos de trabajo dejan de venir de turnos de fondo: corren por el motor contra la API.

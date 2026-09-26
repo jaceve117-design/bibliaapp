@@ -1012,3 +1012,27 @@ Nave's → glosas → **Easton (en marcha, piloto letra Z ✓)** → JFB → Hen
 **Estado:** pasos 0-1-2-5-7 ✓ · paso 3 completo salvo revisión humana · **paso 4: política v1.0 vigente, revisor principal identificado, revisión abierta** · paso 6: SBLGNT ✓ Nave's ✓ JFB ✓ glosas lote 1 ✓ **Easton ES en marcha** — resta Barnes · **motor de traducción operativo**. Bloqueado en usuario: modelo de sostenimiento, nombre/dominio.
 
 **En el árbol sin commitear:** `11. Motor de Traducción/` completo · `lib/referencias.ts` (Abd) · `henry-es/MAT.json` (Mateo 1 por motor, sin revisar) · `easton-es/z.json` · política y guía de Juan actualizadas · `globals.css` y `lector/page.tsx` (barra de recursos).
+
+### 2026-09-26 · GLM — REVISIÓN DE RELEVO: narración de los commits 22–23 sept (sin registro en bitácora) · verificación de producción · automatización del vigilante ELIMINADA por orden del usuario
+
+**Petición del usuario:** «revisa la carpeta madre y ve los nuevos avances». El trabajo del 22–23 sept quedó narrado hasta el motor (entrada 2026-09-22 de Claude); los 11 commits posteriores (`ccff4ee`→`11cccd3`) no estaban en ninguna bitácora. Se reconstruye aquí desde los mensajes de commit y la verificación directa de los datos (lectura de production + medición de cobertura real). Árbol limpio, HEAD `11cccd3`.
+
+1. **`ccff4ee` — Lector: la capa del texto original pasa a ser un desplegable con nombre** (page.tsx, globals.css).
+2. **`3e4da1e` — La app se llama «Biblia de Estudio AION»** (i18n + manifest) · griego usable (`lib/morfgnt.ts` nuevo) · fix de una ✕ que se escapaba.
+3. **`9a6b694` — EASTON ES COMPLETO** (`public/data/easton-es/`, 26 archivos por letra, generado por el motor; piloto letra Z del motor → obra entera) · el griego ya no saca al lector de su posición · comentario visible en la vista griega.
+4. **`be78ef2` — Notas con el griego activo** · griego con tono propio (CSS) · referencias del diccionario tocables (`lib/referencias.ts`).
+5. **`9f49427` — BUG DEL ÍNDICE LÉXICO CORREGIDO** (el documentado en mi entrada del 21-09: `abrirLexico` resolvía entradas equivocadas vía el índice contaminado de TBESH/TBESG) · diccionario bilingüe · fix de desborde de unidad corta. Cambia el motor (`obras.mjs`, `validadores.mjs`) y el lector.
+6. **`9cc70b1` — las tarjetas apiladas se coordinan en vez de taparse** (page.tsx, globals.css).
+7. **`c5bc610` — paneles en baraja** · fix del motor: las glosas se paraban por comillas.
+8. **`55448db` — cabecera móvil en tres filas fijas**; el título del capítulo ya no queda tapado (Cabecera.tsx).
+9. **`9c435de` — fix del motor: los lotes de glosas se perdían enteros y costaban 10×**.
+10. **`cb136d2` — tope de gasto del motor: 75 USD** para todo el proyecto · prompt de glosas con ortografía completa.
+11. **`11cccd3` — glosas ES con ortografía completa** (pase «antes-tildes», backups en `estado/`) · **el léxico recupera 1.424 fichas** («bará» incluido; además se regeneró tbesh.json desde `ingesta-stepbible.mjs`).
+
+**Verificación de datos (medida, no heredada):** interlineal AT **99,62%** de palabras con glosa ES (282.664/283.734; 550 cadenas raras restantes) — el «100%» del commit b95c211 es sustancialmente cierto; léxico **8.721 Strong H + 10.846 G** (obra prácticamente completa); H0430→«Dios», H3068→«Jehová», H1254→«crear» ✓. **El `_meta` de glosas-es.json quedó CADUCO** (dice 71,78% y lista los lotes 1b/1c) — cosmético, corregir en próximo pase. tahot sigue sin `es` inline (el AT depende del overlay en runtime; el NT lleva `es` inline 100% — decisión de diseño a documentar). `textoG` del NT al 63% (irrelevante: el NT ya está en español inline).
+
+**Producción verificada al día con HEAD** (26-09): lector 200 · vbl manifest+JHN 200 · easton-es a/z 200 · glosas-es.json 2,4 MB con léxico completo · manifest «Biblia de Estudio AION».
+
+**AUTOMATIZACIÓN ELIMINADA (orden del usuario, 26-09):** el vigilante de 30 min (`automation-1cdbc91d`, 56 ejecuciones, ya pausado) queda BORRADO — «ya con el motor de traducción no es necesario». Los turnos de fondo dejan de existir; el trabajo por lotes corre por el motor contra la API (fuera del chat).
+
+**Estado:** pasos 0-1-2-5-7 ✓ · paso 3 completo salvo revisión humana · paso 4: política v1.0, revisión abierta · paso 6: SBLGNT ✓ Nave's ✓ JFB ✓ glosas ✓ **Easton ES ✓ — resta Barnes** (vías: CCEL código real de obra, biblehub por capítulo, módulo e-Sword) · motor operativo con tope 75 USD · VBL ingerida (CC BY-SA, solo agregación). Bloqueado en usuario: sostenimiento, ratificación formal del nombre «AION».

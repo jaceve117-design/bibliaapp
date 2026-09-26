@@ -1,0 +1,174 @@
+{
+  "obra": "Notes on the New Testament / Notes on the Old Testament — Albert Barnes (1832–1872)",
+  "osis_obra": "BARNES",
+  "licencia": "Dominio público (ediciones originales pre-1929; autor fallecido 1870)",
+  "fuente": "https://biblehub.com/commentaries/barnes/ — espejo del texto PD original, designado en Ficha - Barnes.md (la edición Baker/Grand Rapids 1949 de CCEL queda DESCARTADA por la ficha)",
+  "fecha_ingesta": "2026-09-26",
+  "idioma": "en",
+  "alcance": "NT completo (27 libros) + AT parcial de autoría verificada: Génesis, Job, Salmos, Isaías, Daniel. Los libros que Barnes nunca escribió (Exo–Est, Prov, Ecl, Sng) quedan EXCLUYIDOS: las ediciones 'completas' modernas los rellenan con otros autores sin acreditar.",
+  "total_anclas": 12224,
+  "nota": "Barnes comenta por anclas de versículo; los versos sin ancla quedan cubiertos por el bloque anterior. El bloque v:'Intro' de cada capítulo 1 es la introducción del libro.",
+  "incidentes": [],
+  "libros": [
+    {
+      "osis": "1CO",
+      "caps_vistos": 16,
+      "anclas": 434
+    },
+    {
+      "osis": "1JN",
+      "caps_vistos": 5,
+      "anclas": 106
+    },
+    {
+      "osis": "1PE",
+      "caps_vistos": 5,
+      "anclas": 106
+    },
+    {
+      "osis": "1TH",
+      "caps_vistos": 5,
+      "anclas": 90
+    },
+    {
+      "osis": "1TI",
+      "caps_vistos": 6,
+      "anclas": 114
+    },
+    {
+      "osis": "2CO",
+      "caps_vistos": 13,
+      "anclas": 258
+    },
+    {
+      "osis": "2JN",
+      "caps_vistos": 1,
+      "anclas": 14
+    },
+    {
+      "osis": "2PE",
+      "caps_vistos": 3,
+      "anclas": 62
+    },
+    {
+      "osis": "2TH",
+      "caps_vistos": 3,
+      "anclas": 47
+    },
+    {
+      "osis": "2TI",
+      "caps_vistos": 4,
+      "anclas": 84
+    },
+    {
+      "osis": "3JN",
+      "caps_vistos": 1,
+      "anclas": 15
+    },
+    {
+      "osis": "ACT",
+      "caps_vistos": 28,
+      "anclas": 943
+    },
+    {
+      "osis": "COL",
+      "caps_vistos": 4,
+      "anclas": 93
+    },
+    {
+      "osis": "DAN",
+      "caps_vistos": 12,
+      "anclas": 349
+    },
+    {
+      "osis": "EPH",
+      "caps_vistos": 6,
+      "anclas": 156
+    },
+    {
+      "osis": "GAL",
+      "caps_vistos": 6,
+      "anclas": 150
+    },
+    {
+      "osis": "GEN",
+      "caps_vistos": 50,
+      "anclas": 479
+    },
+    {
+      "osis": "HEB",
+      "caps_vistos": 13,
+      "anclas": 302
+    },
+    {
+      "osis": "ISA",
+      "caps_vistos": 66,
+      "anclas": 1281
+    },
+    {
+      "osis": "JAS",
+      "caps_vistos": 5,
+      "anclas": 107
+    },
+    {
+      "osis": "JHN",
+      "caps_vistos": 21,
+      "anclas": 731
+    },
+    {
+      "osis": "JOB",
+      "caps_vistos": 42,
+      "anclas": 1047
+    },
+    {
+      "osis": "JUD",
+      "caps_vistos": 1,
+      "anclas": 25
+    },
+    {
+      "osis": "LUK",
+      "caps_vistos": 24,
+      "anclas": 647
+    },
+    {
+      "osis": "MAT",
+      "caps_vistos": 28,
+      "anclas": 868
+    },
+    {
+      "osis": "MRK",
+      "caps_vistos": 16,
+      "anclas": 281
+    },
+    {
+      "osis": "PHM",
+      "caps_vistos": 1,
+      "anclas": 26
+    },
+    {
+      "osis": "PHP",
+      "caps_vistos": 4,
+      "anclas": 105
+    },
+    {
+      "osis": "PSA",
+      "caps_vistos": 150,
+      "anclas": 2438
+    },
+    {
+      "osis": "REV",
+      "caps_vistos": 22,
+      "anclas": 394
+    },
+    {
+      "osis": "ROM",
+      "caps_vistos": 16,
+      "anclas": 425
+    },
+    {
+      "osis": "TIT",
+      "caps_vistos": 3,
+      "anclas": 47
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Ficha legal — Barnes' Notes on the New Testament
 
-> Estado: **fichada** (pendiente de ingesta — paso 6, cierre del núcleo)
+> Estado: **ingerida e integrada** (2026-09-26 — paso 6, 4.º comentarista del núcleo)
 > Uso previsto: comentario bíblico EN (traducción ES en ola posterior)
 
 ## Identificación
@@ -12,8 +12,9 @@
 | Titular de derechos | Ninguno vigente: dominio público (autor fallecido 1870; ediciones originales pre-1929) |
 | Idioma | Inglés |
 | Formato de ingesta | Texto estructurado por verso → JSON propio |
-| URL de origen candidato | https://biblehub.com/commentaries/barnes/ (espejo público del texto PD original) |
-| `verified_at` | 2026-09-19 (status PD por fecha; **⚠️ usar SIEMPRE el texto original de Barnes, no revisiones modernas con derechos — p. ej. la edición revisada de Grand Rapids 1949+ está protegida**) |
+| URL de origen | https://biblehub.com/commentaries/barnes/ (espejo público del texto PD original) — **usado en la ingesta**; el ThML de CCEL (`barnes/ntnotes.xml`) quedó DESCARTADO: es la edición Baker/Grand Rapids 1949 que esta ficha prohibe, y los volúmenes AT de CCEL son solo imágenes de página |
+| Alcance de autoría | NT completo + del AT solo Génesis, Job, Salmos, Isaías y Daniel (verificado 2026-09-26: Barnes nunca escribió Exo–Est, Prov, Ecl, Sng; las ediciones «completas» modernas los rellenan con otros autores sin acreditar — excluidos de la ingesta) |
+| `verified_at` | 2026-09-26 (ingesta: 32 libros, 12.224 anclas, 0 incidentes; rastreo cortés de 580 capítulos vía biblehub) · 2026-09-19 (status PD por fecha; **⚠️ usar SIEMPRE el texto original de Barnes, no revisiones modernas con derechos — p. ej. la edición revisada de Grand Rapids 1949+ está protegida**) |
 | Jurisdicción | PD en EUA (ediciones originales pre-1929) · PD en España/AL (autor fallecido hace más de 70 años) |
 
 ## Licencia
