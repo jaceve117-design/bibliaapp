@@ -119,6 +119,8 @@ export default function Lector() {
   const [comIdioma, setComIdioma] = useState<"es" | "en">("es");
   const [comFuente, setComFuente] = useState<ComFuente>("henry");
   const [jfbData, setJfbData] = useState<JfbJson | null>(null);
+  // espejo ES del comentario EN activo (motor, sin revisar); null si no existe aún
+  const [comEsData, setComEsData] = useState<JfbJson | null>(null);
   const [panelCita, setPanelCita] = useState<PanelCita | null>(null);
   const [panelTermino, setPanelTermino] = useState<Termino | null>(null);
   const [panelInfo, setPanelInfo] = useState(false);
@@ -512,6 +514,22 @@ export default function Lector() {
         setJfbData(json);
       })
       .catch(() => setJfbData(null));
+    // espejo ES (motor): si el libro aún no tiene traducción, 404 → null y el
+    // conmutador ES/EN ni aparece (recursoTraducido se deriva de estos datos)
+    const claveEs = `com:${ruta}-es:${osis}`;
+    const esCache = cache.get(claveEs) as JfbJson | undefined;
+    if (esCache) {
+      setComEsData(esCache);
+      return;
+    }
+    setComEsData(null);
+    fetch(`/data/${ruta}-es/${osis}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: JfbJson | null) => {
+        if (json) cache.set(claveEs, json);
+        setComEsData(json);
+      })
+      .catch(() => setComEsData(null));
   }, [comentario, comFuente, osis]);
 
   // nombres de tema de Nave's en español: una sola descarga, cacheada
@@ -835,7 +853,7 @@ export default function Lector() {
   // ¿Este recurso ofrece ES? Se deriva de los datos cargados, no de la bandera del
   // catálogo: así el conmutador ES/EN aparece en cuanto exista la traducción, sin
   // tocar código, y no miente si el archivo aún no está desplegado.
-  const recursoTraducido = comFuente === "henry" ? !!henryEs : false;
+  const recursoTraducido = comFuente === "henry" ? !!henryEs : !!comEsData;
 
   // Pareja de la palabra del SBLGNT en el interlineal (glosa + Strong).
   // Se calcula al vuelo: alinear un versículo son unas decenas de comparaciones.
@@ -867,6 +885,17 @@ export default function Lector() {
   const comSel = COMENTARIOS.find((c) => c.id === comFuente) ?? COMENTARIOS[0];
   const capComEn = jfbData?.c[capClave];
   const parrafosComEn = (capComEn ?? []).flatMap((e) => e.p.map((x) => `${e.v}. ${x}`));
+  // modo ES: el capítulo traducido se sirve del espejo; el ancla sin traducir cae
+  // al EN del mismo ancla (la estructura 1:1 lo permite) — el idioma delata el salto
+  const capComEs = comEsData?.c[capClave];
+  const usarEsCom = comIdioma === "es" && !!capComEs?.some((a) => a.p.some(Boolean));
+  const parrafosCom = usarEsCom
+    ? (capComEs ?? []).flatMap((a, ai) => {
+        const es = a.p.filter(Boolean);
+        if (es.length) return es.map((x) => `${a.v}. ${x}`);
+        return (capComEn?.[ai]?.p ?? []).map((x) => `${a.v}. ${x}`);
+      })
+    : parrafosComEn;
 
   const limpiarDef = (d: string) =>
     d
@@ -1128,7 +1157,7 @@ export default function Lector() {
             </select>
 
             <span className="rec-der">
-              {comentario && recursoTraducido && idiomaEfectivo === "es" && esCapDisp && (
+              {comentario && recursoTraducido && (comFuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : usarEsCom) && (
                 <span className="badge-revision" title={tr.estadoNota}>
                   {tr.sinRevisar}
                 </span>
@@ -1205,10 +1234,10 @@ export default function Lector() {
                   {renderMarcado(rCom)}
                 </div>
               )}
-              {comentario && comFuente !== "henry" && parrafosComEn.length > 0 && (
+              {comentario && comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
-                  seccion={{ t: `${tr.capitulo} ${cap} — ${tr.jfbModo}`, v: null, p: parrafosComEn, sinTraducir: false }}
+                  seccion={{ t: `${tr.capitulo} ${cap} — ${usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
                   tr={tr}
                   renderFn={renderMarcado}
                 />
@@ -1329,10 +1358,10 @@ export default function Lector() {
                   {renderMarcado(rCom)}
                 </div>
               )}
-              {comentario && comFuente !== "henry" && parrafosComEn.length > 0 && (
+              {comentario && comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
-                  seccion={{ t: `${tr.capitulo} ${cap} — ${tr.jfbModo}`, v: null, p: parrafosComEn, sinTraducir: false }}
+                  seccion={{ t: `${tr.capitulo} ${cap} — ${usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
                   tr={tr}
                   renderFn={renderMarcado}
                 />
@@ -1923,9 +1952,9 @@ export default function Lector() {
                     </>
                   ) : (
                     comFuente === "barnes" ? (
-                      <>Albert Barnes, Notes on the New / Old Testament (1832–1872) · Dominio público · texto original EN (traducción ES en cola)</>
+                      <>Albert Barnes, Notes on the New / Old Testament (1832–1872) · Dominio público · texto original EN{comEsData ? " · traducción ES automática (sin revisar)" : " (traducción ES en cola)"}</>
                     ) : (
-                      <>Jamieson, Fausset and Brown Commentary (1871) · Dominio público · texto EN (traducción ES en cola)</>
+                      <>Jamieson, Fausset and Brown Commentary (1871) · Dominio público · texto EN{comEsData ? " · traducción ES automática (sin revisar)" : " (traducción ES en cola)"}</>
                     )
                   )}
                 </div>

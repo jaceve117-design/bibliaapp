@@ -352,7 +352,111 @@ JSON COMPACTO en una sola línea, sin sangrías ni saltos: cada espacio cuesta.`
   },
 };
 
-export const OBRAS = { henry, easton, glosas, naves };
+// ── Comentarios EN por anclas (JFB, Barnes, …) ─────────────────────────────
+// Esquema compartido: {osis, fuente, c: {cap: [{v, p: [párrafos]}]}} — el mismo
+// que produce la ingesta. Unidades = párrafos no vacíos; id estable por posición
+// (`jfb.JHN.3.14.2` = ancla 14, párrafo 2). Salida ES espejo: los párrafos aún
+// sin traducir van como "" y el lector cae al EN párrafo a párrafo.
+const comentarioEn = (id, nombre, fuente) => ({
+  id,
+  nombre,
+  dirEn: path.join(DATA, id),
+  dirEs: path.join(DATA, `${id}-es`),
+
+  async unidades(filtro = {}) {
+    const out = [];
+    const libros = fs.readdirSync(this.dirEn)
+      .filter((f) => f.endsWith('.json') && !f.startsWith('_'))
+      .sort();
+    for (const f of libros) {
+      const osis = f.replace('.json', '');
+      if (filtro.libro && osis !== filtro.libro) continue;
+      const j = leer(path.join(this.dirEn, f));
+      for (const [cap, anclas] of Object.entries(j.c ?? {})) {
+        anclas.forEach((a, ai) => {
+          (a.p ?? []).forEach((parrafo, pi) => {
+            const en = String(parrafo ?? '').trim();
+            if (!en) return;
+            out.push({ id: `${id}.${osis}.${cap}.${ai}.${pi}`, obra: id, osis, cap: Number(cap), ai, pi, en });
+          });
+        });
+      }
+    }
+    return out.map((u) => ({ ...u, h: hash(u.en), chars: u.en.length }));
+  },
+
+  ensambla(estado, filtro = {}) {
+    fs.mkdirSync(this.dirEs, { recursive: true });
+    const libros = fs.readdirSync(this.dirEn)
+      .filter((f) => f.endsWith('.json') && !f.startsWith('_'))
+      .sort();
+    let escritos = 0, unidades = 0, posibles = 0;
+
+    for (const f of libros) {
+      const osis = f.replace('.json', '');
+      if (filtro.libro && osis !== filtro.libro) continue;
+      const j = leer(path.join(this.dirEn, f));
+      const caps = {};
+      let hay = 0;
+      for (const [cap, anclas] of Object.entries(j.c ?? {})) {
+        const salidas = anclas.map((a, ai) => ({
+          v: a.v,
+          p: (a.p ?? []).map((parrafo, pi) => {
+            const en = String(parrafo ?? '').trim();
+            if (!en) return parrafo;
+            posibles++;
+            const r = estado.resultados.get(`${id}.${osis}.${cap}.${ai}.${pi}`);
+            if (r && r.es && r.h === hash(en) && ['traducida', 'auditada', 'aprobada'].includes(r.estado)) {
+              unidades++;
+              hay++;
+              return r.es;
+            }
+            return '';
+          }),
+        }));
+        if (salidas.some((s) => s.p.some(Boolean))) caps[cap] = salidas;
+      }
+      if (!hay) continue;
+      fs.writeFileSync(
+        path.join(this.dirEs, `${osis}.json`),
+        JSON.stringify({ osis, fuente: `${fuente} · traducción ES: obra derivada propia, CC BY 4.0 (B18), sin revisar`, c: caps })
+      );
+      escritos++;
+    }
+
+    if (escritos) {
+      const mf = {
+        obra: nombre,
+        osis_obra: id.toUpperCase(),
+        licencia: 'Traducción propia CC BY 4.0 (B18) · obra original de dominio público',
+        revisado_humano: false,
+        origen: 'motor automático (sin revisar)',
+        fecha: new Date().toISOString().slice(0, 10),
+        archivos: escritos,
+        unidades_traducidas: unidades,
+        unidades_total: posibles,
+      };
+      fs.writeFileSync(path.join(this.dirEs, '_manifest.json'), JSON.stringify(mf, null, 2));
+    }
+    return { escritos, unidades, posibles };
+  },
+});
+
+const jfb = comentarioEn(
+  'jfb',
+  'A Commentary, Critical and Explanatory, on the Whole Bible — Jamieson, Fausset y Brown (1871)',
+  'JFB',
+  'Jamieson, Fausset and Brown Commentary (1871) · Dominio público'
+);
+
+const barnes = comentarioEn(
+  'barnes',
+  'Notes on the New / Old Testament — Albert Barnes (1832–1872)',
+  'Barnes',
+  'Albert Barnes, Notes on the New / Old Testament (1832–1872) · Dominio público · texto original vía biblehub.com'
+);
+
+export const OBRAS = { henry, easton, glosas, naves, jfb, barnes };
 
 
 export function obra(id) {
