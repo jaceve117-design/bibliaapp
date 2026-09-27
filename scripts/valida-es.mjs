@@ -36,10 +36,20 @@ const SOSPECHOSOS = [
 const libros = fs.readdirSync(dirEn).filter((f) => f.endsWith(".json") && !f.startsWith("_"));
 // términos citados deliberadamente por el autor (fórmulas legales/latín) con glosa ES:
 // no son residuos aunque contengan palabras inglesas
-const PERMITIDOS = [/Oyer and Terminer/i];
+const PERMITIDOS = [
+  /Oyer and Terminer/i,
+  // Barnes: títulos y citas verificadas una a una (2026-09-27) — quedan en EN por práctica editorial
+  /Boat and Caravan/, /On the Prophecies/, /Ter\. And\./, /Swift works his double spine/,
+  /solid hoof that wears the ground/, /Dissertation on the most ancient/, /The Pictorial Bible/,
+  /The [Ll]and and Book/, /Foster's Life and Correspondence/, /Decline and Fall/, /destinar, appoint/,
+  /Nature and Moral Influence of Heathenism/, /Rome in the Nineteenth Century/,
+];
 // fuentes del impreso que vienen truncadas en el EN original (el ES las refleja fielmente;
 // precedente: JN 18.2 idx20 de Henry). Formato: OSIS.cap.verso.párrafo
-const FUENTE_TRUNCADA = new Set(["ROM.3.28.0"]);
+const FUENTE_TRUNCADA = new Set([
+  "ROM.3.28.0", // JFB
+  "HEB.8.9.6", "HEB.8.11.0", "HEB.9.28.5", "ROM.5.14.1", "TIT.1.Intro.16", // Barnes (el EN acaba «for.» / «Nor.»)
+]);
 let sinEs = 0, totalEn = 0, totalEs = 0, residuos = [], cortes = [], cortos = [];
 
 // ¿el match cae dentro de una cita o título citado («[Pearson, Exposition of the Creed]»,
@@ -81,17 +91,25 @@ for (const f of libros) {
         if (!pEs || !String(pEs).trim()) { sinEs++; return; }
         totalEs++;
         if (PERMITIDOS.some((re) => re.test(pEs))) return;
+        // transliteraciones griegas/hebreas con diacríticos («ebebaiōthē»): la raya
+        // rompe la clase de letras y haría matchear «the» dentro de la palabra —
+        // se quitan los diacríticos combinantes antes de comparar
+        const plano = pEs.replace(/[\u0300-\u036f]/g, "");
         // frase-ancla del comentario impreso: JFB/Barnes citan el verso KJV en EN
         // ANTES de la raya y exponen en ES después — lo que cae antes de la primera
         // raya es la cita, legítimo por construcción
         const primeraRaya = pEs.indexOf("—");
         const esAncla = primeraRaya > 0;
+        // títulos de obras citadas en Title Case («Tour to the Hebrides»,
+        // «Land and the Book», «Lectures on the Evidences…») — legítimos
+        const esTitulo = /[A-Z][A-Za-z'’]*(?:'s)? (?:and|to|of|on) the [A-Z]/.test(pEs);
         for (const re of SOSPECHOSOS) {
-          const m = pEs.match(re);
+          const m = plano.match(re);
           if (!m) continue;
           const i = m.index;
           if (esAncla && i < primeraRaya) continue;           // parte citada del ancla
           if (dentroDeCita(pEs, i)) continue;                 // título/obra citada
+          if (esTitulo) continue;                             // título sin comillas
           residuos.push(`${f} ${cap}.${a.v}[${pi}]: ${m[0]}`);
           break;
         }
