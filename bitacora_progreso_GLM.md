@@ -1193,3 +1193,11 @@ Arriba de `hoja_de_ruta_recursos_GLM.md` hay dos tareas **⚑ PRIORIDAD** que va
 - Logo: siete luces alrededor de una llama. Fuente única `07. App/app/components/LogoAion.tsx` (llama con corazón ≥40 px; sólida en pequeño). Íconos PWA/iOS/favicon generados con `node scripts/genera-iconos.mjs` (sharp). Cabecera con el logo. Bajo el ícono instalado: «AION» (Android `short_name`, iOS `appleWebApp.title`).
 - Intro (`components/Intro.tsx` + estilos `.intro-*` en globals.css): llama que se enciende, 7 luces que llegan tenues y toman color, nombre completo debajo; ~4 s, una vez por sesión, tocar la salta, respeta reduced-motion.
 - Sonido `public/intro/aion.wav` (215 KB): compuesto con `scripts/intro-sonido.py` (mido + FluidSynth + GeneralUser GS, del motor de partituras de 1-Altrium): pad cálido en Re, celesta pentatónica por cada luz, coro suave al aparecer el nombre. Los navegadores sólo permiten sonido tras un gesto del usuario: si lo bloquean, la intro es silenciosa.
+
+### 2026-09-28 · GLM (vigilante) — FASE 1.2 COMPLETA: Valdés Romanos ingerido (fuente Usoz 1856 hallada)
+
+- **Fuente hallada tras 6 búsquedas**: la edición española de Usoz de 1856 «La Epístola de san Pablo a los Romanos, i la 1.ª a los Corintios» (vol. 1 = Romanos COMPLETO, OCR limpio con ortografía original: grazia, justizia, Evanjelio, azzeptado). archive.org: `laepistoladesanp01vald` (646 KB texto).
+- **Parser con numerales romanos difusos**: las 152 marcas «CAPITULO <roman>. [n]» traen ruido OCR (Y por V, SI por II, ÍL/llí por III, L por I, 1 por I) — decodificador con tabla + tolerancia de 1 carácter. Números ≤60 = verso de la sección; mayores = página impresa (se descartan). Resultado: **16 capítulos · 152 secciones · 579 párrafos** con distribución coherente (cap 8: 19 secciones, cap 3: 2).
+- **Detalle bueno**: las citas latinas/griegas del propio Valdés («Paulis servus lesu Christi», «Commendo autem vobis») quedan conservadas en el texto — valen como en 1.3.
+- Deploy `f8142135`: valdes/ROM.json 200 (504 KB) — el comentario de Valdés cubre ahora **Romanos y 1 Corintios** en el desplegable.
+- Gasto: $48,61 (1.2 = $0: obra en castellano original).
