@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Biblia de Estudio AION: texto bíblico, lenguas originales, comentarios, diccionarios y notas del lector, conectados alrededor de cada pasaje. Construcción inicial sobre corpus libre verificado.",
   applicationName: "Biblia de Estudio AION",
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Biblia de Estudio AION" },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "AION" },
   icons: { icon: "/icons/icon-192.png", apple: "/icons/icon-192.png" },
 };
 
