@@ -194,6 +194,11 @@ export default function Lector() {
   // color (0 = ninguno, 1-5) y tamaño de letra (-2…+3) de cada cuadro de la mesa
   const [estiloZona, setEstiloZona] = useGuardado<Partial<Record<Zona, { c: number; t: number }>>>("mesa-estilos", {});
   const [estiloAbierto, setEstiloAbierto] = useState<Zona | null>(null);
+  // ARCHIVADOR (móvil < 680 px): las tarjetas son carpetas con lengüeta. Abierto =
+  // la carpeta del frente a la vista; cerrado = sólo asoman las lengüetas abajo.
+  const [hojaAbierta, setHojaAbierta] = useState(true);
+  const [menuHoja, setMenuHoja] = useState<{ id: string; x: number } | null>(null);
+  const ordenHoja = useRef<string[]>([]);
   // menú de recurso de una pestaña: se abre SÓLO con su flecha ▾
   const [menuRecurso, setMenuRecurso] = useState<{ id: string; x: number; y: number } | null>(null);
   // Ajustes: panel lateral con tema, letra, información, fuentes, derechos y apoyo
@@ -226,16 +231,17 @@ export default function Lector() {
   };
   // los menús flotantes (capas, estilo del cuadro) se cierran al tocar fuera
   useEffect(() => {
-    if (!capasAbierto && !estiloAbierto && !menuRecurso) return;
+    if (!capasAbierto && !estiloAbierto && !menuRecurso && !menuHoja) return;
     const fuera = (e: PointerEvent) => {
       const el = e.target as HTMLElement;
       if (!el.closest(".capas-wrap")) setCapasAbierto(false);
       if (!el.closest(".estilo-popo, .pestana-estilo")) setEstiloAbierto(null);
       if (!el.closest(".recurso-popo, .pestana-flecha")) setMenuRecurso(null);
+      if (!el.closest(".hoja-popo, .lengueta-flecha")) setMenuHoja(null);
     };
     document.addEventListener("pointerdown", fuera);
     return () => document.removeEventListener("pointerdown", fuera);
-  }, [capasAbierto, estiloAbierto, menuRecurso]);
+  }, [capasAbierto, estiloAbierto, menuRecurso, menuHoja]);
   const [parDisp, setParDisp] = useGuardado<"lado" | "apilado">("paralelo-disp", "lado");
   const [citasRecientes, setCitasRecientes] = useState<NonNullable<ReturnType<typeof parseCita>>[]>([]);
   const [arrastreTab, setArrastreTab] = useState<{ id: string; x: number; y: number; sobre: Zona | null } | null>(null);
@@ -1083,19 +1089,13 @@ export default function Lector() {
         onPointerDown: undefined,
       };
     }
-    const i = pila.indexOf(id);
-    const prof = i === -1 ? 0 : pila.length - 1 - i;
-    const enPila = pila.length > 1;
+    // móvil: carpeta del archivador; sólo la del frente se ve, las demás esperan
+    // detrás con su lengüeta (la «baraja» anterior queda sustituida)
+    const alFrente = pila[pila.length - 1] === id;
     return {
-      className:
-        `lex-panel prof-${Math.min(prof, 3)}` +
-        (enPila ? " apilado" : "") +
-        (enPila && prof > 0 ? " pestana" : ""),
-      style: { zIndex: 60 + Math.max(0, i) },
-      // pulsar una pestaña la trae al frente; la que estaba se agacha
-      onPointerDown: () => {
-        if (prof > 0) setPila((p) => [...p.filter((x) => x !== id), id]);
-      },
+      className: `lex-panel movil${alFrente ? " frente" : " detras"}${hojaAbierta ? "" : " guardada"}`,
+      style: { zIndex: alFrente ? 61 : 60 },
+      onPointerDown: undefined,
     };
   };
 
@@ -1146,6 +1146,7 @@ export default function Lector() {
     if (nPila > nPilaAntes.current) {
       const id = pila[pila.length - 1];
       if (id) setActivo((a) => ({ ...a, [zonaEf(id)]: id }));
+      setHojaAbierta(true);
     }
     nPilaAntes.current = nPila;
   }, [nPila]);
@@ -1318,18 +1319,89 @@ export default function Lector() {
       if (ajustes) return setAjustes(ajustes === "menu" ? null : "menu");
       if (vistazo) return setVistazo(null);
       const id = pila[pila.length - 1];
-      const cerrar: Record<string, () => void> = {
-        dic: () => setDicPanel(false), busqueda: () => setBusPanel(false), griego: () => setGrPal(null),
-        lex: () => setLex(null), refs: () => setPanelRefs(null), cita: () => setPanelCita(null),
-        termino: () => setPanelTermino(null), fuentes: () => setPanelFuentes(false),
-        notas: () => setPanelNotas(false), info: () => setPanelInfo(false), tema: () => setPanelTema(null),
-      };
-      if (id && cerrar[id]) cerrar[id]();
+      if (id) cerrarPanel(id);
     } else if (ancho && /^[1-9]$/.test(e.key)) {
       const ids = [...(comentario ? ["com"] : []), ...pila];
       const id = ids[Number(e.key) - 1];
       if (id) traerAlFrente(id);
     }
+  };
+
+  const cerrarPanel = (id: string) => {
+    const cerrar: Record<string, () => void> = {
+      dic: () => setDicPanel(false), busqueda: () => setBusPanel(false), griego: () => setGrPal(null),
+      lex: () => setLex(null), refs: () => setPanelRefs(null), cita: () => setPanelCita(null),
+      termino: () => setPanelTermino(null), fuentes: () => setPanelFuentes(false),
+      notas: () => setPanelNotas(false), info: () => setPanelInfo(false), tema: () => setPanelTema(null),
+    };
+    cerrar[id]?.();
+  };
+  // móvil: como mucho 5 carpetas; al abrir la sexta se cierra la más antigua
+  useEffect(() => {
+    if (!ancho && pila.length > 5) cerrarPanel(ordenHoja.current.find((x) => pila.includes(x)) ?? pila[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pila, ancho]);
+  // orden ESTABLE de las lengüetas (el de apertura): elegir una no las reordena
+  ordenHoja.current = [...ordenHoja.current.filter((x) => pila.includes(x)), ...pila.filter((x) => !ordenHoja.current.includes(x))];
+
+  /**
+   * Gesto del archivador sobre la tira de lengüetas:
+   *  · de lado → la tira se desplaza (nativo, `touch-action: pan-x`); la carpeta NO cambia
+   *  · toque en una lengüeta → esa carpeta al frente (y el archivador se abre)
+   *  · hacia abajo → la carpeta y la tira siguen al dedo; al soltar se guarda si bajó
+   *    más de un tercio o fue un gesto rápido. Hacia arriba (cerrado) → se abre.
+   * Durante el arrastre sólo se tocan variables CSS: nada de renders por píxel.
+   */
+  const iniciarHoja = (e: React.PointerEvent) => {
+    const el = e.target as HTMLElement;
+    if (el.closest(".lengueta-flecha, .lengueta-x")) return;
+    const html = document.documentElement;
+    const x0 = e.clientX;
+    const y0 = e.clientY;
+    const t0 = performance.now();
+    const H = window.innerHeight * 0.6;
+    let modo: "?" | "v" | "h" = "?";
+    let dy = 0;
+    const mover = (ev: PointerEvent) => {
+      const dx = ev.clientX - x0;
+      const d = ev.clientY - y0;
+      if (modo === "?") {
+        if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(d)) modo = "h";
+        else if (Math.abs(d) > 8) {
+          modo = "v";
+          html.classList.add("hoja-arrastrando");
+        }
+      }
+      if (modo !== "v") return;
+      dy = hojaAbierta ? Math.max(0, Math.min(H, d)) : Math.max(-H, Math.min(0, d));
+      html.style.setProperty("--hoja-dy", `${dy}px`);
+      const frac = hojaAbierta ? dy / H : 1 + dy / H;
+      html.style.setProperty("--hoja-op", String(1 - frac * 0.65));
+    };
+    const soltar = (ev: PointerEvent) => {
+      window.removeEventListener("pointermove", mover);
+      window.removeEventListener("pointerup", soltar);
+      window.removeEventListener("pointercancel", soltar);
+      html.classList.remove("hoja-arrastrando");
+      html.style.setProperty("--hoja-dy", "0px");
+      html.style.removeProperty("--hoja-op");
+      if (modo === "v") {
+        const vel = dy / Math.max(1, performance.now() - t0);
+        if (hojaAbierta && (dy > H / 3 || vel > 0.6)) setHojaAbierta(false);
+        else if (!hojaAbierta && (-dy > H / 5 || vel < -0.6)) setHojaAbierta(true);
+        return;
+      }
+      if (modo === "h") return; // sólo se desplazó la tira
+      const leng = (ev.target as HTMLElement).closest<HTMLElement>(".lengueta") ?? el.closest<HTMLElement>(".lengueta");
+      const id = leng?.dataset.id;
+      if (id) {
+        setPila((p) => [...p.filter((x) => x !== id), id]);
+        setHojaAbierta(true);
+      } else if (!hojaAbierta) setHojaAbierta(true);
+    };
+    window.addEventListener("pointermove", mover);
+    window.addEventListener("pointerup", soltar);
+    window.addEventListener("pointercancel", soltar);
   };
 
   const traerAlFrente = (id: string) => {
@@ -1972,7 +2044,7 @@ export default function Lector() {
         style={{ "--estudio-w": `${anchoEstudio}px`, ...(ancho ? { marginRight: mesa.mr, paddingBottom: mesa.pb } : {}), ...(anchoNav ? { marginLeft: navW } : {}) } as React.CSSProperties}
       >
         <div
-          className={`lector-columna${pila.length && !ancho ? ` con-panel pila-${Math.min(pila.length, 2)}` : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
+          className={`lector-columna${pila.length && !ancho ? (hojaAbierta ? " con-hoja" : " con-hoja-cerrada") : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
           ref={columna}
         >
           <div className="lector-titulo">
@@ -2309,6 +2381,60 @@ export default function Lector() {
               );
             })}
         </nav>
+      )}
+
+      {!ancho && pila.length > 0 && (
+        <div className={`archivador${hojaAbierta ? " abierto" : ""}`} aria-label="Carpetas abiertas">
+          <div className="archivador-tira" onPointerDown={iniciarHoja} role="tablist">
+            {ordenHoja.current.filter((id) => pila.includes(id)).map((id) => {
+              const frente = pila[pila.length - 1] === id;
+              return (
+                <div key={id} data-id={id} role="tab" aria-selected={frente} className={`lengueta${frente ? " frente" : ""}`}>
+                  <span className="lengueta-nombre">{ETIQUETA_PANEL[id] ?? id}</span>
+                  <button
+                    className={`lengueta-flecha${menuHoja?.id === id ? " activa" : ""}`}
+                    aria-label="Cambiar por otro recurso"
+                    onClick={(ev) => {
+                      const r = ev.currentTarget.getBoundingClientRect();
+                      setMenuHoja(menuHoja?.id === id ? null : { id, x: r.left });
+                    }}
+                  >
+                    ▾
+                  </button>
+                  <button className="lengueta-x" aria-label={`Cerrar ${ETIQUETA_PANEL[id] ?? id}`} onClick={() => cerrarPanel(id)}>
+                    ✕
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          {menuHoja && (
+            <div className="hoja-popo" role="menu" style={{ left: Math.max(8, Math.min(menuHoja.x - 20, ventW - 228)) }}>
+              <div className="hoja-popo-t">Cambiar por…</div>
+              {([
+                ["dic", "Diccionario", () => abrirDic()],
+                ["busqueda", "Buscar", () => abrirBusqueda()],
+                ["notas", "Mis notas", () => setPanelNotas(true)],
+              ] as const)
+                .filter(([id]) => id !== menuHoja.id)
+                .map(([id, nombre, abrir]) => (
+                  <button
+                    key={id}
+                    role="menuitem"
+                    className="recurso-op"
+                    onClick={() => {
+                      const actual = menuHoja.id;
+                      abrir();
+                      if (actual !== id) cerrarPanel(actual);
+                      setMenuHoja(null);
+                    }}
+                  >
+                    <span>{nombre}</span>
+                  </button>
+                ))}
+            </div>
+          )}
+        </div>
       )}
 
       {vistazo && (

@@ -6581,3 +6581,130 @@ button.rec-original[aria-pressed="true"]::before {
   .com-strip-fila .badge-revision { font-size: 0; padding: 2px 6px; }
   .com-strip-fila .badge-revision::after { content: "sin rev."; font-size: 9px; letter-spacing: 0.03em; }
 }
+
+/* ═══ ARCHIVADOR (móvil < 680 px): carpetas con lengüeta ═══
+   Abierto: la carpeta del frente ocupa el 60 % inferior y su lengüeta se funde con
+   su borde; las demás lengüetas asoman al lado, más oscuras (están «detrás»).
+   Cerrado: todo baja hasta que sólo asoman las lengüetas. El dedo mueve carpeta y
+   tira juntas vía --hoja-dy (sólo transform: fluido); al soltar, transición suave. */
+@media (max-width: 679px) {
+  :root { --hoja-h: 60vh; }
+  @supports (height: 1dvh) { :root { --hoja-h: 60dvh; } }
+
+  .lex-panel.movil {
+    inset-inline: 0;
+    bottom: 0;
+    height: var(--hoja-h);
+    max-height: none;
+    border-top: 1.5px solid var(--accent);
+    border-radius: 0;
+    box-shadow: 0 -10px 30px -12px rgba(0, 0, 0, 0.45);
+    transform: translate3d(0, var(--hoja-dy, 0px), 0);
+    transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.29s ease;
+    animation: hoja-entra 0.32s ease;
+    overscroll-behavior: contain;
+  }
+  .lex-panel.movil.guardada { transform: translate3d(0, calc(100% + var(--hoja-dy, 0px)), 0); }
+  .lex-panel.movil.detras { opacity: 0; pointer-events: none; }
+  .lex-panel.movil.frente > .lex-panel-inner { opacity: var(--hoja-op, 1); transition: opacity 0.2s ease; }
+  @keyframes hoja-entra { from { opacity: 0; } to { opacity: 1; } }
+
+  .archivador {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--hoja-h);
+    z-index: 62;
+    transform: translate3d(0, var(--hoja-dy, 0px), 0);
+    transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    pointer-events: none;
+  }
+  .archivador:not(.abierto) {
+    transform: translate3d(0, calc(var(--hoja-h) + var(--hoja-dy, 0px)), 0);
+  }
+  html.hoja-arrastrando .archivador,
+  html.hoja-arrastrando .lex-panel.movil,
+  html.hoja-arrastrando .lex-panel.movil > .lex-panel-inner { transition: none !important; }
+  html.hoja-arrastrando { user-select: none; }
+
+  .archivador-tira {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 44px;
+    padding: 0 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
+  }
+  .archivador-tira::-webkit-scrollbar { display: none; }
+  .archivador:not(.abierto) .archivador-tira { padding-bottom: env(safe-area-inset-bottom, 0); height: calc(44px + env(safe-area-inset-bottom, 0)); }
+
+  .lengueta {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    height: 34px;
+    padding: 0 3px 0 13px;
+    margin-bottom: -1.5px;
+    border: 1.5px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+    border-bottom: 0;
+    border-radius: 11px 11px 0 0;
+    background: color-mix(in srgb, var(--bg-elev) 72%, var(--bg));
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 13px;
+    transform: translateY(3px);
+    transition: transform 0.29s cubic-bezier(0.32, 0.72, 0, 1), background 0.25s ease, color 0.25s ease, height 0.25s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .lengueta.frente {
+    height: 38px;
+    transform: none;
+    background: var(--bg-elev);
+    border-color: var(--accent);
+    color: var(--ink);
+    box-shadow: 0 -6px 14px -8px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+  .archivador:not(.abierto) .lengueta.frente { border-color: color-mix(in srgb, var(--accent) 70%, var(--line)); }
+  .lengueta-nombre { white-space: nowrap; max-width: 130px; overflow: hidden; text-overflow: ellipsis; margin-right: 3px; }
+  .lengueta-flecha, .lengueta-x {
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: inherit;
+    opacity: 0.7;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.23s ease;
+  }
+  .lengueta-flecha.activa { transform: rotate(180deg); opacity: 1; }
+  .lengueta-flecha:active, .lengueta-x:active { background: var(--hover); opacity: 1; }
+  .hoja-popo {
+    pointer-events: auto;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    min-width: 210px;
+    padding: 6px;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    animation: vistazo-entra 0.16s ease;
+  }
+  .hoja-popo-t { font-family: var(--sans); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 6px 10px 4px; }
+
+  .lector-columna.con-hoja { padding-bottom: calc(var(--hoja-h) + 70px); }
+  .lector-columna.con-hoja-cerrada { padding-bottom: 90px; }
+}
+@media (max-width: 679px) and (prefers-reduced-motion: reduce) {
+  .lex-panel.movil, .archivador, .lengueta { transition: none !important; animation: none !important; }
+}
