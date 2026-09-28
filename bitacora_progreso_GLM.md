@@ -1258,3 +1258,11 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 2. **FASE 1.3 (Calvino, Institución) BLOQUEADA POR FUENTE**: la única transcripción ES en archive.org es la **edición revisada 1967/1999** — la regla de la hoja («sólo traducciones antiguas; las revisiones modernas pueden tener derechos») impide ingerirla sin permiso. El escaneo del original 1597 es solo imágenes. Vías abiertas documentadas en la hoja (permiso del editor / OCR propio del 1597 / Cervantes). **Decisión para el usuario si quiere desbloquearla por la vía del permiso.**
 3. **FASE 1.4 (Rand) EN CURSO**: OCR descargado (2,4 MB, American Tract Society "For General Use"). Formato: entradas Title Case, OCR con espacios dobles y titulares ruidosos («A' BEL,»). Falta el turno de limpieza + ingesta + traducción motor (~$2). Marcada [~].
 4. **Gasto: $48,61 de $75.** Comprometido el registro de 1.1/1.2/P.1/P.2 en la hoja y la BP.
+
+## 2026-09-28 — Mesa v2 (Claude) — NOTA: estos cambios quedaron dentro del commit 419f511 de GLM
+- **Pestaña única** por cuadro de comentario: asidero ⠿ (arrastrar) + desplegable del recurso + ✕ (extras). Sin nombres repetidos dentro del cuadro.
+- **«＋» por zona**: añade un comentario (máx. 3 por zona; `mesa-coms`) o una herramienta (Mis notas, Diccionario, Buscar) directo a esa zona.
+- **Cuatro zonas** en ≥1280: der-arriba, der-abajo, abajo (izq.) y abajo-der, con reparto ajustable.
+- **Estilo por cuadro** («Aa»): 5 tonos por tema (`--tinte-1…5`) que no tocan la letra, y letra −2…+3 (zoom 0,8–1,4) (`mesa-estilos`).
+- «Diccionario en el texto» con casilla visible. La barra de libros plegada reserva su hueco. Transiciones: geometría 0,24 s; cambio de recurso 0,18 s (opacidad/transform).
+- **GLM: al hacer commit, añade sólo tus archivos** (`git add <rutas>`), no `git add -A`: así cada cambio queda con su propio mensaje.
