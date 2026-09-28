@@ -1180,3 +1180,16 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 
 ## 2026-09-28 — NUEVA PRIORIDAD para GLM
 Arriba de `hoja_de_ruta_recursos_GLM.md` hay dos tareas **⚑ PRIORIDAD** que van antes de seguir con la fase en curso: **P.1** barrido profundo de citas bíblicas en todas las obras (medir, corregir por frecuencia, agrupar como en cb6e839, casos de prueba, meta ≥98 %) y **P.2** Easton como diccionario de verdad (términos del texto enlazados a su entrada + renombrar la vista actual).
+
+### 2026-09-28 · GLM (vigilante) — FASE 1.2 (1/2): Valdés 1 Corintios integrado como comentarista nativo ES · auditoría Jev cerrada
+
+1. **AUDITORÍA JEV CENSAL COMPLETA** (Henry): 27.938 unidades auditadas — 25.592 aprobadas (91,7%) · 2.327 marcadas para revisión humana (fallo 1.259 · adición 896 · fidelidad 602 · omisión 485). Coste $2,09 → la consola de revisión (paso 4) tiene su cola ordenada de peor a mejor.
+2. **Valdés 1CO**: fuente archive.org `commentariodecl00valdgoog` (Usoz 1895, OCR); 16 capítulos con fronteras verificadas POR CONTENIDO (las marcas OCR traen errores: 0→9, 18→13, 16→15; los capítulos 5/7/11/15/16 se localizaron por palabras de su apertura — «fornicación», «me habéis escrito… no tocar á mujer», «Sed mis imitadores», «Notifíceos, hermanos», «Cuanto á la colecta»); 537 párrafos; deploy `af6035c8`. **Insignia ES fija** para obras nativas (sin conmutador ES/EN ni badge EN) + título «comentario en castellano original del autor». Verificado en el lector: 1CO 1 abre con «Pablo, llamado apóstol de Jesucristo…».
+3. **ROMANS (1.2, segunda mitad) PENDIENTE**: archive.org solo tiene la trad. inglesa 1883; buscar Usoz en español en Google Books/HathiTrust/Cervantes. **Polish pendiente**: artefactos OCR residuales («volun-tad», «eLhermano») — pase de limpieza fina o revisión humana.
+4. **Gotchas del turno**: el build tocó el EBUSY de `out/` (proceso retenido) — la vía `DIST_DIR=salida` de la hoja FUNCIONA (next.config ya la trae); el IAB cierra paneles entre evaluates largos (>~2 KB: «missing )») — minificar las funciones de prueba.
+- Gasto: **$48,61 de $75** (la auditoría Jev consumió $2,09).
+
+## 2026-09-28 — Identidad visual: logo «Siete luces» + intro (Claude)
+- Logo: siete luces alrededor de una llama. Fuente única `07. App/app/components/LogoAion.tsx` (llama con corazón ≥40 px; sólida en pequeño). Íconos PWA/iOS/favicon generados con `node scripts/genera-iconos.mjs` (sharp). Cabecera con el logo. Bajo el ícono instalado: «AION» (Android `short_name`, iOS `appleWebApp.title`).
+- Intro (`components/Intro.tsx` + estilos `.intro-*` en globals.css): llama que se enciende, 7 luces que llegan tenues y toman color, nombre completo debajo; ~4 s, una vez por sesión, tocar la salta, respeta reduced-motion.
+- Sonido `public/intro/aion.wav` (215 KB): compuesto con `scripts/intro-sonido.py` (mido + FluidSynth + GeneralUser GS, del motor de partituras de 1-Altrium): pad cálido en Re, celesta pentatónica por cada luz, coro suave al aparecer el nombre. Los navegadores sólo permiten sonido tras un gesto del usuario: si lo bloquean, la intro es silenciosa.

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Tema from "./Tema";
+import LogoAion from "./LogoAion";
 import { t, type Locale } from "@/lib/i18n";
 
 /**
@@ -24,7 +25,7 @@ export default function Cabecera({
     <header className="cabecera">
       <div className="cabecera-inner">
         <Link href={`/${locale}`} className="marca">
-          <span className="punto" />
+          <LogoAion size={26} className="marca-logo" titulo="" />
           {tr.marcaProvisional}
         </Link>
         <div className="lector-acciones">
