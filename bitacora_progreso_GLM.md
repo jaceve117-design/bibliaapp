@@ -1307,3 +1307,10 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 - **FASE 1 COMPLETA**: Oso 1569 ✓ · Valdés ROM+1CO ✓ · Calvino-Valera ⚠ bloqueada por licencia (documentada, requiere decisión del usuario: permiso del editor de la revisión 1967 u OCR propio del escaneo 1597) · Rand ✓.
 - **SIGUIENTE: FASE 2** (≈0-1 USD): 2.1 Theographic (CC BY-SA), 2.2 OpenBible geo+refs (CC BY), 2.3 MACULA (CC BY 4.0) → ⛔PUERTA A.
 - Gasto: **$49,48 de $75**.
+
+## 2026-09-28 — Móvil: archivador de carpetas (Claude)
+Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta** (nombre · ▾ · ✕), máx. **5** (al abrir la 6.ª se cierra la más antigua).
+- Tira de lengüetas en orden de apertura (estable): deslizar de lado sólo mueve la tira (`touch-action: pan-x`); **tocar** una lengüeta la trae al frente.
+- **Deslizar hacia abajo** desde la tira: carpeta y tira siguen al dedo (`--hoja-dy`, sólo transform), el contenido se atenúa (`--hoja-op`); al soltar se guarda si bajó > 1/3 o fue rápido. Guardado = sólo asoman las lengüetas; deslizar hacia arriba o tocar una lengüeta la saca. Deslizar nunca cierra: sólo ✕.
+- ▾ = «Cambiar por…» (Diccionario, Buscar, Mis notas): abre ese recurso y cierra el actual.
+- Código: `propsPanel` rama móvil (`lex-panel movil frente|detras|guardada`), `iniciarHoja`, `cerrarPanel` (compartido con Esc), CSS «ARCHIVADOR».
