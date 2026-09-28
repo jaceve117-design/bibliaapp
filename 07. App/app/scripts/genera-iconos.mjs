@@ -4,7 +4,7 @@
  * Uso: node scripts/genera-iconos.mjs
  *
  * - aion.svg              favicon vectorial (llama sólida: a 16 px el corazón no se ve)
- * - icon-192/512.png      ícono de app: fondo oscuro, logo completo (llama con corazón)
+ * - icon-192/512.png      «any», sin fondo: pantalla de arranque de Android (sobre #0b0906)
  * - icon-*-maskable.png   Android adaptable: logo dentro de la zona segura (80 %)
  * - apple-touch-icon.png  iPhone, 180 px (iOS redondea las esquinas solo)
  * - app/favicon.ico       32 px, llama sólida
@@ -46,8 +46,10 @@ fs.writeFileSync(
   svg({ tam: 64, escala: 0.8, corazon: false, esquinas: 14 })
 );
 console.log('✓ aion.svg');
-await png('icon-192.png', { tam: 192, escala: 0.66 });
-await png('icon-512.png', { tam: 512, escala: 0.66 });
+// «any» SIN fondo: Android lo pinta en la pantalla de arranque sobre background_color
+// (#0b0906), igual que el primer fotograma de la intro. El lanzador usa el maskable.
+await png('icon-192.png', { tam: 192, escala: 0.9, fondo: false });
+await png('icon-512.png', { tam: 512, escala: 0.9, fondo: false });
 await png('icon-192-maskable.png', { tam: 192, escala: 0.52 });
 await png('icon-512-maskable.png', { tam: 512, escala: 0.52 });
 await png('apple-touch-icon.png', { tam: 180, escala: 0.64 });

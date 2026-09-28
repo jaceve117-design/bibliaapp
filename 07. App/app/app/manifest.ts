@@ -12,7 +12,9 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait-primary",
-    background_color: "#faf8f3",
+    // = fondo de la intro: la pantalla de arranque de Android (ícono «any» sobre
+    // este color) queda idéntica al primer fotograma de components/Intro.tsx
+    background_color: "#0b0906",
     theme_color: "#12100d",
     lang: "es",
     icons: [

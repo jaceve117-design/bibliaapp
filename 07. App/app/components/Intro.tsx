@@ -4,6 +4,11 @@
  * Intro de AION: en la oscuridad se enciende la llama, llegan las siete luces
  * desde lejos —tenues— y toman color al llegar; debajo aparece el nombre.
  *
+ * Empieza DESDE el logo encendido y centrado, tal como lo deja la pantalla de
+ * arranque de Android (ícono «any» sobre background_color #0b0906, ver
+ * app/manifest.ts): así no se nota el paso. Primero las luces se dispersan y la
+ * llama baja a brasa (0–0,4 s); luego todo se vuelve a encender.
+ *
  * Línea de tiempo (sincronizada con public/intro/aion.wav, ver scripts/intro-sonido.py):
  *   0,40 s llama · 1,60 s + i·0,12 cada luz · 2,45 s nombre · 3,50 s fundido · 4,10 s fuera
  *
@@ -43,7 +48,7 @@ export default function Intro() {
   return (
     <div className="intro" onClick={() => setVivo(false)} aria-hidden="true">
       <div className="intro-halo" />
-      <svg className="intro-logo" viewBox="-40 -40 80 80" width="150" height="150">
+      <svg className="intro-logo" viewBox="-40 -40 80 80" width="124" height="124">
         {LUCES.map(([x, y], i) => (
           <circle
             key={i}
