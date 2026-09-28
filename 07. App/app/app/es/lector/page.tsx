@@ -6,6 +6,7 @@ import TamTexto from "@/components/TamTexto";
 import { t } from "@/lib/i18n";
 import { parejaDe } from "@/lib/alinea-gr";
 import { morfGntEs } from "@/lib/morfgnt";
+import { buscaEnVarias, cargaIndice, tramosResaltados, type Resultado } from "@/lib/busqueda";
 import { parseCita, segmentarPorCitas } from "@/lib/referencias";
 
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
@@ -631,7 +632,48 @@ export default function Lector() {
   };
 
   // diccionario Easton: índice + definiciones por letra, todo con caché
+  // ── Buscador de pasajes (paso 1: en el dispositivo, sin coste) ──────────────
+  const [busPanel, setBusPanel] = useState(false);
+  const [busQ, setBusQ] = useState("");
+  const [busRes, setBusRes] = useState<Resultado[] | null>(null);
+  const [busEstado, setBusEstado] = useState<"" | "cargando" | "error">("");
+  const busIndices = useRef<Array<{ obra: string; versos: Awaited<ReturnType<typeof cargaIndice>> }> | null>(null);
+
+  useEffect(() => {
+    if (!busPanel) return;
+    const q = busQ.trim();
+    if (q.length < 3) { setBusRes(null); return; }
+    let vivo = true;
+    // espera a que el lector deje de teclear: recorrer 62.000 versos en cada
+    // pulsación sería trabajo tirado
+    const t = setTimeout(async () => {
+      try {
+        if (!busIndices.current) {
+          setBusEstado("cargando");
+          // las dos versiones a la vez: cada una encuentra lo que a la otra se
+          // le escapa («vanidad de vanidades» solo en RV1909; «el Señor es mi
+          // pastor», en VBL)
+          const [rv, vbl] = await Promise.all([cargaIndice("rv1909"), cargaIndice("vbl")]);
+          busIndices.current = [{ obra: "rv1909", versos: rv }, { obra: "vbl", versos: vbl }];
+        }
+        const r = buscaEnVarias(busIndices.current, q, obra === "vbl" ? "vbl" : "rv1909", 40);
+        if (vivo) { setBusRes(r); setBusEstado(""); }
+      } catch {
+        if (vivo) setBusEstado("error");
+      }
+    }, 280);
+    return () => { vivo = false; clearTimeout(t); };
+  }, [busQ, busPanel, obra]);
+
+  const nombreLibro = (o: string) => manifest?.libros.find((l) => l.osis === o)?.nombre ?? o;
+
+  const abrirBusqueda = () => {
+    setDicPanel(false);
+    setBusPanel(true);
+  };
+
   const abrirDic = () => {
+    setBusPanel(false);
     setDicPanel(true);
     if (!dicIndice) {
       fetch("/data/easton/_indice.json")
@@ -775,6 +817,7 @@ export default function Lector() {
    */
   const ABIERTOS: Record<string, boolean> = {
     dic: !!dicPanel,
+    busqueda: !!busPanel,
     griego: !!grPal,
     lex: !!lex,
     refs: !!panelRefs,
@@ -1171,9 +1214,9 @@ export default function Lector() {
             <div className="lector-acciones">
               <button
                 className="icono-btn"
-                onClick={abrirDic}
-                aria-label={tr.diccionario}
-                title={tr.diccionario}
+                onClick={abrirBusqueda}
+                aria-label="Buscar pasajes y diccionario"
+                title="Buscar pasajes y diccionario"
               >
                 ⌕
               </button>
@@ -1465,6 +1508,60 @@ export default function Lector() {
         </div>
       </main>
 
+      {busPanel && (
+        <div {...propsPanel("busqueda")} role="dialog" aria-label="Buscar pasajes">
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>Buscar</span>
+              <button className="icono-btn cerrar" onClick={() => setBusPanel(false)} aria-label={tr.lexCerrar}>
+                ✕
+              </button>
+            </div>
+            <div className="bus-pestanas" role="tablist">
+              <button role="tab" aria-selected className="bus-pestana activa">Pasajes</button>
+              <button role="tab" aria-selected={false} className="bus-pestana" onClick={abrirDic}>Diccionario</button>
+            </div>
+            <input
+              className="sel bus-campo"
+              type="search"
+              autoFocus
+              value={busQ}
+              onChange={(e) => setBusQ(e.target.value)}
+              placeholder="Escribe lo que recuerdes del versículo…"
+              aria-label="Buscar un pasaje por sus palabras"
+            />
+            {busEstado === "cargando" && <div className="lex-meta">Preparando la búsqueda (solo la primera vez)…</div>}
+            {busEstado === "error" && <div className="lex-meta">No se pudo cargar el índice de búsqueda.</div>}
+            {busQ.trim().length > 0 && busQ.trim().length < 3 && <div className="lex-meta">Escribe al menos tres letras.</div>}
+            {busRes && busRes.length === 0 && busEstado === "" && (
+              <div className="lex-meta">Sin resultados. Prueba con menos palabras o con otras que recuerdes.</div>
+            )}
+            {busRes && busRes.length > 0 && (
+              <ol className="bus-resultados">
+                {busRes.map((r) => (
+                  <li key={r.ref}>
+                    <button
+                      className="bus-resultado"
+                      onClick={() =>
+                        abrirCita({ etiqueta: `${nombreLibro(r.osis)} ${r.c}:${r.v}`, refs: [{ osis: r.osis, c: r.c, v: r.v }] })
+                      }
+                    >
+                      <span className="bus-ref">{nombreLibro(r.osis)} {r.c}:{r.v}</span>
+                      <span className="bus-texto">
+                        {tramosResaltados(r.texto, busQ).map((tr2, i) =>
+                          tr2.marca ? <mark key={i}>{tr2.t}</mark> : <span key={i}>{tr2.t}</span>
+                        )}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <div className="lex-fuente">Busca en RV1909 y VBL a la vez, en tu dispositivo · sin conexión tras la primera vez</div>
+          </div>
+        </div>
+      )}
+
       {dicPanel && (
         <div {...propsPanel("dic")} role="dialog" aria-label={tr.diccionario}>
           <div className="lex-panel-inner">
@@ -1483,6 +1580,10 @@ export default function Lector() {
               >
                 ✕
               </button>
+            </div>
+            <div className="bus-pestanas" role="tablist">
+              <button role="tab" aria-selected={false} className="bus-pestana" onClick={abrirBusqueda}>Pasajes</button>
+              <button role="tab" aria-selected className="bus-pestana activa">Diccionario</button>
             </div>
             {dicEntrada ? (
               <>

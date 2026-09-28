@@ -18,3 +18,6 @@ Thumbs.db
 
 # Build de export estático (regenerable con npm run build)
 07. App/app/out/
+
+# Salida alternativa del build (DIST_DIR=salida) cuando `out` queda retenida
+07. App/app/salida/
