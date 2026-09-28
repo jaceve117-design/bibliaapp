@@ -64,10 +64,13 @@ const COMENTARIOS = [
   { id: "henry", etiqueta: "Matthew Henry", anio: "1706", traducido: true },
   { id: "jfb", etiqueta: "Jamieson, Fausset y Brown", anio: "1871", traducido: false },
   { id: "barnes", etiqueta: "Albert Barnes", anio: "1872", traducido: false },
+  // Easton es diccionario: aquí se ve por versículo mediante su índice inverso
+  // (scripts/genera-easton-pasajes.mjs) — las entradas que citan cada verso
+  { id: "easton", etiqueta: "Diccionario Easton", anio: "1897", traducido: false },
 ] as const;
 type ComFuente = (typeof COMENTARIOS)[number]["id"];
 // obras de comentario EN servidas de /data/{ruta}/{OSIS}.json (misma forma de JSON para todas)
-const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes" };
+const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes", easton: "easton-pasajes" };
 const OSIS_INICIAL = "JHN";
 const CAP_INICIAL = 1;
 const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
@@ -2270,7 +2273,9 @@ export default function Lector() {
                       {henryEs ? tr.estadoNota : tr.comentarioEN}
                     </>
                   ) : (
-                    comFuente === "barnes" ? (
+                    comFuente === "easton" ? (
+                      <>M. G. Easton, Illustrated Bible Dictionary (1897) · Dominio público · entradas del diccionario que citan cada versículo (la oración pertinente; la entrada completa, en el diccionario){comEsData ? " · traducción ES automática (sin revisar)" : ""}</>
+                    ) : comFuente === "barnes" ? (
                       <>Albert Barnes, Notes on the New / Old Testament (1832–1872) · Dominio público · texto original EN{comEsData ? " · traducción ES automática (sin revisar)" : " (traducción ES en cola)"}</>
                     ) : (
                       <>Jamieson, Fausset and Brown Commentary (1871) · Dominio público · texto EN{comEsData ? " · traducción ES automática (sin revisar)" : " (traducción ES en cola)"}</>

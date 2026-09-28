@@ -1164,3 +1164,16 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 - **Verificado end-to-end en navegador** (deploy `c90b854a`): «sangre de Cristo» en Barnes → 30 resultados («Barnes · Hebreos 9:22», «Colosenses 1:14»…) con 63 marcas de resaltado; clic → tarjeta «Hebreos 9» + Barnes en la barra. Gotcha de transporte del IAB: los evaluate largos (>~2 KB) fallan con «missing )» — minificar.
 - **Falta para cerrar la tarea previa**: auditoría Jev de Henry (secuencial, ~2 USD, horas) — lanzarla en un turno con el gateway libre.
 - Gasto: **$45,65 de $75** (Buscador paso 3 = $0: índices locales, sin traducción).
+
+### 2026-09-28 · GLM (vigilante) — FASE 1.1 HECHA: Biblia del Oso 1569 en el selector (cuarta versión bíblica)
+
+- **Fuente real**: CrossWire NO publica SpaSEV.zip (404 en rawzip/strict/common/beta). Vía alternativa verificada: **getbible.net v2 `sse`** («Sagradas Escrituras (1569)»), edición con ortografía actualizada → nombre registrado «Biblia del Oso 1569 (ortografía actualizada)» (regla 1.1). Crudo en `05. Datos/corpus_crudo/oso1569/`.
+- **Portón**: 66 libros · **31.098 versos · 0 incidentes** de capítulos vs RV1909. **Sin deuterocanónicos**: la edición no los trae (anotado en el manifiesto — los intercalados del original de 1569 quedan fuera de esta edición electrónica).
+- **Lector**: cuarta pestaña «Oso 1569» en el selector (comparte el array OBRAS con el desplegable de las tarjetas de cita — hereda el selector de versión automáticamente). Verificado en navegador: Jn 1:1 «En el principio ya era el Verbo» (texto 1569 propio, ≠ RV1909); Jn 3:16 «que haya dado a su Hijo unigénito».
+- **Buscador**: índice `busqueda/oso1569.json` (4,08 MB) regenerado — los resultados de Pasajes ahora incluyen el Oso. llms.txt actualizado. Auditoría Jev de Henry corre en segundo plano (no interfiere).
+- Gasto: $45,65 (esta tarea: $0 — solo ingesta, sin traducción).
+
+## 2026-09-28 — Easton «en vivo» en el lector + fix de citas (Claude)
+- Easton aparece ahora en el selector de comentarios («Diccionario Easton · 1897»): índice inverso versículo → entradas que lo citan, con la oración pertinente. Generador: `07. App/app/scripts/genera-easton-pasajes.mjs` (salida `public/data/easton-pasajes/` y `easton-pasajes-es/`; ~25.500 citas, 66 libros). **Regenerarlo si cambia `easton-es`.** Resuelve citas elípticas («(Ex 6:20) … (2:1, 4)»).
+- **Fix en `lib/referencias.ts` (afecta a TODOS los comentarios):** «Lc 24:48; 1 Ts 2:5» se leía como Lc 24:48 + Lc 24:1 y se perdía 1 Ts. Ahora un «1–3» seguido de nombre de libro no se toma como verso extra.
+- Pendiente menor: «2 Sam 7:12» (número + espacio + «Sam») no enlaza; falta la clave con espacio en MAPA.

@@ -59,9 +59,12 @@ const MAPA: Record<string, string> = {
 
 const CLAVES = Object.keys(MAPA).sort((a, b) => b.length - a.length).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
+// Cada verso extra lleva un lookahead: «Lc 24:48; 1 Ts 2:5» NO es Lc 24:48 y
+// 24:1 — ese «1» es el número del libro siguiente. Sin él se inventaba una
+// cita y se perdía la verdadera (medido en Easton: «Jn 7:35; 1P 1:1»).
 /** Cita: "Jn 1:1-5", "1Co 1:6,2:1", "Mal 3:1", "Isa 40:12,28"… (con o sin punto, con o sin espacio). */
 export const RE_CITA = new RegExp(
-  '\\b([1-3]\\s?)?(' + CLAVES.join('|') + ')\\.?\\s?(\\d{1,3})(?::(\\d{1,3}))?((?:[,;]\\s?\\d{1,3}(?::\\d{1,3})?)*)(?:[-–—](\\d{1,3}))?',
+  '\\b([1-3]\\s?)?(' + CLAVES.join('|') + ')\\.?\\s?(\\d{1,3})(?::(\\d{1,3}))?((?:[,;]\\s?(?![1-3]\\s?[A-ZÁÉÍÓÚ])\\d{1,3}(?::\\d{1,3})?)*)(?:[-–—](\\d{1,3}))?',
   'g'
 );
 
