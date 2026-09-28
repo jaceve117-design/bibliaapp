@@ -43,6 +43,10 @@ const PERMITIDOS = [
   /solid hoof that wears the ground/, /Dissertation on the most ancient/, /The Pictorial Bible/,
   /The [Ll]and and Book/, /Foster's Life and Correspondence/, /Decline and Fall/, /destinar, appoint/,
   /Nature and Moral Influence of Heathenism/, /Rome in the Nineteenth Century/,
+  // Henry: frases latinas/griegas de autores clásicos con su traducción inglesa al lado
+  // (estilo del autor, verificado una a una el 2026-09-27)
+  /ad leones—Away with Christians/, /Nip the mischief in the bud/, /and it encircles all/,
+  /before I am entreated/, /feelings of a physician/, /Away to thy cell/, /to mind the same thing/,
 ];
 // fuentes del impreso que vienen truncadas en el EN original (el ES las refleja fielmente;
 // precedente: JN 18.2 idx20 de Henry). Formato: OSIS.cap.verso.párrafo
