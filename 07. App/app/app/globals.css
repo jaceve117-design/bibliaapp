@@ -5692,3 +5692,121 @@ html.sin-intro .intro { display: none; }
   .par-otra[lang="el"] { font-size: 1.04em; }
   .par-falta { color: var(--muted); }
 }
+
+/* ═══ Navegación lateral (≥ 1280 px) ═══
+   Libros por grupo del canon y la cuadrícula de capítulos del libro abierto.
+   Se pliega a una tira con « / » y la app lo recuerda. */
+@media (min-width: 1280px) {
+  main { transition: margin-right 0.42s cubic-bezier(0.32, 0.72, 0, 1), margin-left 0.42s cubic-bezier(0.32, 0.72, 0, 1); }
+  main.con-nav { margin-left: 210px; }
+  .nav-lateral {
+    position: fixed;
+    top: var(--cab-h, 120px);
+    left: 0;
+    bottom: 0;
+    width: 210px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 44px 10px 40px 14px;
+    border-right: 1px solid var(--line);
+    background: var(--bg);
+    z-index: 30;
+    font-family: var(--sans);
+    scrollbar-width: thin;
+    transition: width 0.4s cubic-bezier(0.32, 0.72, 0, 1), padding 0.4s ease;
+    animation: nav-entra 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .nav-lateral.plegada { width: 40px; padding: 44px 0 0; overflow: hidden; }
+  @keyframes nav-entra { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .nav-plegar {
+    position: absolute;
+    top: 8px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--bg-elev);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.25s ease, border-color 0.25s ease;
+  }
+  .nav-plegar:hover { color: var(--ink); border-color: var(--accent); }
+  .nav-grupo { margin-bottom: 14px; }
+  .nav-grupo-t {
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 4px 6px;
+  }
+  .nav-libro {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    font-size: 13.5px;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: var(--ink-soft, var(--ink));
+    cursor: pointer;
+    transition: background 0.22s ease, color 0.22s ease;
+  }
+  .nav-libro:hover { background: var(--hover); }
+  .nav-libro.activo { color: var(--accent-strong, var(--accent)); font-weight: 600; }
+  .nav-caps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 3px;
+    padding: 4px 4px 8px 8px;
+    animation: pestana-entra 0.3s ease;
+  }
+  .nav-cap {
+    font: inherit;
+    font-size: 12px;
+    padding: 4px 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+  }
+  .nav-cap:hover { background: var(--hover); color: var(--ink); }
+  .nav-cap.activo {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+}
+
+/* ═══ Vistazo: el versículo citado, al pasar el ratón (sólo con ratón) ═══ */
+.vistazo {
+  position: fixed;
+  z-index: 90;
+  width: 360px;
+  max-width: calc(100vw - 16px);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px 13px;
+  animation: vistazo-entra 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.vistazo.arriba { transform: translateY(-100%); animation-name: vistazo-entra-arriba; }
+.vistazo-ref {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-strong, var(--accent));
+  margin-bottom: 5px;
+}
+.vistazo-texto { font-family: var(--serif); font-size: 15px; line-height: 1.6; color: var(--ink); max-height: 220px; overflow: auto; }
+@keyframes vistazo-entra { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes vistazo-entra-arriba { from { opacity: 0; transform: translateY(calc(-100% + 4px)); } to { opacity: 1; transform: translateY(-100%); } }
+@media (prefers-reduced-motion: reduce) {
+  .vistazo, .nav-lateral, .nav-caps { animation: none !important; transition: none !important; }
+}

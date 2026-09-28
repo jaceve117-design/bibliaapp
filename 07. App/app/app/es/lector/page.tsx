@@ -9,7 +9,7 @@ import { morfGntEs } from "@/lib/morfgnt";
 import { buscaEnVarias, cargaIndice, ordenaConIA, tramosResaltados, type Resultado } from "@/lib/busqueda";
 import { cargaComentarios, buscaComentarios, contexto } from "@/lib/busqueda";
 import { parseCita, segmentarPorCitas } from "@/lib/referencias";
-import { ANCHO_ESTUDIO, useAlturaCabecera, useAnchoEstudio, useMedia } from "@/lib/pantalla";
+import { ANCHO_ESTUDIO, ANCHO_NAV, useAlturaCabecera, useAnchoEstudio, useMedia } from "@/lib/pantalla";
 
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
 type Verso = { c: number; v: number; osis: string; t: string };
@@ -75,6 +75,17 @@ type ComFuente = (typeof COMENTARIOS)[number]["id"];
 // obras de comentario EN servidas de /data/{ruta}/{OSIS}.json (misma forma de JSON para todas)
 const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes", easton: "easton-pasajes", valdes: "valdes" };
 const OSIS_INICIAL = "JHN";
+/** Grupos del canon para la navegación lateral (pantallas ≥ 1280 px). */
+const GRUPOS_LIBROS = [
+  { nombre: "Ley", osis: ["GEN", "EXO", "LEV", "NUM", "DEU"] },
+  { nombre: "Históricos", osis: ["JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST"] },
+  { nombre: "Poéticos", osis: ["JOB", "PSA", "PRO", "ECC", "SNG"] },
+  { nombre: "Profetas", osis: ["ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO", "OBA", "JON", "MIC", "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL"] },
+  { nombre: "Evangelios", osis: ["MAT", "MRK", "LUK", "JHN"] },
+  { nombre: "Hechos", osis: ["ACT"] },
+  { nombre: "Epístolas", osis: ["ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD"] },
+  { nombre: "Profecía", osis: ["REV"] },
+];
 /** Nombre de cada panel como pestaña de la mesa de estudio (pantallas anchas). */
 const ETIQUETA_PANEL: Record<string, string> = {
   dic: "Diccionario", busqueda: "Buscar", griego: "Griego", lex: "Léxico", refs: "Versículo",
@@ -172,6 +183,12 @@ export default function Lector() {
   const anchoParalelo = useMedia("(min-width: 1000px)");
   const [paralelo, setParalelo] = useState<string[] | null>(null); // null = modo apagado
   const [textosPar, setTextosPar] = useState<Record<string, Record<string, string>>>({});
+  // ── Navegación lateral (≥ 1280 px) y vistazo de citas al pasar el ratón ──
+  const anchoNav = useMedia(`(min-width: ${ANCHO_NAV}px)`);
+  const [navPlegada, setNavPlegada] = useState(false);
+  const conRaton = useMedia("(hover: hover) and (pointer: fine)");
+  const [vistazo, setVistazo] = useState<{ x: number; y: number; arriba: boolean; etiqueta: string; texto: string | null } | null>(null);
+  const tVistazo = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lexCache = useRef(cacheLex);
 
   // El SBLGNT son 27 libros. Si el lector lo tiene activo y navega al AT, la
@@ -988,6 +1005,54 @@ export default function Lector() {
     if (nPila > nPilaAntes.current) setFrente(null);
     nPilaAntes.current = nPila;
   }, [nPila]);
+  useEffect(() => {
+    try { setNavPlegada(localStorage.getItem("nav-plegada") === "1"); } catch {}
+  }, []);
+  const plegarNav = (v: boolean) => {
+    setNavPlegada(v);
+    try { localStorage.setItem("nav-plegada", v ? "1" : "0"); } catch {}
+  };
+  const navVisible = anchoNav && !navPlegada;
+
+  /** Vistazo: el versículo citado aparece al pasar el ratón, sin clic (sólo con ratón). */
+  const verVistazo = (cita: NonNullable<ReturnType<typeof parseCita>>, el: HTMLElement) => {
+    if (!conRaton) return;
+    if (tVistazo.current) clearTimeout(tVistazo.current);
+    tVistazo.current = setTimeout(async () => {
+      const r = el.getBoundingClientRect();
+      const arriba = r.bottom + 170 > window.innerHeight;
+      const base = { x: Math.max(8, Math.min(r.left, window.innerWidth - 368)), y: arriba ? r.top - 8 : r.bottom + 8, arriba, etiqueta: cita.etiqueta };
+      setVistazo({ ...base, texto: null });
+      const refs = cita.refs.slice(0, 4);
+      const clave = `vistazo:${obra}:${refs[0].osis}`;
+      let libro = cache.get(clave) as ObraJson | undefined;
+      if (!libro) {
+        libro = (await fetch(`/data/${obra}/${refs[0].osis}.json`).then((x) => (x.ok ? x.json() : null)).catch(() => null)) ?? undefined;
+        if (libro) cache.set(clave, libro);
+      }
+      const texto = refs
+        .map((rf) => libro?.versos.find((v) => v.c === rf.c && v.v === rf.v))
+        .filter((v): v is Verso => !!v)
+        .map((v) => (refs.length > 1 ? `${v.v} ${v.t}` : v.t))
+        .join(" ");
+      setVistazo((act) => (act && act.etiqueta === cita.etiqueta ? { ...act, texto: texto || "—" } : act));
+    }, 260);
+  };
+  const ocultarVistazo = () => {
+    if (tVistazo.current) clearTimeout(tVistazo.current);
+    tVistazo.current = setTimeout(() => setVistazo(null), 120);
+  };
+
+  // ── Atajos de teclado (laptop y escritorio) ──
+  //   ← →  capítulo anterior / siguiente · /  buscar · Esc  cierra el panel del frente
+  //   1-9  pestañas de la mesa de estudio
+  const refTeclas = useRef<(e: KeyboardEvent) => void>(() => {});
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => refTeclas.current(e);
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, []);
+
   const comEnTexto = comentario && !ancho;
   const estudioVisible = ancho && (comentario || pila.length > 0);
   const comAlFrente = comentario && (frente === "com" || pila.length === 0);
@@ -1024,6 +1089,29 @@ export default function Lector() {
     columna.current.querySelectorAll("[data-osis]").forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [ancho, comentario, osis, cap, cargando, griego, interlineal]);
+  refTeclas.current = (e: KeyboardEvent) => {
+    const el = e.target as HTMLElement;
+    if (e.ctrlKey || e.metaKey || e.altKey || el.closest?.("input, textarea, select, [contenteditable]")) return;
+    if (e.key === "ArrowLeft") { e.preventDefault(); ir(-1); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); adelante(1); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    else if (e.key === "/") { e.preventDefault(); abrirBusqueda(); }
+    else if (e.key === "Escape") {
+      if (vistazo) return setVistazo(null);
+      const id = pila[pila.length - 1];
+      const cerrar: Record<string, () => void> = {
+        dic: () => setDicPanel(false), busqueda: () => setBusPanel(false), griego: () => setGrPal(null),
+        lex: () => setLex(null), refs: () => setPanelRefs(null), cita: () => setPanelCita(null),
+        termino: () => setPanelTermino(null), fuentes: () => setPanelFuentes(false),
+        notas: () => setPanelNotas(false), info: () => setPanelInfo(false),
+      };
+      if (id && cerrar[id]) cerrar[id]();
+    } else if (ancho && /^[1-9]$/.test(e.key)) {
+      const ids = [...(comentario ? ["com"] : []), ...pila];
+      const id = ids[Number(e.key) - 1];
+      if (id) traerAlFrente(id);
+    }
+  };
+
   const traerAlFrente = (id: string) => {
     if (id === "com") return setFrente("com");
     setFrente(null);
@@ -1228,7 +1316,14 @@ export default function Lector() {
       if (seg.tipo === "cita" && seg.cita) {
         const cita = seg.cita;
         nodos.push(
-          <button key={clave++} className="cita" onClick={() => abrirCita(cita)} title={tr.verTexto}>
+          <button
+            key={clave++}
+            className="cita"
+            onClick={() => { setVistazo(null); abrirCita(cita); }}
+            onMouseEnter={(e) => verVistazo(cita, e.currentTarget)}
+            onMouseLeave={ocultarVistazo}
+            title={conRaton ? undefined : tr.verTexto}
+          >
             {seg.contenido}
           </button>
         );
@@ -1505,7 +1600,7 @@ export default function Lector() {
       </Cabecera>
 
       <main
-        className={estudioVisible ? `con-estudio${arrastrando ? " arrastrando" : ""}` : undefined}
+        className={[estudioVisible && "con-estudio", arrastrando && "arrastrando", navVisible && "con-nav"].filter(Boolean).join(" ") || undefined}
         style={{ "--estudio-w": `${anchoEstudio}px` } as React.CSSProperties}
       >
         <div
@@ -1768,6 +1863,67 @@ export default function Lector() {
           )}
         </div>
       </main>
+
+      {anchoNav && (
+        <nav className={`nav-lateral${navPlegada ? " plegada" : ""}`} aria-label="Libros y capítulos">
+          <button
+            className="nav-plegar"
+            onClick={() => plegarNav(!navPlegada)}
+            aria-label={navPlegada ? "Mostrar libros" : "Ocultar libros"}
+            title={navPlegada ? "Mostrar libros" : "Ocultar libros"}
+          >
+            {navPlegada ? "»" : "«"}
+          </button>
+          {!navPlegada &&
+            GRUPOS_LIBROS.map((g) => {
+              const libros = (manifest?.libros ?? []).filter((l) => g.osis.includes(l.osis));
+              if (!libros.length) return null;
+              return (
+                <div key={g.nombre} className="nav-grupo">
+                  <div className="nav-grupo-t">{g.nombre}</div>
+                  {libros.map((l) => (
+                    <div key={l.osis}>
+                      <button
+                        className={`nav-libro${l.osis === osis ? " activo" : ""}`}
+                        onClick={() => {
+                          setPendiente(null);
+                          if (l.osis !== osis) {
+                            setOsis(l.osis);
+                            setCap(1);
+                          }
+                        }}
+                      >
+                        {l.nombre}
+                      </button>
+                      {l.osis === osis && (
+                        <div className="nav-caps">
+                          {Array.from({ length: l.caps }, (_, i) => i + 1).map((n) => (
+                            <button key={n} className={`nav-cap${n === cap ? " activo" : ""}`} onClick={() => setCap(n)}>
+                              {n}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+        </nav>
+      )}
+
+      {vistazo && (
+        <div
+          className={`vistazo${vistazo.arriba ? " arriba" : ""}`}
+          style={{ left: vistazo.x, top: vistazo.y }}
+          onMouseEnter={() => tVistazo.current && clearTimeout(tVistazo.current)}
+          onMouseLeave={ocultarVistazo}
+          role="tooltip"
+        >
+          <div className="vistazo-ref">{vistazo.etiqueta}</div>
+          <div className="vistazo-texto">{vistazo.texto ?? "…"}</div>
+        </div>
+      )}
 
       {estudioVisible && (
         <aside
