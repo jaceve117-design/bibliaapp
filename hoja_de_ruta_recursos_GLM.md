@@ -2,7 +2,8 @@
 
 > ## ⚑ PRIORIDAD — hacer ANTES de seguir con la fase en curso (añadido 2026-09-28)
 >
-> ### [ ] P.1 Barrido profundo de citas bíblicas (todas las obras, EN y ES)
+> ### [x] P.1 Barrido profundo de citas bíblicas (todas las obras, EN y ES)
+> **COMPLETA 2026-09-28 (GLM)**: paso 1 (auditoría: 1.102 formas, informe en 05. Datos/auditoria-citas.md) → paso 2 (MAPA ampliado: Lu/Ac/Ge/Re/Nu/Ne/Ho/Ec/Ti/Mk/So/Chr/He/Da/Tt/Ga/Mi/Nú + nombres completos ES + espaciadas 1 Co/2 Sam/1 Ts/1 Cr/2 Cr/1 Pe…; frontera unicode É/Nú/Gá; herencia elíptica de libro en el lector 78k→25k; rangos que cruzan capítulo) → paso 4 (62 casos de regresión en scripts/casos-citas.json + runner prueba-citas.mjs, 62/62). El Paso 3 (agrupación) ya estaba (cb6e839). Re-auditoría: Lu/Co/Ac/Ge/1 Co/Isaías/Salmo desaparecen del top; la cola restante son ambiguas correctas (Corintios sin número) y elípticas fuera de ventana.
 > **Problema:** comentarios y diccionarios citan con muchísimas abreviaturas y formas, y el lector
 > (`07. App/app/lib/referencias.ts`, `RE_CITA` + `parseCita` + `MAPA`) no detecta parte de ellas:
 > esas citas quedan como texto muerto. Ya corregido por Claude: «Lc 24:48; 1 Ts 2:5» ya no inventa
