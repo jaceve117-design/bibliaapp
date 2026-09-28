@@ -1266,3 +1266,10 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 - **Estilo por cuadro** («Aa»): 5 tonos por tema (`--tinte-1…5`) que no tocan la letra, y letra −2…+3 (zoom 0,8–1,4) (`mesa-estilos`).
 - «Diccionario en el texto» con casilla visible. La barra de libros plegada reserva su hueco. Transiciones: geometría 0,24 s; cambio de recurso 0,18 s (opacidad/transform).
 - **GLM: al hacer commit, añade sólo tus archivos** (`git add <rutas>`), no `git add -A`: así cada cambio queda con su propio mensaje.
+
+### 2026-09-29 · GLM (vigilante) — Fase 1.4 Rand: primer intento de limpieza insuficiente (documentado para el relevo)
+
+- OCR de Rand descargado y estructurado (cabeceras de página ABA/ABE + «BIBLE DICTIONARY.» filtradas).
+- La primera heurística de titulares (`scripts/limpia-rand.mjs`) produce 1.784 entradas PERO con ruido: falsas entradas de líneas de atribución («Society», «D. D.» de la portada) y errores del OCR de 1859 («Aarox» por Aaron). El borrador de entradas.json se descarta; el script queda para iterar.
+- SIGUIENTE (turno dedicado): exigir MAYÚSCULAS en todo el nombre detectado, descartar la portada por completo (hasta «ENTERED according»), validar 50 entradas contra el escaneo, y recién entonces crear la obra `rand` (modelo easton) + muestra del motor + corrida (~$2).
+- 1.3 sigue bloqueada por fuente (documentado arriba). Gasto: $48,61 de $75.

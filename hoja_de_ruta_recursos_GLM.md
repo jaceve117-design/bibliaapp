@@ -159,11 +159,13 @@ parar y dejar el informe para el usuario.
 - **Costo: 0.**
 
 ### [~] 1.4 Diccionario de W. W. Rand (*A Dictionary of the Holy Bible*)
-- **EN CURSO (2026-09-28, GLM)**: OCR descargado (`05. Datos/corpus_crudo/rand/rand-djvu.txt`, 2,4 MB,
-  edición "For General Use" American Tract Society). Formato identificado: entradas en Title Case con
-  OCR de espacios dobles y cortes ruidosos («A' BEL,» = ABEL; «A, the first letter»). Falta: el script
-  de limpieza (unir guiones/palabras, detectar titulares con tolerancia a espacios dobles) + la
-  ingesta + la traducción motor (~1,5-2 USD). Turno dedicado.
+- **EN CURSO (2026-09-28/29, GLM)**: OCR descargado (`05. Datos/corpus_crudo/rand/rand-djvu.txt`,
+  2,4 MB). Script de limpieza primera versión en `scripts/limpia-rand.mjs` — produce 1.784 entradas
+  PERO con ruido: falsas entradas de líneas de atribución («Society», «D. D.») y errores del propio
+  OCR de 1859 («Aarox» por Aaron). SIGUIENTE: afinar el filtro de titulares (requerir MAYÚSCULAS del
+  todo en el nombre, descartar líneas de atribución de la portada), muestrear 50 entradas contra el
+  escaneo, y recién entonces ingesta + motor (~1,5-2 USD). Turno dedicado — la limpieza es «lo más
+  trabajoso» como avisaba esta hoja.
 - Dominio público («NOT_IN_COPYRIGHT» en Internet Archive).
 - **Fuente:** https://archive.org/details/dictionholybible00randrich (texto completo djvu.txt, 2,3 MB)
   y edición de 1886 https://archive.org/details/dictionaryofholy02rand (preferir la más completa;
