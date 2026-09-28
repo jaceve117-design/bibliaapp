@@ -36,7 +36,7 @@ type HenryJson = { osis: string; c: Record<string, { r: string | null; s: Seccio
 type HenryEsJson = HenryJson & { estado?: string };
 type JfbJson = { osis: string; c: Record<string, { v: number; p: string[] }[]> };
 type Termino = { t: string; variantes: string[]; idioma: string; sig: string };
-type PanelCita = { etiqueta: string; osis: string; c: number; versos: { v: number; t: string }[]; cargando: boolean; mas: boolean };
+type PanelCita = { id: number; etiqueta: string; osis: string; c: number; refs: { c: number; v: number }[]; versos: { c: number; v: number; t: string }[]; cargando: boolean; mas: boolean };
 type ColorSubrayado = "" | "amarillo" | "verde" | "rosa";
 type Nota = { texto: string; color: ColorSubrayado; ts: string };
 type Notas = Record<string, Nota>;
@@ -73,6 +73,10 @@ const cacheLex = new Map<string, { entradas: Record<string, EntradaLex>; indice:
 export default function Lector() {
   const tr = t("es");
   const [obra, setObra] = useState("rv1909");
+  // versión de Biblia para las tarjetas de cita/pasaje: null = sigue la obra principal;
+  // el desplegable de la tarjeta la cambia SIN mover la lectura principal (petición 2026-09-27)
+  const [obraCita, setObraCita] = useState<string | null>(null);
+  const obraVer = obraCita ?? obra;
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [osis, setOsis] = useState(OSIS_INICIAL);
   const [cap, setCap] = useState(CAP_INICIAL);
@@ -124,6 +128,7 @@ export default function Lector() {
   // espejo ES del comentario EN activo (motor, sin revisar); null si no existe aún
   const [comEsData, setComEsData] = useState<JfbJson | null>(null);
   const [panelCita, setPanelCita] = useState<PanelCita | null>(null);
+  const panelCitaId = useRef(0);
   const [panelTermino, setPanelTermino] = useState<Termino | null>(null);
   const [panelInfo, setPanelInfo] = useState(false);
   const [pasaje, setPasaje] = useState<{ osis: string; c: number } | null>(null);
@@ -717,21 +722,21 @@ export default function Lector() {
       setPasajeTexto(null);
       return;
     }
-    const clave = `obra:${pasaje.osis}`;
+    const clave = `obra:${obraVer}:${pasaje.osis}`;
     const enCache = cache.get(clave) as ObraJson | undefined;
     if (enCache) {
       setPasajeTexto(enCache);
       return;
     }
     setPasajeTexto(null);
-    fetch(`/data/${obra}/${pasaje.osis}.json`)
+    fetch(`/data/${obraVer}/${pasaje.osis}.json`)
       .then((r) => (r.ok ? r.json() : null))
       .then((json: ObraJson | null) => {
         if (json) cache.set(clave, json);
         setPasajeTexto(json);
       })
       .catch(() => setPasajeTexto(null));
-  }, [pasaje, obra]);
+  }, [pasaje, obraVer]);
 
   // altura del header fijo: referencia para las barras de comentario ancladas (sticky)
   useEffect(() => {
@@ -958,36 +963,45 @@ export default function Lector() {
   // D22: cita clicable → pop-up con el texto del verso en la obra activa
   const abrirCita = (cita: NonNullable<ReturnType<typeof parseCita>>) => {
     const primero = cita.refs[0];
-    const ultima = cita.refs[cita.refs.length - 1];
-    const mismoCap = ultima.c === primero.c;
-    const visibles = mismoCap ? cita.refs.filter((r) => r.v <= primero.v + 11) : cita.refs.filter((r) => r.c === primero.c).slice(0, 12);
+    // TODOS los versos del grupo, capítulos incluidos («1 Co 2:3, 6, 10, 4:4» = 4 versos
+    // de DOS capítulos del mismo libro): cada uno se muestra con su referencia (petición 2026-09-27)
+    const visibles = cita.refs.slice(0, 40);
     const mas = cita.refs.length > visibles.length;
-    setPanelCita({ etiqueta: cita.etiqueta, osis: primero.osis, c: primero.c, versos: [], cargando: true, mas });
-    const clave = `${obra}:${primero.osis}`;
+    panelCitaId.current += 1;
+    setPanelCita({ id: panelCitaId.current, etiqueta: cita.etiqueta, osis: primero.osis, c: primero.c, refs: visibles, versos: [], cargando: true, mas });
+  };
+
+  // carga/recarga los versos del panel de cita: al abrir Y al cambiar la versión de la tarjeta
+  useEffect(() => {
+    if (!panelCita) return;
+    const { osis, refs } = panelCita;
+    const clave = `obra:${obraVer}:${osis}`;
     const usar = (data: ObraJson) => {
-      const lista = visibles.map((r) => {
+      const lista = refs.map((r) => {
         const v = data.versos.find((x) => x.c === r.c && x.v === r.v);
-        return { v: r.v, t: v?.t ?? "" };
+        return { c: r.c, v: r.v, t: v?.t ?? "" };
       }).filter((v) => v.t);
-      setPanelCita((prev) => (prev && prev.etiqueta === cita.etiqueta ? { ...prev, versos: lista, cargando: false } : prev));
+      setPanelCita((prev) => (prev && prev.id === panelCita.id ? { ...prev, versos: lista, cargando: false } : prev));
     };
     const enCache = cache.get(clave) as ObraJson | undefined;
     if (enCache) {
       usar(enCache);
       return;
     }
-    fetch(`/data/${obra}/${primero.osis}.json`)
+    setPanelCita((prev) => (prev && prev.id === panelCita.id ? { ...prev, cargando: true } : prev));
+    fetch(`/data/${obraVer}/${osis}.json`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data: ObraJson | null) => {
         if (!data) {
-          setPanelCita((prev) => (prev && prev.etiqueta === cita.etiqueta ? { ...prev, cargando: false } : prev));
+          setPanelCita((prev) => (prev && prev.id === panelCita.id ? { ...prev, cargando: false } : prev));
           return;
         }
         cache.set(clave, data);
         usar(data);
       })
       .catch(() => setPanelCita(null));
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [obraVer, panelCita?.id]);
 
   // D22: renderiza un párrafo con citas y términos transliterados clicables
   const renderMarcado = (texto: string): React.ReactNode => {
@@ -1749,23 +1763,50 @@ export default function Lector() {
           <div className="lex-panel-inner">
             <div className="lex-cabecera">
               <span className="lex-palabra" style={{ fontSize: 20 }}>
-                {panelCita.etiqueta} · {manifest?.osis_obra}
+                {panelCita.etiqueta}
               </span>
-              <button className="icono-btn cerrar" onClick={() => setPanelCita(null)} aria-label={tr.lexCerrar}>
-                ✕
-              </button>
+              <span className="split-acciones">
+                <select
+                  className="sel sel-mini"
+                  aria-label={tr.versionCita}
+                  value={obraVer}
+                  onChange={(e) => setObraCita(e.target.value)}
+                >
+                  {OBRAS.map((o) => (
+                    <option key={o.id} value={o.id}>{o.etiqueta}</option>
+                  ))}
+                </select>
+                <button className="icono-btn cerrar" onClick={() => setPanelCita(null)} aria-label={tr.lexCerrar}>
+                  ✕
+                </button>
+              </span>
             </div>
             {panelCita.cargando ? (
               <div className="lex-meta">…</div>
             ) : panelCita.versos.length ? (
               <>
                 <div className="cita-versos">
-                  {panelCita.versos.map((v) => (
-                    <div key={v.v} className="cita-verso">
-                      <sup className="num">{v.v}</sup> {v.t}
-                    </div>
-                  ))}
+                  {panelCita.versos.flatMap((v, i) => {
+                    const anterior = panelCita.versos[i - 1];
+                    const capNuevo = !anterior || anterior.c !== v.c;
+                    const nombreLibro = manifest?.libros.find((l) => l.osis === panelCita.osis)?.nombre ?? panelCita.osis;
+                    return [
+                      capNuevo ? (
+                        <div key={`cap-${v.c}`} className="cita-capitulo">
+                          {nombreLibro} {v.c}
+                        </div>
+                      ) : null,
+                      <div key={`${v.c}:${v.v}`} className="cita-verso">
+                        <span className="cita-ref">{v.c}:{v.v}</span> {v.t}
+                      </div>,
+                    ];
+                  })}
                 </div>
+                {panelCita.mas && (
+                  <div className="lex-meta" style={{ marginTop: 8 }}>
+                    {tr.citaMas}
+                  </div>
+                )}
                 <button
                   className="btn btn-fantasma"
                   style={{ marginTop: 12 }}
@@ -2048,6 +2089,16 @@ export default function Lector() {
               {manifest?.libros.find((l) => l.osis === pasaje.osis)?.nombre ?? pasaje.osis} {pasaje.c}
             </span>
             <span className="split-acciones">
+              <select
+                className="sel sel-mini"
+                aria-label={tr.versionCita}
+                value={obraVer}
+                onChange={(e) => setObraCita(e.target.value)}
+              >
+                {OBRAS.map((o) => (
+                  <option key={o.id} value={o.id}>{o.etiqueta}</option>
+                ))}
+              </select>
               <button className="icono-btn cerrar" onClick={() => setPasaje(null)} aria-label={tr.lexCerrar} title={tr.lexCerrar}>
                 ✕
               </button>
@@ -2068,7 +2119,7 @@ export default function Lector() {
               <p style={{ color: "var(--muted)" }}>…</p>
             )}
             <div className="lex-fuente" style={{ marginTop: 14 }}>
-              {manifest?.obra} · {pasaje.osis}.{pasaje.c}
+              {OBRAS.find((o) => o.id === obraVer)?.etiqueta ?? manifest?.obra} · {pasaje.osis}.{pasaje.c}
             </div>
           </div>
         </div>

@@ -2658,4 +2658,2690 @@ body {
   color: var(--ink);
   font-weight: 600;
 }
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Biblioteca — sistema de diseño
+   Sobrio · elegante · minimalista · vanguardista
+   Tokens en variables CSS; tipografía serif de lectura, sans de interfaz.
+   Las tipografías autoalojadas (hebreo/griego real) llegan en la fase de diseño.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="claro"] {
+  --bg: #faf8f3;
+  --bg-elev: #ffffff;
+  --ink: #211d15;
+  --ink-soft: #4c4536;
+  --muted: #8a8171;
+  --line: #e6e0d2;
+  --line-strong: #d3c9b3;
+  --accent: #8f6f2f;
+  --accent-strong: #6e5521;
+  --accent-soft: #f1e9d6;
+  --hover: #f2eee3;
+  --shadow: 0 1px 2px rgba(33, 29, 21, 0.04), 0 8px 32px rgba(33, 29, 21, 0.05);
+}
+
+[data-theme="oscuro"] {
+  --bg: #12100d;
+  --bg-elev: #1a1713;
+  --ink: #eae3d4;
+  --ink-soft: #c6bda9;
+  --muted: #8e8571;
+  --line: #2b2720;
+  --line-strong: #3c362a;
+  --accent: #c8a558;
+  --accent-strong: #e2c27c;
+  --accent-soft: #241e12;
+  --hover: #201c15;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+:root {
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+/* Nada se sale del viewport en móvil: el desborde horizontal se recorta
+   y el ancho del documento nunca supera la pantalla. */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+::selection { background: var(--accent-soft); color: var(--ink); }
+
+/* ── piezas de interfaz ── */
+
+.kicker {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.serif-display {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
+}
+
+.btn {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 12px 26px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+.btn-primario {
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+}
+.btn-primario:hover { background: var(--accent-strong); border-color: var(--accent-strong); transform: translateY(-1px); }
+.btn-fantasma {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line-strong);
+}
+.btn-fantasma:hover { border-color: var(--accent); color: var(--accent-strong); }
+
+.icono-btn {
+  font-family: var(--sans);
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  border-radius: 9px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+.icono-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+/* botón de cierre: rojo con X blanca (misma forma) */
+.icono-btn.cerrar {
+  background: #a63d2f;
+  border-color: #a63d2f;
+  color: #ffffff;
+}
+.icono-btn.cerrar:hover { background: #8a3125; border-color: #8a3125; color: #ffffff; }
+
+.sel {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.sel:hover, .sel:focus { border-color: var(--accent); outline: none; }
+
+.cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top, 0); /* notch en PWA instalada */
+}
+.cabecera-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cabecera-sub {
+  border-top: 1px solid var(--line);
+}
+.cabecera-sub-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap; /* en móvil estrecho los controles bajan de línea en vez de desbordar */
+  row-gap: 6px;
+}
+.cabecera-sub-inner .sel {
+  flex: 1 1 100px;
+  min-width: 0; /* los select se encogen antes que desbordar */
+  padding: 7px 9px;
+  font-size: 13px;
+}
+.cabecera-sub-inner .obras-toggle,
+.cabecera-sub-inner .lector-acciones {
+  flex-shrink: 0;
+}
+.com-strip-fila {
+  border-top: 1px solid var(--line);
+}
+/* ── Barra de recursos ──────────────────────────────────────────────────────
+   [✎] [obra ▾] ............ [sin revisar] [ES|EN] [☑]
+   Sin zona de clic a lo ancho: cada control responde por sí mismo, para que el
+   desplegable y el idioma nunca queden tapados por una superficie invisible. */
+.rec-barra {
+  display: flex;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+.rec-barra.activa {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.rec-icono {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 21px; height: 21px; border-radius: 6px; flex-shrink: 0;
+  border: 1px solid var(--line-strong); color: var(--muted);
+  font-size: 11.5px;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.rec-barra.activa .rec-icono {
+  background: var(--accent); border-color: var(--accent); color: var(--bg);
+}
+
+/* desplegable: se funde con la barra hasta que lo tocas */
+.rec-sel {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 3px 24px 3px 7px;
+  min-width: 0;
+  max-width: 320px;
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+.rec-sel:hover { border-color: var(--line-strong); background-color: var(--hover); }
+.rec-sel:focus-visible { outline: none; border-color: var(--accent); }
+.rec-barra.activa .rec-sel { color: var(--accent-strong); }
+.rec-sel option { background: var(--bg-elev); color: var(--ink); font-weight: 500; }
+
+.rec-der { margin-left: auto; display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+
+/* capa del texto original — control propio, no mezclado con el comentario */
+.rec-original { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.rec-icono-orig {
+  font-family: var(--serif);
+  font-size: 13px;
+  /* se enciende con su propia capa, no con la del comentario */
+  border-color: var(--line-strong);
+}
+.rec-sel-orig { max-width: 190px; font-weight: 500; }
+.rec-original.activa .rec-icono-orig {
+  background: var(--accent); border-color: var(--accent); color: var(--bg);
+}
+.rec-original.activa .rec-sel-orig { color: var(--accent-strong); font-weight: 600; }
+
+/* separador fino entre los dos controles: dice que son cosas distintas */
+.rec-sep {
+  width: 1px; height: 16px; flex-shrink: 0;
+  background: var(--line-strong); opacity: 0.6;
+  margin: 0 2px;
+}
+
+/* conmutador ES/EN — solo si el recurso tiene traducción */
+.rec-idioma {
+  display: inline-flex;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-elev);
+}
+.rec-idioma-tab {
+  font-family: var(--sans);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  padding: 3px 9px;
+  border: none; background: transparent; color: var(--muted);
+  cursor: pointer; line-height: 1.4;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.rec-idioma-tab:hover { color: var(--ink-soft); background: var(--hover); }
+.rec-idioma-tab.activa { background: var(--accent); color: var(--bg); }
+.rec-idioma-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* recurso sin traducir: insignia pasiva, no un botón que no hace nada */
+.rec-idioma-fijo {
+  font-family: var(--sans);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  color: var(--muted);
+  border: 1px dashed var(--line-strong); border-radius: 999px;
+  padding: 2px 9px; cursor: help;
+}
+
+/* casilla de visibilidad — dibujada a mano para no heredar el gris de Windows */
+.rec-check { display: inline-flex; align-items: center; cursor: pointer; padding: 2px; }
+.rec-check input {
+  position: absolute; opacity: 0; width: 0; height: 0;
+}
+.rec-check-caja {
+  display: inline-block; position: relative;
+  width: 17px; height: 17px; border-radius: 5px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--bg-elev);
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.rec-check-caja::after {
+  content: ""; position: absolute;
+  left: 5.5px; top: 2px; width: 4px; height: 8.5px;
+  border: solid var(--bg); border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0.4);
+  opacity: 0;
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+.rec-check:hover .rec-check-caja { border-color: var(--accent); }
+.rec-check input:checked + .rec-check-caja {
+  background: var(--accent); border-color: var(--accent);
+}
+.rec-check input:checked + .rec-check-caja::after {
+  opacity: 1; transform: rotate(45deg) scale(1);
+}
+.rec-check input:focus-visible + .rec-check-caja {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .rec-sel { max-width: 180px; }
+  .rec-sel-orig { max-width: 130px; }
+}
+@media (max-width: 620px) {
+  /* Con «Original» ya en la fila de navegación, la barra del comentario cabe
+     en UNA línea: [✎ obra ▾] ··· [ES|EN] [☑]. Antes se partía en dos y el
+     idioma y la casilla quedaban sueltos en un renglón propio. */
+  .rec-sel { max-width: none; }
+}
+
+.badge-revision {
+  font-family: var(--sans);
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent-strong); border: 1px solid var(--accent); border-radius: 999px;
+  padding: 2px 7px; cursor: help;
+}
+
+/* citas bíblicas y términos originales dentro de los comentarios (D22) */
+.cita {
+  background: none; border: none; padding: 0;
+  font: inherit; color: var(--accent-strong); cursor: pointer;
+  text-decoration: underline dotted; text-underline-offset: 3px;
+}
+.cita:hover { color: var(--accent); text-decoration-style: solid; }
+.termino {
+  background: none; border: none; padding: 0; font: inherit;
+  font-style: italic; color: var(--ink-soft); cursor: help;
+  border-bottom: 1px dotted var(--accent);
+}
+.termino:hover { color: var(--accent-strong); }
+
+/* pop-up del tamaño de texto */
+.tam-wrap { position: relative; }
+.tam-popo {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 60;
+  background: var(--bg-elev); border: 1px solid var(--line-strong);
+  border-radius: 10px; box-shadow: var(--shadow); padding: 7px;
+  display: flex; gap: 4px;
+}
+.tam-opt {
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  background: transparent; border: 1px solid var(--line); color: var(--ink-soft);
+  border-radius: 7px; padding: 6px 9px; cursor: pointer;
+}
+.tam-opt.activa { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tam-opt:hover:not(.activa) { border-color: var(--accent); }
+
+/* panel de información (todo lo informativo vive aquí, fuera de la lectura) */
+.info-seccion { margin-bottom: 14px; }
+.info-titulo {
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent-strong); margin-bottom: 4px;
+}
+
+/* ── pantalla dividida: tarjeta de pasaje (mini-lector) ── */
+
+.split-card {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  height: 56vh;
+  z-index: 45;
+  background: var(--bg);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: split-entra 0.22s ease;
+}
+@keyframes split-entra {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.split-cab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.split-titulo {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  margin-right: auto;
+}
+.split-acciones { display: flex; align-items: center; gap: 6px; }
+.split-contenido {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 24px;
+}
+.split-versos { font-size: calc(1.05rem * var(--factor-texto, 1)); line-height: 1.85; }
+
+.marca {
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.marca .punto {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.pie {
+  border-top: 1px solid var(--line);
+  margin-top: 96px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.pie-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px 24px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: space-between;
+}
+
+/* ── héroe ── */
+
+.hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(72px, 14vh, 140px) 24px 0;
+}
+.hero h1 {
+  font-size: clamp(42px, 7vw, 84px);
+  margin: 22px 0 26px;
+  max-width: 13ch;
+}
+.hero h1 em { font-style: italic; color: var(--accent-strong); }
+.hero p.sub {
+  font-size: clamp(17px, 2vw, 21px);
+  color: var(--ink-soft);
+  max-width: 52ch;
+  margin-bottom: 40px;
+}
+.hero-regla {
+  width: 64px;
+  height: 3px;
+  background: var(--accent);
+  margin-bottom: 22px;
+}
+
+.dato-fila {
+  max-width: 1120px;
+  margin: 64px auto 0;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-block: 1px solid var(--line);
+}
+.dato {
+  background: var(--bg);
+  padding: 22px 20px;
+}
+.dato .n {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.dato .et {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── lector ── */
+
+.obras-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.obras-tab {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: var(--bg-elev);
+  color: var(--muted);
+  border: none;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.obras-tab + .obras-tab { border-left: 1px solid var(--line); }
+.obras-tab.activa {
+  background: var(--ink);
+  color: var(--bg);
+}
+.obras-tab:hover:not(.activa) { color: var(--accent-strong); }
+
+.lector-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.lector-columna {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 26px 16px 48px;
+  overflow-wrap: break-word;
+}
+
+.lector-titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 14px;
+  margin-bottom: 34px;
+}
+.lector-titulo h1 {
+  font-size: clamp(26px, 6vw, 44px);
+  font-weight: 600;
+  min-width: 0;
+}
+.lector-titulo .ref-osis {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.texto-biblico {
+  font-size: calc(clamp(1.12rem, 0.95rem + 0.8vw, 1.32rem) * var(--factor-texto, 1));
+  line-height: 1.95;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.verso {
+  transition: background 0.12s ease;
+  border-radius: 3px;
+  padding: 1px 0;
+}
+.verso:hover { background: var(--hover); }
+
+/* El versículo completo es el blanco táctil: abre notas, subrayado y referencias.
+   Se desactiva la selección nativa para que el sistema no muestre su propio menú
+   de búsqueda al mantener pulsado. El copiado vive en el panel, con referencia formada. */
+.versoTocable {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.versoTocable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.verso sup.num {
+  font-family: var(--sans);
+  font-size: 0.6em;
+  font-weight: 700;
+  color: var(--accent-strong);
+  margin-right: 0.35em;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
+.atribucion-obra {
+  margin-top: 56px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+.atribucion-obra b { color: var(--ink-soft); font-weight: 600; }
+
+.avisos {
+  font-family: var(--sans);
+  font-size: 13px;
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--ink-soft);
+  margin-bottom: 28px;
+}
+
+/* ── interlineal ── */
+
+.interlin {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.interlin.rtl .interlin-verso { direction: rtl; }
+.interlin-verso {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: stretch;
+  line-height: 1.4;
+}
+.interlin-verso > .num {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-strong);
+  margin-top: 6px;
+  user-select: none;
+}
+.palabra {
+  font-family: var(--serif);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 9px;
+  min-width: 68px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  transition: border-color 0.14s ease, transform 0.14s ease;
+}
+.palabra:hover { border-color: var(--accent); transform: translateY(-1px); }
+.palabra .w { font-size: 1.08rem; color: var(--ink); }
+.palabra .gl {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+.palabra .st {
+  font-family: var(--sans);
+  font-size: 8.5px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.sin-interlin { color: var(--ink); }
+
+.lex-panel {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  background: var(--bg-elev);
+  border-top: 2px solid var(--accent);
+  box-shadow: var(--shadow);
+  z-index: 60;
+  max-height: 58vh;
+  overflow: auto;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: panel-entra 0.24s ease;
+  /* la coreografía de la pila: subir y encoger, nunca saltar */
+  transition: bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+              max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 0.3s ease;
+}
+
+/* ── Pila de paneles (baraja) ───────────────────────────────────────────────
+   Primer intento: el panel de atrás subía al 50% y se encogía. Quedaba
+   flotando a media página, con texto asomando entre las dos tarjetas: ruido
+   visual, no ayuda.
+
+   Ahora es una baraja. SOLO UNA tarjeta abierta a la vez, abajo; las demás se
+   repliegan a una pestaña justo encima, con su título. Pulsas una pestaña y
+   pasa al frente mientras la anterior se agacha a pestaña. Sin solapes, sin
+   huecos, sin adivinar qué tapa a qué.
+
+   La del frente toma ALTURA FIJA cuando hay pila: así las pestañas encajan
+   siempre a ras, sin depender de cuánto contenido tenga. */
+.lex-panel.prof-0 { bottom: 0; }
+
+.lex-panel.apilado.prof-0 { height: 50vh; max-height: 50vh; }
+.lex-panel.apilado.pestana {
+  height: 40px;
+  max-height: 40px;
+  min-height: 40px;
+  overflow: hidden;
+  cursor: pointer;
+  border-top-width: 1px;
+  box-shadow: none;
+}
+.lex-panel.apilado.prof-1 { bottom: 50vh; }
+.lex-panel.apilado.prof-2 { bottom: calc(50vh + 41px); }
+/* a partir de la cuarta no cabe: se mantiene montada pero fuera de la vista */
+.lex-panel.apilado.prof-3 { display: none; }
+
+/* la pestaña muestra su título en una línea y nada más */
+.lex-panel.apilado.pestana .lex-panel-inner { padding: 0 24px; }
+.lex-panel.apilado.pestana .lex-cabecera {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  margin-bottom: 0;
+  box-shadow: none;
+}
+.lex-panel.apilado.pestana .lex-cabecera > :first-child {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lex-panel.apilado.pestana:hover { background: var(--hover); }
+.lex-panel.apilado.pestana .lex-cabecera::after {
+  content: "↑ abrir";
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-inline-start: auto;
+  margin-inline-end: 10px;
+  white-space: nowrap;
+}
+/* la ✕ de una pestaña estorba: se cierra desde el frente */
+.lex-panel.apilado.pestana .cerrar { display: none; }
+
+@media (max-width: 620px) {
+  .lex-panel.apilado.prof-0 { height: 58vh; max-height: 58vh; }
+  .lex-panel.apilado.prof-1 { bottom: 58vh; }
+  .lex-panel.apilado.prof-2 { bottom: calc(58vh + 41px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lex-panel { transition: none; }
+}
+@keyframes panel-entra {
+  from { transform: translateY(18px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.com-info-popo { animation: panel-entra 0.2s ease; }
+.lex-panel-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 28px;
+}
+/* La cabecera con la ✕ NO puede irse con el scroll: es la unica salida del
+   panel. Se queda pegada arriba, con el fondo del panel para que el texto
+   que pasa por debajo no se le transparente. */
+.lex-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* La ✕ NO puede irse con el scroll: es la única salida del panel. Se queda
+     pegada arriba, con el fondo del panel para que el texto que pasa por
+     debajo no se le transparente. */
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-elev);
+  padding-top: 16px;
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  box-shadow: 0 6px 10px -8px rgba(0, 0, 0, 0.28);
+}
+.lex-palabra {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.lex-meta {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.lex-glosa {
+  font-size: 17px;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.lex-glosa-en {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: normal;
+}
+.lex-def {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  white-space: pre-line;
+}
+.lex-fuente {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.ref-btn { cursor: pointer; }
+.ref-btn:hover { text-decoration: underline dotted; }
+
+.refs-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.ref-item {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 11px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.14s ease;
+}
+.ref-item b { color: var(--ink); font-weight: 600; }
+.ref-item:hover { border-color: var(--accent); }
+
+/* ── comentario de Matthew Henry ── */
+
+.com-bloque-wrap { display: block; }
+
+/* barra de sección: colapsada es un botón; expandida se ancla (sticky) bajo el header */
+.com-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent-strong);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 7px 10px;
+  margin: 12px 0 6px;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.com-toggle:hover { border-color: var(--accent); }
+.com-toggle .com-flecha { flex-shrink: 0; font-size: 10px; }
+.com-etiqueta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.com-etiqueta .l1 {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted);
+}
+.com-toggle.abierto .com-etiqueta .l1 { color: var(--accent-strong); }
+.com-etiqueta .l2 { font-size: 11.5px; line-height: 1.35; color: var(--ink-soft); }
+.com-toggle .com-etiqueta b { color: var(--muted); font-weight: 700; }
+
+/* expandida: color dinámico + anclaje bajo el header */
+.com-toggle.abierto {
+  position: sticky;
+  top: calc(var(--altura-cabecera, 130px) + 4px);
+  z-index: 6;
+  background: var(--bg-elev);
+  border-color: var(--accent);
+  border-left-width: 3px;
+  color: var(--accent-strong);
+  padding: 9px 12px;
+}
+/* anclada de verdad (leyendo dentro de la sección): fondo dorado y sombra de barra activa */
+.com-toggle.anclada {
+  background: var(--accent-soft);
+  box-shadow: var(--shadow), 0 2px 0 var(--accent);
+}
+
+.com-info-btn {
+  flex-shrink: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--muted);
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.com-info-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+.com-info-popo {
+  position: absolute;
+  right: 6px;
+  top: calc(100% + 6px);
+  z-index: 10;
+  max-width: 280px;
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  background: var(--bg-elev);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 10px 12px;
+}
+.com-info-popo b { color: var(--accent-strong); }
+
+.com-bloque {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin: 0 0 0 0;
+  transition: grid-template-rows 0.32s ease, opacity 0.26s ease, margin 0.32s ease;
+}
+.com-bloque.abierto {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-bottom: 14px;
+}
+.com-bloque-int {
+  display: block;
+  overflow: hidden;
+  min-height: 0;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-elev);
+  border-radius: 0 8px 8px 0;
+  padding: 0;
+}
+.com-bloque.abierto .com-bloque-int { padding: 12px 16px; }
+.com-bloque .com-titulo {
+  display: block;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.com-bloque .com-parrafo {
+  display: block;
+  font-size: calc(15px * var(--factor-texto, 1));
+  line-height: 1.75;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+  text-wrap: pretty;
+}
+.com-resumen {
+  display: block;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  font-size: calc(14.5px * var(--factor-texto, 1));
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+.com-resumen .com-titulo {
+  display: block;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 6px;
+}
+
+@media (max-width: 420px) {
+  .marca { font-size: 18px; }
+  .cabecera-inner .lector-acciones a { display: none; } /* la portada ya tiene su CTA */
+  .hero { padding-top: 56px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ── Notas y subrayados del lector (B15: 100 % locales + export/import) ── */
+.verso.subrayado-amarillo { background: rgba(255, 214, 64, 0.32); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.verso.subrayado-verde { background: rgba(46, 184, 114, 0.24); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.verso.subrayado-rosa { background: rgba(240, 98, 146, 0.22); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.num.con-nota { color: var(--accent-strong); }
+.num.con-nota::after { content: "✍"; font-size: 0.62em; margin-left: 1px; vertical-align: super; }
+
+.nota-editor { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.nota-area {
+  width: 100%; margin-top: 8px; padding: 10px;
+  font: inherit; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line-strong); border-radius: 8px;
+  resize: vertical;
+}
+.nota-area:focus { outline: none; border-color: var(--accent); }
+.nota-colores { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.color-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: var(--bg-elev);
+  cursor: pointer; padding: 0;
+}
+.color-btn.activo { outline: 2px solid var(--accent); outline-offset: 1px; }
+.color-btn.swatch-amarillo { background: rgba(255, 214, 64, 0.55); }
+.color-btn.swatch-verde { background: rgba(46, 184, 114, 0.45); }
+.color-btn.swatch-rosa { background: rgba(240, 98, 146, 0.40); }
+
+.notas-acciones { display: flex; gap: 10px; margin-top: 12px; }
+.refs-lista .ref-item.swatch-amarillo { border-left: 4px solid rgba(234, 179, 8, 0.8); }
+.refs-lista .ref-item.swatch-verde { border-left: 4px solid rgba(22, 163, 74, 0.7); }
+.refs-lista .ref-item.swatch-rosa { border-left: 4px solid rgba(219, 39, 119, 0.65); }
+
+/* ── Panel Fuentes (paso 7: etiquetado autor/tradición/fecha por obra) ── */
+.fuente-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.fuente-item .lex-meta { margin-top: 4px; font-size: 0.82rem; }
+
+/* ── Vista griega SBLGNT (paso 6: cierre del núcleo) ── */
+.griego-vista { font-family: var(--serif); }
+.griego-vista .verso { font-size: 1.08em; line-height: 2; }
+.griego-vista .palabra-g { cursor: help; }
+.griego-vista .palabra-g:hover { color: var(--accent-strong); }
+
+/* (el desplegable y la insignia de idioma viven ahora en .rec-sel / .rec-idioma) */
+
+/* ── Barras de desplazamiento ───────────────────────────────────────────────
+   La barra nativa de Windows 11 rompe la sobriedad de la página: gris de
+   sistema, ancha y con flechas. Se sustituye por una delgada, sin flechas y
+   teñida con los tokens del tema, que se oscurece al pasar el ratón.
+   `scrollbar-color` cubre Firefox; `::-webkit-scrollbar`, el resto. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  /* el borde transparente adelgaza el pulgar sin estrechar la zona de agarre */
+  border: 3px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
+::-webkit-scrollbar-thumb:active { background: var(--accent); background-clip: content-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+/* las flechas de Windows fuera */
+::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
+
+/* Quien prefiera menos movimiento, no lo tiene. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Griego crítico emparejado con el español ───────────────────────────────
+   El griego solo no dice nada a quien no lo lee. Cada versículo lleva arriba
+   su texto en la versión elegida y debajo el griego, para que se vea de qué
+   habla cada verso sin tener que ir y volver. */
+.griego-par { display: flex; flex-direction: column; gap: 4px; }
+.gr-par {
+  padding: 10px 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+.gr-par:last-child { border-bottom: none; }
+.gr-es {
+  margin: 0 0 6px;
+  padding: 3px 4px;
+  border-radius: 5px;
+  font-family: var(--serif);
+  color: var(--ink);
+  line-height: 1.62;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+.gr-es:hover { background: var(--hover); }
+.gr-es:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gr-gr {
+  margin: 0;
+  font-family: var(--serif);
+  color: var(--ink-soft);
+  line-height: 1.9;
+  /* algo más pequeño que el español: el griego acompaña, no manda */
+  font-size: 0.94em;
+  /* Tono propio: que se vea de un golpe que son DOS cosas distintas, no la
+     continuación del versículo. Un filete lateral en vez de una caja, para
+     no cortar la columna de lectura. */
+  background: color-mix(in srgb, var(--accent-soft) 55%, transparent);
+  border-inline-start: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 0 6px 6px 0;
+  padding: 7px 10px 7px 11px;
+  margin-top: 2px;
+}
+.palabra-g {
+  font: inherit;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 1px 2px;
+  margin: 0 1px;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.palabra-g:hover { background: var(--hover); color: var(--accent-strong); }
+.palabra-g.activa { background: var(--accent); color: var(--bg); }
+.palabra-g:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* número de versículo del interlineal: es un botón, no un adorno */
+.interlin-num {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 1px 5px;
+  margin-inline-end: 6px;
+  cursor: pointer;
+  vertical-align: top;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+.interlin-num:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.interlin-num:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* salto del texto crítico al interlineal, donde sí hay Strong y glosa */
+.btn-inter {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  margin: 14px 0 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent-strong);
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.btn-inter:hover { background: var(--accent); color: var(--bg); }
+
+/* ── Push-up: el panel de abajo no puede tapar lo que estás leyendo ─────────
+   Los paneles son `position: fixed` sobre el texto. Al abrirse, la columna
+   gana hueco al final para que la última línea siga siendo alcanzable. */
+/* el hueco crece con la pila: dos tarjetas ocupan más que una */
+/* el hueco cubre la tarjeta del frente más las pestañas de las de atrás */
+.lector-columna.con-panel.pila-1 { padding-bottom: 62vh; }
+.lector-columna.con-panel.pila-2 { padding-bottom: calc(50vh + 60px); }
+@media (max-width: 620px) {
+  .lector-columna.con-panel.pila-1 { padding-bottom: 66vh; }
+  .lector-columna.con-panel.pila-2 { padding-bottom: calc(58vh + 60px); }
+}
+
+/* salto secundario al interlineal: es una salida, no la acción principal —
+   la glosa ya está en la tarjeta y cambiar de vista rompe la lectura */
+.btn-inter-sec {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  margin: 14px 0 0;
+  padding: 5px 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: start;
+  transition: color 0.16s ease;
+}
+.btn-inter-sec:hover { color: var(--accent-strong); text-decoration: underline; }
+.btn-inter-sec:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* referencias del diccionario: fichas tocables, no una lista muerta */
+.dic-refs { line-height: 2; }
+.dic-refs-rotulo { color: var(--muted); }
+.dic-refs-sep { color: var(--line-strong); }
+.dic-refs .cita {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 0.86em;
+}
+.dic-refs .cita:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+/* el nombre inglés detrás del español en los resultados del diccionario */
+.ref-item-en { color: var(--muted); font-size: 0.86em; font-weight: 400; }
+
+
+/* ── Cabecera del lector en móvil ───────────────────────────────────────────
+   Tres filas fijas, sin depender de dónde caiga el ancho:
+     1  [RV1909|VBL|WEB] [Libro ▾]
+     2  [cap] [Ω Solo el texto ▾] [⌕] [✍] [←] [→]
+     3  [✎ Matthew Henry · 1706 ▾] ········ [ES|EN] [☑]
+   Información y fuentes subieron a la cabecera, junto al tema. */
+.nav-fila {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* el capítulo tiene como mucho tres cifras: no necesita el ancho de un libro */
+.cabecera-sub-inner .sel.sel-cap {
+  flex: 0 0 58px;
+  width: 58px;
+  padding-left: 9px;
+  padding-right: 4px;
+}
+/* capítulo pendiente tras elegir libro: se expande, se anilla en dorado y avisa — obligatorio */
+.cabecera-sub-inner .sel.sel-cap.requerido {
+  flex: 1 1 auto;
+  width: auto;
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 1px var(--accent);
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+/* «Original» en la fila de navegación: toma lo que sobra y recorta con … */
+.rec-original-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 5px;
+}
+.rec-original-nav .rec-sel-orig {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  height: 34px;
+  border: 1px solid var(--line);
+  background-color: var(--bg-elev);
+  border-radius: 9px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rec-original-nav .rec-icono { width: 24px; height: 34px; border-radius: 9px; }
+/* el selector del comentario toma el resto de su fila; idioma y casilla a ras */
+.rec-barra > .rec-sel { flex: 1 1 auto; min-width: 0; text-overflow: ellipsis; }
+
+@media (max-width: 620px) {
+  .nav-fila { flex-basis: 100%; }
+  .cabecera-sub-inner > .sel { flex: 1 1 auto; }
+}
+@media (max-width: 360px) {
+  /* pantallas muy estrechas: el icono Ω cede su sitio al texto del selector */
+  .rec-original-nav .rec-icono { display: none; }
+}
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Biblioteca — sistema de diseño
+   Sobrio · elegante · minimalista · vanguardista
+   Tokens en variables CSS; tipografía serif de lectura, sans de interfaz.
+   Las tipografías autoalojadas (hebreo/griego real) llegan en la fase de diseño.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="claro"] {
+  --bg: #faf8f3;
+  --bg-elev: #ffffff;
+  --ink: #211d15;
+  --ink-soft: #4c4536;
+  --muted: #8a8171;
+  --line: #e6e0d2;
+  --line-strong: #d3c9b3;
+  --accent: #8f6f2f;
+  --accent-strong: #6e5521;
+  --accent-soft: #f1e9d6;
+  --hover: #f2eee3;
+  --shadow: 0 1px 2px rgba(33, 29, 21, 0.04), 0 8px 32px rgba(33, 29, 21, 0.05);
+}
+
+[data-theme="oscuro"] {
+  --bg: #12100d;
+  --bg-elev: #1a1713;
+  --ink: #eae3d4;
+  --ink-soft: #c6bda9;
+  --muted: #8e8571;
+  --line: #2b2720;
+  --line-strong: #3c362a;
+  --accent: #c8a558;
+  --accent-strong: #e2c27c;
+  --accent-soft: #241e12;
+  --hover: #201c15;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+:root {
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+/* Nada se sale del viewport en móvil: el desborde horizontal se recorta
+   y el ancho del documento nunca supera la pantalla. */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+::selection { background: var(--accent-soft); color: var(--ink); }
+
+/* ── piezas de interfaz ── */
+
+.kicker {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.serif-display {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
+}
+
+.btn {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 12px 26px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+.btn-primario {
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+}
+.btn-primario:hover { background: var(--accent-strong); border-color: var(--accent-strong); transform: translateY(-1px); }
+.btn-fantasma {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line-strong);
+}
+.btn-fantasma:hover { border-color: var(--accent); color: var(--accent-strong); }
+
+.icono-btn {
+  font-family: var(--sans);
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  border-radius: 9px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+.icono-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+/* botón de cierre: rojo con X blanca (misma forma) */
+.icono-btn.cerrar {
+  background: #a63d2f;
+  border-color: #a63d2f;
+  color: #ffffff;
+}
+.icono-btn.cerrar:hover { background: #8a3125; border-color: #8a3125; color: #ffffff; }
+
+.sel {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.sel:hover, .sel:focus { border-color: var(--accent); outline: none; }
+
+.cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top, 0); /* notch en PWA instalada */
+}
+.cabecera-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cabecera-sub {
+  border-top: 1px solid var(--line);
+}
+.cabecera-sub-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap; /* en móvil estrecho los controles bajan de línea en vez de desbordar */
+  row-gap: 6px;
+}
+.cabecera-sub-inner .sel {
+  flex: 1 1 100px;
+  min-width: 0; /* los select se encogen antes que desbordar */
+  padding: 7px 9px;
+  font-size: 13px;
+}
+.cabecera-sub-inner .obras-toggle,
+.cabecera-sub-inner .lector-acciones {
+  flex-shrink: 0;
+}
+.com-strip-fila {
+  border-top: 1px solid var(--line);
+}
+/* ── Barra de recursos ──────────────────────────────────────────────────────
+   [✎] [obra ▾] ............ [sin revisar] [ES|EN] [☑]
+   Sin zona de clic a lo ancho: cada control responde por sí mismo, para que el
+   desplegable y el idioma nunca queden tapados por una superficie invisible. */
+.rec-barra {
+  display: flex;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+.rec-barra.activa {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.rec-icono {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 21px; height: 21px; border-radius: 6px; flex-shrink: 0;
+  border: 1px solid var(--line-strong); color: var(--muted);
+  font-size: 11.5px;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.rec-barra.activa .rec-icono {
+  background: var(--accent); border-color: var(--accent); color: var(--bg);
+}
+
+/* desplegable: se funde con la barra hasta que lo tocas */
+.rec-sel {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 3px 24px 3px 7px;
+  min-width: 0;
+  max-width: 320px;
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+.rec-sel:hover { border-color: var(--line-strong); background-color: var(--hover); }
+.rec-sel:focus-visible { outline: none; border-color: var(--accent); }
+.rec-barra.activa .rec-sel { color: var(--accent-strong); }
+.rec-sel option { background: var(--bg-elev); color: var(--ink); font-weight: 500; }
+
+.rec-der { margin-left: auto; display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+
+/* capa del texto original — control propio, no mezclado con el comentario */
+.rec-original { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.rec-icono-orig {
+  font-family: var(--serif);
+  font-size: 13px;
+  /* se enciende con su propia capa, no con la del comentario */
+  border-color: var(--line-strong);
+}
+.rec-sel-orig { max-width: 190px; font-weight: 500; }
+.rec-original.activa .rec-icono-orig {
+  background: var(--accent); border-color: var(--accent); color: var(--bg);
+}
+.rec-original.activa .rec-sel-orig { color: var(--accent-strong); font-weight: 600; }
+
+/* separador fino entre los dos controles: dice que son cosas distintas */
+.rec-sep {
+  width: 1px; height: 16px; flex-shrink: 0;
+  background: var(--line-strong); opacity: 0.6;
+  margin: 0 2px;
+}
+
+/* conmutador ES/EN — solo si el recurso tiene traducción */
+.rec-idioma {
+  display: inline-flex;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-elev);
+}
+.rec-idioma-tab {
+  font-family: var(--sans);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  padding: 3px 9px;
+  border: none; background: transparent; color: var(--muted);
+  cursor: pointer; line-height: 1.4;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.rec-idioma-tab:hover { color: var(--ink-soft); background: var(--hover); }
+.rec-idioma-tab.activa { background: var(--accent); color: var(--bg); }
+.rec-idioma-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* recurso sin traducir: insignia pasiva, no un botón que no hace nada */
+.rec-idioma-fijo {
+  font-family: var(--sans);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  color: var(--muted);
+  border: 1px dashed var(--line-strong); border-radius: 999px;
+  padding: 2px 9px; cursor: help;
+}
+
+/* casilla de visibilidad — dibujada a mano para no heredar el gris de Windows */
+.rec-check { display: inline-flex; align-items: center; cursor: pointer; padding: 2px; }
+.rec-check input {
+  position: absolute; opacity: 0; width: 0; height: 0;
+}
+.rec-check-caja {
+  display: inline-block; position: relative;
+  width: 17px; height: 17px; border-radius: 5px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--bg-elev);
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.rec-check-caja::after {
+  content: ""; position: absolute;
+  left: 5.5px; top: 2px; width: 4px; height: 8.5px;
+  border: solid var(--bg); border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0.4);
+  opacity: 0;
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+.rec-check:hover .rec-check-caja { border-color: var(--accent); }
+.rec-check input:checked + .rec-check-caja {
+  background: var(--accent); border-color: var(--accent);
+}
+.rec-check input:checked + .rec-check-caja::after {
+  opacity: 1; transform: rotate(45deg) scale(1);
+}
+.rec-check input:focus-visible + .rec-check-caja {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .rec-sel { max-width: 180px; }
+  .rec-sel-orig { max-width: 130px; }
+}
+@media (max-width: 620px) {
+  /* Con «Original» ya en la fila de navegación, la barra del comentario cabe
+     en UNA línea: [✎ obra ▾] ··· [ES|EN] [☑]. Antes se partía en dos y el
+     idioma y la casilla quedaban sueltos en un renglón propio. */
+  .rec-sel { max-width: none; }
+}
+
+.badge-revision {
+  font-family: var(--sans);
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent-strong); border: 1px solid var(--accent); border-radius: 999px;
+  padding: 2px 7px; cursor: help;
+}
+
+/* citas bíblicas y términos originales dentro de los comentarios (D22) */
+.cita {
+  background: none; border: none; padding: 0;
+  font: inherit; color: var(--accent-strong); cursor: pointer;
+  text-decoration: underline dotted; text-underline-offset: 3px;
+}
+.cita:hover { color: var(--accent); text-decoration-style: solid; }
+.termino {
+  background: none; border: none; padding: 0; font: inherit;
+  font-style: italic; color: var(--ink-soft); cursor: help;
+  border-bottom: 1px dotted var(--accent);
+}
+.termino:hover { color: var(--accent-strong); }
+
+/* pop-up del tamaño de texto */
+.tam-wrap { position: relative; }
+.tam-popo {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 60;
+  background: var(--bg-elev); border: 1px solid var(--line-strong);
+  border-radius: 10px; box-shadow: var(--shadow); padding: 7px;
+  display: flex; gap: 4px;
+}
+.tam-opt {
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  background: transparent; border: 1px solid var(--line); color: var(--ink-soft);
+  border-radius: 7px; padding: 6px 9px; cursor: pointer;
+}
+.tam-opt.activa { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tam-opt:hover:not(.activa) { border-color: var(--accent); }
+
+/* panel de información (todo lo informativo vive aquí, fuera de la lectura) */
+.info-seccion { margin-bottom: 14px; }
+.info-titulo {
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent-strong); margin-bottom: 4px;
+}
+
+/* ── pantalla dividida: tarjeta de pasaje (mini-lector) ── */
+
+.split-card {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  height: 56vh;
+  z-index: 45;
+  background: var(--bg);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: split-entra 0.22s ease;
+}
+@keyframes split-entra {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.split-cab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.split-titulo {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  margin-right: auto;
+}
+.split-acciones { display: flex; align-items: center; gap: 6px; }
+.split-contenido {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 24px;
+}
+.split-versos { font-size: calc(1.05rem * var(--factor-texto, 1)); line-height: 1.85; }
+
+.marca {
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.marca .punto {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.pie {
+  border-top: 1px solid var(--line);
+  margin-top: 96px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.pie-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px 24px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: space-between;
+}
+
+/* ── héroe ── */
+
+.hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(72px, 14vh, 140px) 24px 0;
+}
+.hero h1 {
+  font-size: clamp(42px, 7vw, 84px);
+  margin: 22px 0 26px;
+  max-width: 13ch;
+}
+.hero h1 em { font-style: italic; color: var(--accent-strong); }
+.hero p.sub {
+  font-size: clamp(17px, 2vw, 21px);
+  color: var(--ink-soft);
+  max-width: 52ch;
+  margin-bottom: 40px;
+}
+.hero-regla {
+  width: 64px;
+  height: 3px;
+  background: var(--accent);
+  margin-bottom: 22px;
+}
+
+.dato-fila {
+  max-width: 1120px;
+  margin: 64px auto 0;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-block: 1px solid var(--line);
+}
+.dato {
+  background: var(--bg);
+  padding: 22px 20px;
+}
+.dato .n {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.dato .et {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── lector ── */
+
+.obras-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.obras-tab {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: var(--bg-elev);
+  color: var(--muted);
+  border: none;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.obras-tab + .obras-tab { border-left: 1px solid var(--line); }
+.obras-tab.activa {
+  background: var(--ink);
+  color: var(--bg);
+}
+.obras-tab:hover:not(.activa) { color: var(--accent-strong); }
+
+.lector-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.lector-columna {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 26px 16px 48px;
+  overflow-wrap: break-word;
+}
+
+.lector-titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 14px;
+  margin-bottom: 34px;
+}
+.lector-titulo h1 {
+  font-size: clamp(26px, 6vw, 44px);
+  font-weight: 600;
+  min-width: 0;
+}
+.lector-titulo .ref-osis {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.texto-biblico {
+  font-size: calc(clamp(1.12rem, 0.95rem + 0.8vw, 1.32rem) * var(--factor-texto, 1));
+  line-height: 1.95;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.verso {
+  transition: background 0.12s ease;
+  border-radius: 3px;
+  padding: 1px 0;
+}
+.verso:hover { background: var(--hover); }
+
+/* El versículo completo es el blanco táctil: abre notas, subrayado y referencias.
+   Se desactiva la selección nativa para que el sistema no muestre su propio menú
+   de búsqueda al mantener pulsado. El copiado vive en el panel, con referencia formada. */
+.versoTocable {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.versoTocable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.verso sup.num {
+  font-family: var(--sans);
+  font-size: 0.6em;
+  font-weight: 700;
+  color: var(--accent-strong);
+  margin-right: 0.35em;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
+.atribucion-obra {
+  margin-top: 56px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+.atribucion-obra b { color: var(--ink-soft); font-weight: 600; }
+
+.avisos {
+  font-family: var(--sans);
+  font-size: 13px;
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--ink-soft);
+  margin-bottom: 28px;
+}
+
+/* ── interlineal ── */
+
+.interlin {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.interlin.rtl .interlin-verso { direction: rtl; }
+.interlin-verso {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: stretch;
+  line-height: 1.4;
+}
+.interlin-verso > .num {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-strong);
+  margin-top: 6px;
+  user-select: none;
+}
+.palabra {
+  font-family: var(--serif);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 9px;
+  min-width: 68px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  transition: border-color 0.14s ease, transform 0.14s ease;
+}
+.palabra:hover { border-color: var(--accent); transform: translateY(-1px); }
+.palabra .w { font-size: 1.08rem; color: var(--ink); }
+.palabra .gl {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+.palabra .st {
+  font-family: var(--sans);
+  font-size: 8.5px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.sin-interlin { color: var(--ink); }
+
+.lex-panel {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  background: var(--bg-elev);
+  border-top: 2px solid var(--accent);
+  box-shadow: var(--shadow);
+  z-index: 60;
+  max-height: 58vh;
+  overflow: auto;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: panel-entra 0.24s ease;
+  /* la coreografía de la pila: subir y encoger, nunca saltar */
+  transition: bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+              max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 0.3s ease;
+}
+
+/* ── Pila de paneles (baraja) ───────────────────────────────────────────────
+   Primer intento: el panel de atrás subía al 50% y se encogía. Quedaba
+   flotando a media página, con texto asomando entre las dos tarjetas: ruido
+   visual, no ayuda.
+
+   Ahora es una baraja. SOLO UNA tarjeta abierta a la vez, abajo; las demás se
+   repliegan a una pestaña justo encima, con su título. Pulsas una pestaña y
+   pasa al frente mientras la anterior se agacha a pestaña. Sin solapes, sin
+   huecos, sin adivinar qué tapa a qué.
+
+   La del frente toma ALTURA FIJA cuando hay pila: así las pestañas encajan
+   siempre a ras, sin depender de cuánto contenido tenga. */
+.lex-panel.prof-0 { bottom: 0; }
+
+.lex-panel.apilado.prof-0 { height: 50vh; max-height: 50vh; }
+.lex-panel.apilado.pestana {
+  height: 40px;
+  max-height: 40px;
+  min-height: 40px;
+  overflow: hidden;
+  cursor: pointer;
+  border-top-width: 1px;
+  box-shadow: none;
+}
+.lex-panel.apilado.prof-1 { bottom: 50vh; }
+.lex-panel.apilado.prof-2 { bottom: calc(50vh + 41px); }
+/* a partir de la cuarta no cabe: se mantiene montada pero fuera de la vista */
+.lex-panel.apilado.prof-3 { display: none; }
+
+/* la pestaña muestra su título en una línea y nada más */
+.lex-panel.apilado.pestana .lex-panel-inner { padding: 0 24px; }
+.lex-panel.apilado.pestana .lex-cabecera {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  margin-bottom: 0;
+  box-shadow: none;
+}
+.lex-panel.apilado.pestana .lex-cabecera > :first-child {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lex-panel.apilado.pestana:hover { background: var(--hover); }
+.lex-panel.apilado.pestana .lex-cabecera::after {
+  content: "↑ abrir";
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-inline-start: auto;
+  margin-inline-end: 10px;
+  white-space: nowrap;
+}
+/* la ✕ de una pestaña estorba: se cierra desde el frente */
+.lex-panel.apilado.pestana .cerrar { display: none; }
+
+@media (max-width: 620px) {
+  .lex-panel.apilado.prof-0 { height: 58vh; max-height: 58vh; }
+  .lex-panel.apilado.prof-1 { bottom: 58vh; }
+  .lex-panel.apilado.prof-2 { bottom: calc(58vh + 41px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lex-panel { transition: none; }
+}
+@keyframes panel-entra {
+  from { transform: translateY(18px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.com-info-popo { animation: panel-entra 0.2s ease; }
+.lex-panel-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 28px;
+}
+/* La cabecera con la ✕ NO puede irse con el scroll: es la unica salida del
+   panel. Se queda pegada arriba, con el fondo del panel para que el texto
+   que pasa por debajo no se le transparente. */
+.lex-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* La ✕ NO puede irse con el scroll: es la única salida del panel. Se queda
+     pegada arriba, con el fondo del panel para que el texto que pasa por
+     debajo no se le transparente. */
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-elev);
+  padding-top: 16px;
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  box-shadow: 0 6px 10px -8px rgba(0, 0, 0, 0.28);
+}
+.lex-palabra {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.lex-meta {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.lex-glosa {
+  font-size: 17px;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.lex-glosa-en {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: normal;
+}
+.lex-def {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  white-space: pre-line;
+}
+.lex-fuente {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.ref-btn { cursor: pointer; }
+.ref-btn:hover { text-decoration: underline dotted; }
+
+.refs-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.ref-item {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 11px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.14s ease;
+}
+.ref-item b { color: var(--ink); font-weight: 600; }
+.ref-item:hover { border-color: var(--accent); }
+
+/* ── comentario de Matthew Henry ── */
+
+.com-bloque-wrap { display: block; }
+
+/* barra de sección: colapsada es un botón; expandida se ancla (sticky) bajo el header */
+.com-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent-strong);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 7px 10px;
+  margin: 12px 0 6px;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.com-toggle:hover { border-color: var(--accent); }
+.com-toggle .com-flecha { flex-shrink: 0; font-size: 10px; }
+.com-etiqueta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.com-etiqueta .l1 {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted);
+}
+.com-toggle.abierto .com-etiqueta .l1 { color: var(--accent-strong); }
+.com-etiqueta .l2 { font-size: 11.5px; line-height: 1.35; color: var(--ink-soft); }
+.com-toggle .com-etiqueta b { color: var(--muted); font-weight: 700; }
+
+/* expandida: color dinámico + anclaje bajo el header */
+.com-toggle.abierto {
+  position: sticky;
+  top: calc(var(--altura-cabecera, 130px) + 4px);
+  z-index: 6;
+  background: var(--bg-elev);
+  border-color: var(--accent);
+  border-left-width: 3px;
+  color: var(--accent-strong);
+  padding: 9px 12px;
+}
+/* anclada de verdad (leyendo dentro de la sección): fondo dorado y sombra de barra activa */
+.com-toggle.anclada {
+  background: var(--accent-soft);
+  box-shadow: var(--shadow), 0 2px 0 var(--accent);
+}
+
+.com-info-btn {
+  flex-shrink: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--muted);
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.com-info-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+.com-info-popo {
+  position: absolute;
+  right: 6px;
+  top: calc(100% + 6px);
+  z-index: 10;
+  max-width: 280px;
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  background: var(--bg-elev);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 10px 12px;
+}
+.com-info-popo b { color: var(--accent-strong); }
+
+.com-bloque {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin: 0 0 0 0;
+  transition: grid-template-rows 0.32s ease, opacity 0.26s ease, margin 0.32s ease;
+}
+.com-bloque.abierto {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-bottom: 14px;
+}
+.com-bloque-int {
+  display: block;
+  overflow: hidden;
+  min-height: 0;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-elev);
+  border-radius: 0 8px 8px 0;
+  padding: 0;
+}
+.com-bloque.abierto .com-bloque-int { padding: 12px 16px; }
+.com-bloque .com-titulo {
+  display: block;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.com-bloque .com-parrafo {
+  display: block;
+  font-size: calc(15px * var(--factor-texto, 1));
+  line-height: 1.75;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+  text-wrap: pretty;
+}
+.com-resumen {
+  display: block;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  font-size: calc(14.5px * var(--factor-texto, 1));
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+.com-resumen .com-titulo {
+  display: block;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 6px;
+}
+
+@media (max-width: 420px) {
+  .marca { font-size: 18px; }
+  .cabecera-inner .lector-acciones a { display: none; } /* la portada ya tiene su CTA */
+  .hero { padding-top: 56px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ── Notas y subrayados del lector (B15: 100 % locales + export/import) ── */
+.verso.subrayado-amarillo { background: rgba(255, 214, 64, 0.32); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.verso.subrayado-verde { background: rgba(46, 184, 114, 0.24); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.verso.subrayado-rosa { background: rgba(240, 98, 146, 0.22); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.num.con-nota { color: var(--accent-strong); }
+.num.con-nota::after { content: "✍"; font-size: 0.62em; margin-left: 1px; vertical-align: super; }
+
+.nota-editor { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.nota-area {
+  width: 100%; margin-top: 8px; padding: 10px;
+  font: inherit; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line-strong); border-radius: 8px;
+  resize: vertical;
+}
+.nota-area:focus { outline: none; border-color: var(--accent); }
+.nota-colores { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.color-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: var(--bg-elev);
+  cursor: pointer; padding: 0;
+}
+.color-btn.activo { outline: 2px solid var(--accent); outline-offset: 1px; }
+.color-btn.swatch-amarillo { background: rgba(255, 214, 64, 0.55); }
+.color-btn.swatch-verde { background: rgba(46, 184, 114, 0.45); }
+.color-btn.swatch-rosa { background: rgba(240, 98, 146, 0.40); }
+
+.notas-acciones { display: flex; gap: 10px; margin-top: 12px; }
+.refs-lista .ref-item.swatch-amarillo { border-left: 4px solid rgba(234, 179, 8, 0.8); }
+.refs-lista .ref-item.swatch-verde { border-left: 4px solid rgba(22, 163, 74, 0.7); }
+.refs-lista .ref-item.swatch-rosa { border-left: 4px solid rgba(219, 39, 119, 0.65); }
+
+/* ── Panel Fuentes (paso 7: etiquetado autor/tradición/fecha por obra) ── */
+.fuente-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.fuente-item .lex-meta { margin-top: 4px; font-size: 0.82rem; }
+
+/* ── Vista griega SBLGNT (paso 6: cierre del núcleo) ── */
+.griego-vista { font-family: var(--serif); }
+.griego-vista .verso { font-size: 1.08em; line-height: 2; }
+.griego-vista .palabra-g { cursor: help; }
+.griego-vista .palabra-g:hover { color: var(--accent-strong); }
+
+/* (el desplegable y la insignia de idioma viven ahora en .rec-sel / .rec-idioma) */
+
+/* ── Barras de desplazamiento ───────────────────────────────────────────────
+   La barra nativa de Windows 11 rompe la sobriedad de la página: gris de
+   sistema, ancha y con flechas. Se sustituye por una delgada, sin flechas y
+   teñida con los tokens del tema, que se oscurece al pasar el ratón.
+   `scrollbar-color` cubre Firefox; `::-webkit-scrollbar`, el resto. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  /* el borde transparente adelgaza el pulgar sin estrechar la zona de agarre */
+  border: 3px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
+::-webkit-scrollbar-thumb:active { background: var(--accent); background-clip: content-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+/* las flechas de Windows fuera */
+::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
+
+/* Quien prefiera menos movimiento, no lo tiene. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Griego crítico emparejado con el español ───────────────────────────────
+   El griego solo no dice nada a quien no lo lee. Cada versículo lleva arriba
+   su texto en la versión elegida y debajo el griego, para que se vea de qué
+   habla cada verso sin tener que ir y volver. */
+.griego-par { display: flex; flex-direction: column; gap: 4px; }
+.gr-par {
+  padding: 10px 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+.gr-par:last-child { border-bottom: none; }
+.gr-es {
+  margin: 0 0 6px;
+  padding: 3px 4px;
+  border-radius: 5px;
+  font-family: var(--serif);
+  color: var(--ink);
+  line-height: 1.62;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+.gr-es:hover { background: var(--hover); }
+.gr-es:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gr-gr {
+  margin: 0;
+  font-family: var(--serif);
+  color: var(--ink-soft);
+  line-height: 1.9;
+  /* algo más pequeño que el español: el griego acompaña, no manda */
+  font-size: 0.94em;
+  /* Tono propio: que se vea de un golpe que son DOS cosas distintas, no la
+     continuación del versículo. Un filete lateral en vez de una caja, para
+     no cortar la columna de lectura. */
+  background: color-mix(in srgb, var(--accent-soft) 55%, transparent);
+  border-inline-start: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 0 6px 6px 0;
+  padding: 7px 10px 7px 11px;
+  margin-top: 2px;
+}
+.palabra-g {
+  font: inherit;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 1px 2px;
+  margin: 0 1px;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.palabra-g:hover { background: var(--hover); color: var(--accent-strong); }
+.palabra-g.activa { background: var(--accent); color: var(--bg); }
+.palabra-g:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* número de versículo del interlineal: es un botón, no un adorno */
+.interlin-num {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 1px 5px;
+  margin-inline-end: 6px;
+  cursor: pointer;
+  vertical-align: top;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+.interlin-num:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.interlin-num:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* salto del texto crítico al interlineal, donde sí hay Strong y glosa */
+.btn-inter {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  margin: 14px 0 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent-strong);
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.btn-inter:hover { background: var(--accent); color: var(--bg); }
+
+/* ── Push-up: el panel de abajo no puede tapar lo que estás leyendo ─────────
+   Los paneles son `position: fixed` sobre el texto. Al abrirse, la columna
+   gana hueco al final para que la última línea siga siendo alcanzable. */
+/* el hueco crece con la pila: dos tarjetas ocupan más que una */
+/* el hueco cubre la tarjeta del frente más las pestañas de las de atrás */
+.lector-columna.con-panel.pila-1 { padding-bottom: 62vh; }
+.lector-columna.con-panel.pila-2 { padding-bottom: calc(50vh + 60px); }
+@media (max-width: 620px) {
+  .lector-columna.con-panel.pila-1 { padding-bottom: 66vh; }
+  .lector-columna.con-panel.pila-2 { padding-bottom: calc(58vh + 60px); }
+}
+
+/* salto secundario al interlineal: es una salida, no la acción principal —
+   la glosa ya está en la tarjeta y cambiar de vista rompe la lectura */
+.btn-inter-sec {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  margin: 14px 0 0;
+  padding: 5px 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: start;
+  transition: color 0.16s ease;
+}
+.btn-inter-sec:hover { color: var(--accent-strong); text-decoration: underline; }
+.btn-inter-sec:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* referencias del diccionario: fichas tocables, no una lista muerta */
+.dic-refs { line-height: 2; }
+.dic-refs-rotulo { color: var(--muted); }
+.dic-refs-sep { color: var(--line-strong); }
+.dic-refs .cita {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 0.86em;
+}
+.dic-refs .cita:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+/* el nombre inglés detrás del español en los resultados del diccionario */
+.ref-item-en { color: var(--muted); font-size: 0.86em; font-weight: 400; }
+
+
+/* ── Cabecera del lector en móvil ───────────────────────────────────────────
+   Tres filas fijas, sin depender de dónde caiga el ancho:
+     1  [RV1909|VBL|WEB] [Libro ▾]
+     2  [cap] [Ω Solo el texto ▾] [⌕] [✍] [←] [→]
+     3  [✎ Matthew Henry · 1706 ▾] ········ [ES|EN] [☑]
+   Información y fuentes subieron a la cabecera, junto al tema. */
+.nav-fila {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* el capítulo tiene como mucho tres cifras: no necesita el ancho de un libro */
+.cabecera-sub-inner .sel.sel-cap {
+  flex: 0 0 58px;
+  width: 58px;
+  padding-left: 9px;
+  padding-right: 4px;
+}
+/* capítulo pendiente tras elegir libro: se expande, se anilla en dorado y avisa — obligatorio */
+.cabecera-sub-inner .sel.sel-cap.requerido {
+  flex: 1 1 auto;
+  width: auto;
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 1px var(--accent);
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+/* «Original» en la fila de navegación: toma lo que sobra y recorta con … */
+.rec-original-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 5px;
+}
+.rec-original-nav .rec-sel-orig {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  height: 34px;
+  border: 1px solid var(--line);
+  background-color: var(--bg-elev);
+  border-radius: 9px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rec-original-nav .rec-icono { width: 24px; height: 34px; border-radius: 9px; }
+/* el selector del comentario toma el resto de su fila; idioma y casilla a ras */
+.rec-barra > .rec-sel { flex: 1 1 auto; min-width: 0; text-overflow: ellipsis; }
+
+@media (max-width: 620px) {
+  .nav-fila { flex-basis: 100%; }
+  .cabecera-sub-inner > .sel { flex: 1 1 auto; }
+}
+@media (max-width: 360px) {
+  /* pantallas muy estrechas: el icono Ω cede su sitio al texto del selector */
+  .rec-original-nav .rec-icono { display: none; }
+}
+
+/* D24 — Apoyar el proyecto: medios discretos, nunca sobre la lectura */
+.apoyar-medios {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0 8px;
+}
+.apoyar-medio {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.apoyar-etiqueta {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.apoyar-dato {
+  font-size: 14.5px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Cita con grupo multi-capítulo: encabezado de capítulo + chip cap:v por verso */
+.cita-capitulo {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin: 12px 0 4px;
+}
+.cita-capitulo:first-child {
+  margin-top: 0;
+}
+.cita-ref {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-strong);
+  margin-right: 6px;
+}
+.sel-mini {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  padding: 4px 6px;
+  font-size: 12.5px;
+}
 
