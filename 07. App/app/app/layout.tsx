@@ -24,7 +24,7 @@ export const viewport: Viewport = {
 };
 
 /** Anti-parpadeo: fija tema y tamaño de texto antes del primer paint, y oculta la intro si ya se vio en esta sesión. */
-const temaInit = `try{var t=localStorage.getItem('tema')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'oscuro':'claro');document.documentElement.setAttribute('data-theme',t);var f=localStorage.getItem('tam');if(f)document.documentElement.style.setProperty('--factor-texto',f)}catch(e){}try{if(sessionStorage.getItem('aion-intro'))document.documentElement.classList.add('sin-intro')}catch(e){}`;
+const temaInit = `try{var t=localStorage.getItem('tema')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'oscuro':'claro');document.documentElement.setAttribute('data-theme',t);var f=localStorage.getItem('tam');if(f)document.documentElement.style.setProperty('--factor-texto',f)}catch(e){}try{if(sessionStorage.getItem('aion-intro'))document.documentElement.classList.add('sin-intro')}catch(e){}try{var c=localStorage.getItem('contraste');if(c==='alto'||c==='maximo')document.documentElement.setAttribute('data-contraste',c)}catch(e){}`;
 
 export default function RootLayout({
   children,

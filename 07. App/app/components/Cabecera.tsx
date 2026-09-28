@@ -25,7 +25,7 @@ export default function Cabecera({
 }) {
   const tr = t(locale);
   return (
-    <header className="cabecera">
+    <header className={`cabecera${enLector ? " en-lector" : ""}`}>
       <div className="cabecera-inner">
         <Link href={`/${locale}`} className="marca">
           <LogoAion size={26} className="marca-logo" titulo="" />

@@ -6413,3 +6413,89 @@ button.rec-original[aria-pressed="true"]::before {
 @media (min-width: 680px) {
   .cabecera-sub > .com-strip-fila { flex: 1 1 250px; max-width: 420px; min-width: 230px; }
 }
+
+/* ═══ Pestañas v3: nombre (seleccionar / arrastrar) + ▾ (cambiar recurso) ═══ */
+.pestana-nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.pestana-flecha {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-left: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.2s ease;
+}
+.pestana-flecha:hover { background: var(--hover); color: var(--ink); }
+.pestana-flecha.activa { color: var(--ink); transform: rotate(180deg); }
+.recurso-popo {
+  position: fixed;
+  z-index: 125;
+  min-width: 250px;
+  padding: 6px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  animation: vistazo-entra 0.14s ease;
+}
+.recurso-op {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.recurso-op small { color: var(--muted); font-size: 12px; }
+.recurso-op:hover { background: var(--hover); }
+.recurso-op.activa { background: color-mix(in srgb, var(--accent) 13%, transparent); }
+
+/* ── Tira de pestañas: se encogen antes de desbordar; si aun así no caben, flechas ‹ › ── */
+.zona .estudio-pestanas { scroll-behavior: smooth; }
+.zona .estudio-pestana { flex: 0 1 auto; min-width: 72px; max-width: 220px; }
+.zona .pestana-rec { display: inline-flex; }
+.zona .estudio-pestana:not(.pestana-rec) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pestanas-flecha {
+  position: absolute;
+  top: 8px;
+  z-index: 3;
+  width: 26px;
+  height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-elev);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  box-shadow: var(--shadow);
+}
+.pestanas-flecha.izq { left: 4px; }
+.pestanas-flecha.der { right: 4px; }
+.zona.desborda .pestanas-flecha { display: block; }
+.zona.desborda .estudio-pestanas { padding-left: 34px; padding-right: 34px; }
+
+/* ── Cabecera del lector de extremo a extremo ── */
+.cabecera.en-lector .cabecera-inner { max-width: none; padding-inline: 14px; }
+
+/* ═══ Contraste de las letras (Ajustes) ═══ */
+[data-contraste="alto"] { --ink: #120f0a; --ink-soft: #2f2a20; --muted: #5f5747; }
+[data-contraste="maximo"] { --ink: #000000; --ink-soft: #15120c; --muted: #3a342a; }
+[data-theme="oscuro"][data-contraste="alto"] { --ink: #f7f2e8; --ink-soft: #e2dac8; --muted: #b9ae9a; }
+[data-theme="oscuro"][data-contraste="maximo"] { --ink: #ffffff; --ink-soft: #f3eee4; --muted: #d8cfbd; }
+.contraste-alto { font-weight: 600; }
+.contraste-maximo { font-weight: 700; }

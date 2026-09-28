@@ -192,10 +192,25 @@ export default function Lector() {
   // color (0 = ninguno, 1-5) y tamaño de letra (-2…+3) de cada cuadro de la mesa
   const [estiloZona, setEstiloZona] = useGuardado<Partial<Record<Zona, { c: number; t: number }>>>("mesa-estilos", {});
   const [estiloAbierto, setEstiloAbierto] = useState<Zona | null>(null);
+  // menú de recurso de una pestaña: se abre SÓLO con su flecha ▾
+  const [menuRecurso, setMenuRecurso] = useState<{ id: string; x: number; y: number } | null>(null);
   // Ajustes: panel lateral con tema, letra, información, fuentes, derechos y apoyo
   const [ajustes, setAjustes] = useState<null | "menu" | "info" | "fuentes" | "derechos" | "apoyar">(null);
   const [capasAbierto, setCapasAbierto] = useState(false);
   const [tamGeneral, setTamGeneral] = useState("1");
+  const [contraste, setContraste] = useState<"normal" | "alto" | "maximo">("normal");
+  useEffect(() => {
+    try {
+      const c = localStorage.getItem("contraste");
+      if (c === "alto" || c === "maximo") setContraste(c);
+    } catch {}
+  }, []);
+  const fijaContraste = (c: "normal" | "alto" | "maximo") => {
+    setContraste(c);
+    if (c === "normal") document.documentElement.removeAttribute("data-contraste");
+    else document.documentElement.setAttribute("data-contraste", c);
+    try { localStorage.setItem("contraste", c); } catch {}
+  };
   useEffect(() => {
     try {
       const g = localStorage.getItem("tam");
@@ -209,15 +224,16 @@ export default function Lector() {
   };
   // los menús flotantes (capas, estilo del cuadro) se cierran al tocar fuera
   useEffect(() => {
-    if (!capasAbierto && !estiloAbierto) return;
+    if (!capasAbierto && !estiloAbierto && !menuRecurso) return;
     const fuera = (e: PointerEvent) => {
       const el = e.target as HTMLElement;
       if (!el.closest(".capas-wrap")) setCapasAbierto(false);
       if (!el.closest(".estilo-popo, .pestana-estilo")) setEstiloAbierto(null);
+      if (!el.closest(".recurso-popo, .pestana-flecha")) setMenuRecurso(null);
     };
     document.addEventListener("pointerdown", fuera);
     return () => document.removeEventListener("pointerdown", fuera);
-  }, [capasAbierto, estiloAbierto]);
+  }, [capasAbierto, estiloAbierto, menuRecurso]);
   const [parDisp, setParDisp] = useGuardado<"lado" | "apilado">("paralelo-disp", "lado");
   const [citasRecientes, setCitasRecientes] = useState<NonNullable<ReturnType<typeof parseCita>>[]>([]);
   const [arrastreTab, setArrastreTab] = useState<{ id: string; x: number; y: number; sobre: Zona | null } | null>(null);
@@ -1186,7 +1202,16 @@ export default function Lector() {
   }, []);
 
   const comEnTexto = comentario && !ancho;
-  const extrasVisibles = ancho && comentario ? comsExtra : [];
+  // saneo: un id repetido hace que React deje pestañas huérfanas («cuadros falsos»
+  // con el id por nombre); una entrada sin recurso válido no se muestra
+  const comsLimpios = comsExtra.filter(
+    (e, i, a) => e && e.id && COMENTARIOS.some((c) => c.id === e.fuente) && a.findIndex((x) => x.id === e.id) === i
+  );
+  useEffect(() => {
+    if (comsLimpios.length !== comsExtra.length) setComsExtra(comsLimpios);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [comsExtra]);
+  const extrasVisibles = ancho && comentario ? comsLimpios : [];
   const fuentesExtra = [...new Set(extrasVisibles.map((e) => e.fuente))].filter((f) => f !== "henry").join(",");
   useEffect(() => {
     if (!fuentesExtra) return;
@@ -1208,8 +1233,8 @@ export default function Lector() {
     if (!d || d.osis !== osis) return [];
     return (d.json.c[String(cap)] ?? []).flatMap((a) => a.p.filter(Boolean).map((x) => (a.v > 0 ? `${a.v}. ${x}` : x)));
   };
-  const esCom = (id: string) => id === "com" || comsExtra.some((e) => e.id === id);
-  const fuenteDe = (id: string): ComFuente | undefined => (id === "com" ? comFuente : comsExtra.find((e) => e.id === id)?.fuente);
+  const esCom = (id: string) => id === "com" || comsLimpios.some((e) => e.id === id);
+  const fuenteDe = (id: string): ComFuente | undefined => (id === "com" ? comFuente : comsLimpios.find((e) => e.id === id)?.fuente);
   /** Clase y variables de estilo del cuadro según su zona (color de fondo y escala de letra). */
   const ZOOM = { "-2": 0.8, "-1": 0.9, "0": 1, "1": 1.12, "2": 1.25, "3": 1.4 } as Record<string, number>;
   const estiloDe = (z: Zona) => {
@@ -1344,6 +1369,13 @@ export default function Lector() {
   useEffect(() => {
     document.documentElement.classList.toggle("mesa-arrastrando", arrastrando || !!arrastreTab);
   }, [arrastrando, arrastreTab]);
+  // las flechas ‹ › de una zona sólo aparecen si sus pestañas no caben
+  useEffect(() => {
+    document.querySelectorAll<HTMLElement>(".zona").forEach((zn) => {
+      const tira = zn.querySelector<HTMLElement>(".estudio-pestanas");
+      if (tira) zn.classList.toggle("desborda", tira.scrollWidth > tira.clientWidth + 2);
+    });
+  });
 
   /** «+» de cada zona: un comentario más (máx. 3 por zona) o una herramienta, directo a esa zona. */
   const anadirEn = (z: Zona, v: string) => {
@@ -1365,8 +1397,8 @@ export default function Lector() {
       return;
     }
     if (porZona[z].filter(esCom).length >= 3) return;
-    const id = `c${Date.now().toString(36)}`;
-    setComsExtra((prev) => [...prev, { id, fuente: f }]);
+    const id = `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+    setComsExtra((prev) => (prev.some((e) => e.id === id) ? prev : [...prev, { id, fuente: f }]));
     setZonaDe((prev) => ({ ...prev, [id]: z }));
     setActivo((a) => ({ ...a, [z]: id }));
   };
@@ -2258,7 +2290,21 @@ export default function Lector() {
             const act = activoEn(z);
             return (
               <div key={z} className={`zona zona-${z}${estiloDe(z).clase}`} style={r} data-zona={z}>
-                <div className="estudio-pestanas" role="tablist" aria-label={NOMBRE_ZONA[z]}>
+                <button
+                  className="pestanas-flecha izq"
+                  aria-label="Pestañas anteriores"
+                  onClick={(ev) => ev.currentTarget.nextElementSibling?.scrollBy({ left: -180, behavior: "smooth" })}
+                >
+                  ‹
+                </button>
+                <div
+                  className="estudio-pestanas"
+                  role="tablist"
+                  aria-label={NOMBRE_ZONA[z]}
+                  onWheel={(ev) => {
+                    if (Math.abs(ev.deltaY) > Math.abs(ev.deltaX)) ev.currentTarget.scrollLeft += ev.deltaY;
+                  }}
+                >
                   {porZona[z].map((id) => {
                     const f = fuenteDe(id);
                     const clase = `estudio-pestana${act === id ? " activa" : ""}${arrastreTab?.id === id ? " arrastrada" : ""}`;
@@ -2271,25 +2317,25 @@ export default function Lector() {
                           aria-selected={act === id}
                           className={`${clase} pestana-rec`}
                           onPointerDown={(e) => {
-                            if ((e.target as HTMLElement).closest("select, .pestana-x")) return traerAlFrente(id);
+                            if ((e.target as HTMLElement).closest(".pestana-flecha, .pestana-x")) return;
                             iniciarTab(id, e);
                           }}
                           onKeyDown={(e) => e.key === "Enter" && traerAlFrente(id)}
-                          title="Arrastra para mover · elige el recurso en el desplegable"
+                          title="Toca para ver · arrastra para mover · ▾ para cambiar de recurso"
                         >
                           {ancho && <span className="pestana-asidero" aria-hidden="true">⠿</span>}
-                          <select
-                            className="pestana-sel"
-                            aria-label="Recurso de este cuadro"
-                            value={f}
-                            onChange={(e) => cambiarFuente(id, e.target.value as ComFuente)}
+                          <span className="pestana-nombre">{COMENTARIOS.find((c) => c.id === f)?.etiqueta ?? f}</span>
+                          <button
+                            className={`pestana-flecha${menuRecurso?.id === id ? " activa" : ""}`}
+                            aria-label="Cambiar el recurso de este cuadro"
+                            aria-expanded={menuRecurso?.id === id}
+                            onClick={(ev) => {
+                              const r = ev.currentTarget.getBoundingClientRect();
+                              setMenuRecurso(menuRecurso?.id === id ? null : { id, x: r.left, y: r.bottom + 6 });
+                            }}
                           >
-                            {COMENTARIOS.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.etiqueta} · {c.anio}
-                              </option>
-                            ))}
-                          </select>
+                            ▾
+                          </button>
                           {id !== "com" && (
                             <button className="pestana-x" onClick={() => quitarExtra(id)} aria-label="Cerrar este comentario">
                               ✕
@@ -2349,6 +2395,13 @@ export default function Lector() {
                     </button>
                   )}
                 </div>
+                <button
+                  className="pestanas-flecha der"
+                  aria-label="Pestañas siguientes"
+                  onClick={(ev) => ev.currentTarget.previousElementSibling?.scrollBy({ left: 180, behavior: "smooth" })}
+                >
+                  ›
+                </button>
               </div>
             );
           })}
@@ -2385,6 +2438,31 @@ export default function Lector() {
                     </div>
                   </div>
                 )}
+          {menuRecurso && fuenteDe(menuRecurso.id) && (
+            <div
+              className="recurso-popo"
+              role="listbox"
+              aria-label="Recurso del cuadro"
+              style={{ left: Math.max(8, Math.min(menuRecurso.x, ventW - 280)), top: menuRecurso.y }}
+            >
+              {COMENTARIOS.map((c) => (
+                <button
+                  key={c.id}
+                  role="option"
+                  aria-selected={fuenteDe(menuRecurso.id) === c.id}
+                  className={`recurso-op${fuenteDe(menuRecurso.id) === c.id ? " activa" : ""}`}
+                  onClick={() => {
+                    cambiarFuente(menuRecurso.id, c.id as ComFuente);
+                    traerAlFrente(menuRecurso.id);
+                    setMenuRecurso(null);
+                  }}
+                >
+                  <span>{c.etiqueta}</span>
+                  <small>{c.anio}</small>
+                </button>
+              ))}
+            </div>
+          )}
           {comentario && rectsZona[zonaEf("com")] && (
             <section
               ref={estudioRef}
@@ -3160,6 +3238,23 @@ export default function Lector() {
                       ))}
                     </div>
                     <div className="lex-meta">Cada cuadro de estudio tiene además su propio tamaño (botón «Aa» del cuadro).</div>
+                  </div>
+                  <div className="ajustes-bloque">
+                    <div className="ajustes-rotulo">Contraste de las letras</div>
+                    <div className="ajustes-tams" role="group" aria-label="Contraste de las letras">
+                      {([["normal", "Normal"], ["alto", "Alto"], ["maximo", "Máximo"]] as const).map(([v, e]) => (
+                        <button
+                          key={v}
+                          className={`estilo-tam contraste-${v}${contraste === v ? " activa" : ""}`}
+                          onClick={() => fijaContraste(v)}
+                          aria-pressed={contraste === v}
+                          style={{ padding: "0 12px" }}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="lex-meta">Oscurece (en tema claro) o aclara (en tema oscuro) el texto y las notas grises para leer mejor.</div>
                   </div>
                   {([
                     ["info", "ⓘ", tr.info, "Pasaje, edición y atribución de lo que estás leyendo"],
