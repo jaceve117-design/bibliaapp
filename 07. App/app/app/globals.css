@@ -5857,22 +5857,6 @@ html.sin-intro .intro { display: none; }
   .nav-caps-caja:not(.abierta) > .nav-caps { padding-top: 0; padding-bottom: 0; }
 }
 
-/* ── Cabecera en UNA sola línea en pantallas muy anchas (≥ 1400 px) ──
-   logo · versiones · libro · capítulo · capa del original · acciones · comentario · info/tema.
-   Se gana altura para la mesa de trabajo y desaparecen las filas centradas con márgenes vacíos. */
-@media (min-width: 1400px) {
-  .cabecera { display: flex; align-items: center; gap: 14px; padding-inline: 14px; }
-  .cabecera-inner { display: contents; }
-  .cabecera .marca { flex: none; order: 0; }
-  .cabecera-sub { order: 1; flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px; border-top: 0; }
-  .cabecera .lector-acciones { order: 2; margin-left: 0; flex: none; }
-  .cabecera-sub-inner { max-width: none; margin: 0; padding: 7px 0; flex-wrap: nowrap; flex: 0 1 auto; min-width: 0; }
-  .cabecera-sub-inner > select.sel { width: 170px; flex: none; }
-  .cabecera-sub .nav-fila { flex: 0 1 auto; }
-  .cabecera-sub .rec-original-nav { flex: 0 1 190px; }
-  .com-strip-fila { border-top: 0; flex: 0 1 380px; min-width: 250px; }
-  .com-strip-fila .rec-barra { max-width: none; margin: 0; padding: 5px 8px; border-radius: 10px; }
-}
 
 /* ═══ Mesa de trabajo: zonas, cuadros, bordes y arrastre (lib/mesa.ts) ═══
    Las zonas y los cuadros se posicionan con coordenadas calculadas; al cambiar
@@ -6249,3 +6233,183 @@ button.rec-original[aria-pressed="true"]::before {
 }
 .estilo-tam:hover { color: var(--ink); }
 .estilo-tam.activa { color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+/* ═══ Cabecera del lector en dos líneas ═══
+   1) marca a la izquierda · ⚙ Ajustes a la derecha
+   2) Biblia ▾ · ⫴ · Libro ▾ · Cap ▾ · Capas ▾ · ⌕ ← → ······ Comentarista ▾ */
+.cabecera-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 6px 12px;
+  border-top: 1px solid var(--line);
+}
+.cabecera-sub > .cabecera-sub-inner.barra-lectura {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.barra-lectura .sel-biblia { width: auto; min-width: 104px; flex: none; }
+.barra-lectura > select.sel:not(.sel-biblia):not(.sel-cap) { width: 160px; flex: 0 1 160px; min-width: 110px; }
+.barra-lectura .sel-cap { flex: none; width: auto; }
+.barra-lectura .lector-acciones { margin-left: 0; }
+.cabecera-sub > .com-strip-fila { border-top: 0; margin-left: auto; flex: 0 1 380px; min-width: 250px; }
+.cabecera-sub > .com-strip-fila .rec-barra { max-width: none; margin: 0; border-radius: 10px; padding: 5px 8px; }
+.icono-btn.activo { color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+@media (max-width: 679px) {
+  .cabecera-sub > .com-strip-fila { flex: 1 1 100%; margin-left: 0; }
+  .barra-lectura > select.sel:not(.sel-biblia):not(.sel-cap) { flex: 1 1 120px; width: auto; }
+  .capas-txt { display: none; }
+}
+
+/* ── Capas del texto: casillas en un menú ── */
+.capas-wrap { position: relative; flex: none; }
+.capas-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  color: var(--ink-soft, var(--ink));
+  font-family: var(--sans);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+.capas-btn:hover { border-color: var(--accent); }
+.capas-btn.activa { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.capas-n {
+  min-width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bg-elev);
+  font-size: 10.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.capas-flecha { font-size: 9px; color: var(--muted); }
+.capas-popo {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 110;
+  min-width: 250px;
+  padding: 6px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  animation: vistazo-entra 0.16s ease;
+}
+.capa-op {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.capa-op:hover { background: var(--hover); }
+.capa-op input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
+
+/* ── «Aa» del cuadro: el menú flota por encima de todo ── */
+.estilo-popo { position: fixed; right: auto; z-index: 120; }
+
+/* ── Panel de Ajustes (lateral) ── */
+.ajustes-velo {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  background: rgba(0, 0, 0, 0.32);
+  animation: velo-entra 0.2s ease;
+}
+@keyframes velo-entra { from { opacity: 0; } to { opacity: 1; } }
+.ajustes {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 150;
+  width: min(420px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elev);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding-top: env(safe-area-inset-top, 0);
+  animation: ajustes-entra 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes ajustes-entra { from { transform: translate3d(40px, 0, 0); opacity: 0; } to { transform: none; opacity: 1; } }
+.ajustes-cab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.ajustes-titulo { flex: 1; font-family: var(--serif); font-size: 20px; color: var(--ink); }
+.ajustes-cuerpo { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 18px 40px; }
+.ajustes-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 2px 14px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink);
+}
+.ajustes-bloque { padding: 14px 2px; border-bottom: 1px solid var(--line); }
+.ajustes-rotulo { font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.ajustes-tams { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.ajustes-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 13px 8px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.15s ease;
+}
+.ajustes-item:hover { background: var(--hover); }
+.ajustes-ico { width: 28px; text-align: center; font-size: 17px; color: var(--accent-strong, var(--accent)); }
+.ajustes-txt { flex: 1; display: flex; flex-direction: column; gap: 2px; font-family: var(--sans); }
+.ajustes-txt b { font-size: 14.5px; font-weight: 600; }
+.ajustes-txt small { font-size: 12px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .ajustes, .ajustes-velo, .capas-popo { animation: none !important; } }
+/* móvil: ⌕ ← → comparten fila con el comentarista (3 filas en vez de 4) y Capas no se sale */
+@media (max-width: 679px) {
+  .cabecera-sub > .cabecera-sub-inner.barra-lectura { display: contents; }
+  .barra-lectura > select.sel:not(.sel-biblia):not(.sel-cap) { flex: 1 1 90px; min-width: 0; }
+  .barra-lectura .sel-biblia { min-width: 0; }
+  .barra-lectura .lector-acciones { order: 1; gap: 4px; }
+  .cabecera-sub > .com-strip-fila { order: 2; flex: 1 1 180px; min-width: 0; margin-left: 0; }
+  .capas-popo { left: auto; right: 0; }
+}
+@media (min-width: 680px) {
+  .cabecera-sub > .com-strip-fila { flex: 1 1 250px; max-width: 420px; min-width: 230px; }
+}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Cabecera from "@/components/Cabecera";
+import Tema from "@/components/Tema";
 import TamTexto from "@/components/TamTexto";
 import { t } from "@/lib/i18n";
 import { parejaDe } from "@/lib/alinea-gr";
@@ -191,6 +192,32 @@ export default function Lector() {
   // color (0 = ninguno, 1-5) y tamaño de letra (-2…+3) de cada cuadro de la mesa
   const [estiloZona, setEstiloZona] = useGuardado<Partial<Record<Zona, { c: number; t: number }>>>("mesa-estilos", {});
   const [estiloAbierto, setEstiloAbierto] = useState<Zona | null>(null);
+  // Ajustes: panel lateral con tema, letra, información, fuentes, derechos y apoyo
+  const [ajustes, setAjustes] = useState<null | "menu" | "info" | "fuentes" | "derechos" | "apoyar">(null);
+  const [capasAbierto, setCapasAbierto] = useState(false);
+  const [tamGeneral, setTamGeneral] = useState("1");
+  useEffect(() => {
+    try {
+      const g = localStorage.getItem("tam");
+      if (g) setTamGeneral(g);
+    } catch {}
+  }, []);
+  const fijaTamGeneral = (v: string) => {
+    setTamGeneral(v);
+    document.documentElement.style.setProperty("--factor-texto", v);
+    try { localStorage.setItem("tam", v); } catch {}
+  };
+  // los menús flotantes (capas, estilo del cuadro) se cierran al tocar fuera
+  useEffect(() => {
+    if (!capasAbierto && !estiloAbierto) return;
+    const fuera = (e: PointerEvent) => {
+      const el = e.target as HTMLElement;
+      if (!el.closest(".capas-wrap")) setCapasAbierto(false);
+      if (!el.closest(".estilo-popo, .pestana-estilo")) setEstiloAbierto(null);
+    };
+    document.addEventListener("pointerdown", fuera);
+    return () => document.removeEventListener("pointerdown", fuera);
+  }, [capasAbierto, estiloAbierto]);
   const [parDisp, setParDisp] = useGuardado<"lado" | "apilado">("paralelo-disp", "lado");
   const [citasRecientes, setCitasRecientes] = useState<NonNullable<ReturnType<typeof parseCita>>[]>([]);
   const [arrastreTab, setArrastreTab] = useState<{ id: string; x: number; y: number; sobre: Zona | null } | null>(null);
@@ -1258,6 +1285,7 @@ export default function Lector() {
     else if (e.key === "ArrowRight") { e.preventDefault(); adelante(1); window.scrollTo({ top: 0, behavior: "smooth" }); }
     else if (e.key === "/") { e.preventDefault(); abrirBusqueda(); }
     else if (e.key === "Escape") {
+      if (ajustes) return setAjustes(ajustes === "menu" ? null : "menu");
       if (vistazo) return setVistazo(null);
       const id = pila[pila.length - 1];
       const cerrar: Record<string, () => void> = {
@@ -1634,42 +1662,39 @@ export default function Lector() {
       <Cabecera
         locale="es"
         enLector
+        sinTema
         extra={
           // Información y fuentes del corpus en UN botón, arriba junto al tema.
           // Antes eran dos iconos (ⓘ y ≣) en la fila de navegación, y en móvil
           // empujaban «Solo el texto» a una línea propia.
           <button
-            className="icono-btn"
-            onClick={() => setPanelInfo(true)}
-            aria-label={`${tr.info} · ${tr.fuentes}`}
-            title={`${tr.info} · ${tr.fuentes}`}
+            className={`icono-btn ajustes-btn${ajustes ? " activo" : ""}`}
+            onClick={() => setAjustes(ajustes ? null : "menu")}
+            aria-label="Ajustes"
+            aria-expanded={!!ajustes}
+            title="Ajustes: tema, letra, información, fuentes, derechos y apoyo"
           >
-            ⓘ
+            ⚙
           </button>
         }
       >
-        <div className="cabecera-sub-inner">
-          <div className="obras-toggle" role="tablist" aria-label="Obra">
+        <div className="cabecera-sub-inner barra-lectura">
+          <select className="sel sel-biblia" aria-label="Biblia" value={obra} onChange={(e) => setObra(e.target.value)}>
             {OBRAS.map((o) => (
-              <button
-                key={o.id}
-                role="tab"
-                aria-selected={obra === o.id}
-                className={`obras-tab${obra === o.id ? " activa" : ""}`}
-                onClick={() => setObra(o.id)}
-              >
+              <option key={o.id} value={o.id}>
                 {o.etiqueta}
-              </button>
+              </option>
             ))}
-            <button
-              className={`obras-tab solo-paralelo${paralelo !== null ? " activa" : ""}`}
-              onClick={() => fijaParalelo(paralelo === null ? [OPCIONES_PAR[0]?.id ?? "vbl"] : null)}
-              aria-pressed={paralelo !== null}
-              title="Ver varias versiones lado a lado"
-            >
-              ⫴ Paralelo
-            </button>
-          </div>
+          </select>
+          <button
+            className={`icono-btn solo-paralelo${paralelo !== null ? " activo" : ""}`}
+            onClick={() => fijaParalelo(paralelo === null ? [OPCIONES_PAR[0]?.id ?? "vbl"] : null)}
+            aria-pressed={paralelo !== null}
+            aria-label="Biblias en paralelo"
+            title="Ver varias Biblias lado a lado"
+          >
+            ⫴
+          </button>
           <select
             className="sel"
             aria-label={tr.libro}
@@ -1692,107 +1717,113 @@ export default function Lector() {
               </option>
             ))}
           </select>
-          {/* Fila de navegación: capítulo · capa del original · acciones.
-              Agrupada para que en móvil ocupe SIEMPRE su propia línea en vez de
-              partirse donde caiga el ancho. */}
-          <div className="nav-fila">
             <select
-              ref={capRef}
-              className={`sel sel-cap${pendiente ? " requerido" : ""}`}
-              aria-label={tr.capitulo}
-              value={pendiente ? "" : cap}
-              onChange={(e) => {
-                const n = Number(e.target.value);
-                if (!n) return;
-                if (pendiente) {
-                  setOsis(pendiente);
-                  setPendiente(null);
-                }
-                setCap(n);
-              }}
+            ref={capRef}
+            className={`sel sel-cap${pendiente ? " requerido" : ""}`}
+            aria-label={tr.capitulo}
+            value={pendiente ? "" : cap}
+            onChange={(e) => {
+              const n = Number(e.target.value);
+              if (!n) return;
+              if (pendiente) {
+                setOsis(pendiente);
+                setPendiente(null);
+              }
+              setCap(n);
+            }}
+          >
+            {pendiente && <option value="">{tr.capituloElige}</option>}
+            {Array.from(
+              {
+                length: pendiente
+                  ? (manifest?.libros.find((l) => l.osis === pendiente)?.caps ?? 1)
+                  : caps,
+              },
+              (_, i) => i + 1
+            ).map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+          {/* Capas del texto con casillas: lo que se SUPERPONE a la lectura. */}
+          <div className="capas-wrap">
+            <button
+              className={`capas-btn${dicEnTexto || interlineal || griego || panelNotas ? " activa" : ""}`}
+              onClick={() => setCapasAbierto(!capasAbierto)}
+              aria-expanded={capasAbierto}
+              aria-label="Capas del texto"
+              title="Capas del texto: diccionario, interlineal, griego, notas"
             >
-              {pendiente && <option value="">{tr.capituloElige}</option>}
-              {Array.from(
-                {
-                  length: pendiente
-                    ? (manifest?.libros.find((l) => l.osis === pendiente)?.caps ?? 1)
-                    : caps,
-                },
-                (_, i) => i + 1
-              ).map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-              {/* Capa del texto original. Es un control APARTE del comentario a
-                  propósito: el comentario se muestra DEBAJO del texto, el
-                  interlineal TRANSFORMA el texto. Mezclarlos haría ambiguo el
-                  checkbox y quitaría la combinación más útil de estudio
-                  (interlineal arriba + comentario abajo). */}
-              <button
-                className={`rec-original rec-original-nav${dicEnTexto ? " activa" : ""}`}
-                onClick={() => {
-                  setDicEnTexto(!dicEnTexto);
-                  // el índice de titulares se necesita tanto como el interruptor
-                  if (!dicEnTexto && !dicIndice) abrirDic();
-                }}
-                aria-pressed={dicEnTexto}
-                title={tr.dicEnTexto}
-              >
-                📖 {tr.dicEnTexto}
-              </button>
-              <span className={`rec-original rec-original-nav${interlineal || griego ? " activa" : ""}`}>
-                <span className="rec-icono rec-icono-orig" aria-hidden="true">
-                  {griego ? "Ξ" : "Ω"}
-                </span>
-                <select
-                  className="rec-sel rec-sel-orig"
-                  aria-label="Capa del texto original"
-                  value={interlineal ? "inter" : griego ? "sblgnt" : "ninguno"}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setInterlineal(v === "inter");
-                    setGriego(v === "sblgnt");
-                  }}
-                >
-                  <option value="ninguno">Solo el texto</option>
-                  <option value="inter">
-                    Interlineal ({NT.has(osis) ? "griego" : "hebreo"})
-                  </option>
-                  {/* El SBLGNT son 27 libros: en el AT la opción ni se ofrece.
-                      Antes el icono Ξ se mostraba en Oseas y no podía hacer nada. */}
-                  {NT.has(osis) && <option value="sblgnt">Griego SBLGNT</option>}
-                </select>
-              </span>
-
-            <div className="lector-acciones">
-              <button
-                className="icono-btn"
-                onClick={abrirBusqueda}
-                aria-label="Buscar pasajes y diccionario"
-                title="Buscar pasajes y diccionario"
-              >
-                ⌕
-              </button>
-              <button
-                className={`icono-btn${Object.keys(notas).length ? " activo" : ""}`}
-                onClick={() => {
-                  setPanelNotas(true);
-                  setMsgNotas(null);
-                }}
-                aria-label={tr.notas}
-                title={tr.notas}
-              >
-                ✍
-              </button>
-              <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
-                ←
-              </button>
-              <button className="icono-btn" onClick={() => adelante(1)} aria-label={tr.siguiente} title={tr.siguiente}>
-                →
-              </button>
-            </div>
+              ◫<span className="capas-txt"> Capas</span>
+              {[dicEnTexto, interlineal, griego, panelNotas].filter(Boolean).length > 0 && (
+                <span className="capas-n">{[dicEnTexto, interlineal, griego, panelNotas].filter(Boolean).length}</span>
+              )}
+              <span className="capas-flecha" aria-hidden="true">▾</span>
+            </button>
+            {capasAbierto && (
+              <div className="capas-popo" role="group" aria-label="Capas del texto">
+                <label className="capa-op">
+                  <input
+                    type="checkbox"
+                    checked={dicEnTexto}
+                    onChange={() => {
+                      setDicEnTexto(!dicEnTexto);
+                      // el índice de titulares se necesita tanto como el interruptor
+                      if (!dicEnTexto && !dicIndice) abrirDic();
+                    }}
+                  />
+                  <span>{tr.dicEnTexto}</span>
+                </label>
+                <label className="capa-op">
+                  <input
+                    type="checkbox"
+                    checked={interlineal}
+                    onChange={(e) => {
+                      setInterlineal(e.target.checked);
+                      if (e.target.checked) setGriego(false);
+                    }}
+                  />
+                  <span>Interlineal ({NT.has(osis) ? "griego" : "hebreo"})</span>
+                </label>
+                {/* El SBLGNT son 27 libros: en el AT la opción ni se ofrece. */}
+                {NT.has(osis) && (
+                  <label className="capa-op">
+                    <input
+                      type="checkbox"
+                      checked={griego}
+                      onChange={(e) => {
+                        setGriego(e.target.checked);
+                        if (e.target.checked) setInterlineal(false);
+                      }}
+                    />
+                    <span>Griego SBLGNT</span>
+                  </label>
+                )}
+                <label className="capa-op">
+                  <input
+                    type="checkbox"
+                    checked={panelNotas}
+                    onChange={(e) => {
+                      setPanelNotas(e.target.checked);
+                      setMsgNotas(null);
+                    }}
+                  />
+                  <span>{tr.notas}</span>
+                </label>
+              </div>
+            )}
+          </div>
+          <div className="lector-acciones">
+            <button className="icono-btn" onClick={abrirBusqueda} aria-label="Buscar pasajes y diccionario" title="Buscar pasajes y diccionario">
+              ⌕
+            </button>
+            <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
+              ←
+            </button>
+            <button className="icono-btn" onClick={() => adelante(1)} aria-label={tr.siguiente} title={tr.siguiente}>
+              →
+            </button>
           </div>
         </div>
         {/* Barra de recursos: [obra ▾] · [ES|EN si hay traducción] · [☑ mostrar]
@@ -2318,16 +2349,24 @@ export default function Lector() {
                     </button>
                   )}
                 </div>
-                {estiloAbierto === z && (
-                  <div className="estilo-popo" role="dialog" aria-label="Estilo del cuadro">
+              </div>
+            );
+          })}
+                {estiloAbierto && rectsZona[estiloAbierto] && (
+                  <div
+                    className="estilo-popo"
+                    role="dialog"
+                    aria-label="Estilo del cuadro"
+                    style={{ top: rectsZona[estiloAbierto]!.top + 44, left: Math.max(8, rectsZona[estiloAbierto]!.left + rectsZona[estiloAbierto]!.width - 262) }}
+                  >
                     <div className="estilo-fila" role="group" aria-label="Color">
                       {[0, 1, 2, 3, 4, 5].map((c) => (
                         <button
                           key={c}
-                          className={`estilo-color tinte-muestra-${c}${estiloDe(z).e.c === c ? " activa" : ""}`}
-                          onClick={() => fijaEstilo(z, { c })}
+                          className={`estilo-color tinte-muestra-${c}${estiloDe(estiloAbierto).e.c === c ? " activa" : ""}`}
+                          onClick={() => fijaEstilo(estiloAbierto, { c })}
                           aria-label={c ? `Color ${c}` : "Sin color"}
-                          aria-pressed={estiloDe(z).e.c === c}
+                          aria-pressed={estiloDe(estiloAbierto).e.c === c}
                         />
                       ))}
                     </div>
@@ -2335,9 +2374,9 @@ export default function Lector() {
                       {[-2, -1, 0, 1, 2, 3].map((t) => (
                         <button
                           key={t}
-                          className={`estilo-tam${estiloDe(z).e.t === t ? " activa" : ""}`}
-                          onClick={() => fijaEstilo(z, { t })}
-                          aria-pressed={estiloDe(z).e.t === t}
+                          className={`estilo-tam${estiloDe(estiloAbierto).e.t === t ? " activa" : ""}`}
+                          onClick={() => fijaEstilo(estiloAbierto, { t })}
+                          aria-pressed={estiloDe(estiloAbierto).e.t === t}
                           style={{ fontSize: 11 + (t + 2) * 1.6 }}
                         >
                           {t > 0 ? `+${t}` : t}
@@ -2346,9 +2385,6 @@ export default function Lector() {
                     </div>
                   </div>
                 )}
-              </div>
-            );
-          })}
           {comentario && rectsZona[zonaEf("com")] && (
             <section
               ref={estudioRef}
@@ -3012,96 +3048,6 @@ export default function Lector() {
         </div>
       )}
 
-      {panelFuentes && (
-        <div {...propsPanel("fuentes")} role="dialog" aria-label={tr.fuentes}>
-          <div className="lex-panel-inner">
-            <div className="lex-cabecera">
-              <span className="lex-palabra" style={{ fontSize: 20 }}>
-                {tr.fuentes}
-              </span>
-              <button
-                className="icono-btn cerrar"
-                onClick={() => {
-                  setPanelFuentes(false);
-                  setReporteTexto("");
-                  setReporteCopiado(false);
-                }}
-                aria-label={tr.lexCerrar}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="fuente-item">
-              <b>{manifest?.obra}</b> · {manifest?.licencia}
-              <div className="lex-meta">{manifest?.fuente} · {tr.fuentesEstadoNucleo}</div>
-              {obra === "vbl" && (
-                // CC BY-SA obliga a indicar si el texto se modificó. Mientras se
-                // sirva íntegro, hay que declararlo: no es adorno, es la licencia.
-                <div className="lex-meta">
-                  Traducción desde Nestle-Aland · <b>texto sin modificar</b> ·
-                  freebibleversion.org · ShareAlike: ver ficha legal
-                </div>
-              )}
-            </div>
-            <div className="fuente-item">
-              <b>Interlineal y léxicos</b> — STEPBible-Data (Tyndale House), CC BY 4.0
-              <div className="lex-meta">TAHOT/TAGNT + TBESG/TBESH · autoridad académica Tyndale House, Cambridge · {tr.fuentesEstadoNucleo}</div>
-            </div>
-            <div className="fuente-item">
-              <b>Treasury of Scripture Knowledge</b> — R. A. Torrey, 1907 · dominio público
-              <div className="lex-meta">+ OpenBible.info cross-references (CC BY) · {tr.fuentesEstadoNucleo}</div>
-            </div>
-            <div className="fuente-item">
-              <b>Easton's Bible Dictionary</b> — M. G. Easton, 1897 · dominio público
-              <div className="lex-meta">tradición: presbiteriana evangélica (escocesa-estadounidense) · {tr.fuentesEstadoNucleo} · ES en curso</div>
-            </div>
-            <div className="fuente-item">
-              <b>Matthew Henry, Complete Commentary</b> — Matthew Henry, 1706–1721 · dominio público (edición CC0)
-              <div className="lex-meta">
-                tradición: puritana/noconformista inglesa · {henryEs ? tr.fuentesEstadoEs : tr.fuentesEstadoEn} · JUAN 21/21
-                <br />
-                Traducción ES: obra derivada propia · CC BY 4.0 (decisión B18)
-              </div>
-            </div>
-            <div className="fuente-item">
-              <b>Jamieson, Fausset and Brown Commentary</b> — 1871 · dominio público
-              <div className="lex-meta">
-                tradición: evangélica escocesa-presbiteriana · {tr.fuentesEstadoEn} · texto EN · {tr.fuenteJfbCobertura}
-              </div>
-            </div>
-            <div className="fuente-item">
-              <b>Notes on the New / Old Testament — Albert Barnes</b> — 1832–1872 · dominio público
-              <div className="lex-meta">
-                tradición: presbiteriana americana · {tr.fuentesEstadoEn} · texto EN · {tr.fuenteBarnesCobertura}
-              </div>
-            </div>
-            <div className="nota-editor">
-              <div className="info-titulo">{tr.reportarError}</div>
-              <textarea
-                className="nota-area"
-                placeholder={tr.reportarPlaceholder}
-                value={reporteTexto}
-                onChange={(e) => setReporteTexto(e.target.value)}
-                rows={3}
-              />
-              <div className="notas-acciones">
-                <button className="btn btn-fantasma" onClick={copiarReporte}>
-                  ⧉ {reporteCopiado ? tr.reporteCopiado : tr.copiarReporte}
-                </button>
-              </div>
-              <div className="lex-meta" style={{ marginTop: 8 }}>{tr.fuenteReporte}</div>
-            </div>
-            <div className="info-seccion">
-              <div className="info-titulo">{tr.apoyarTitulo}</div>
-              {/* Sin medios de pago hasta tener datos reales y verificados: una
-                  cuenta de relleno en producción podía desviar una donación a un
-                  tercero. Cuando existan, van aquí (SINPE Móvil y PayPal). */}
-              <div className="lex-def">{tr.apoyarProximamente}</div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {panelNotas && (
         <div {...propsPanel("notas")} role="dialog" aria-label={tr.notas}>
           <div className="lex-panel-inner">
@@ -3174,31 +3120,66 @@ export default function Lector() {
         </div>
       )}
 
-      {panelInfo && (
-        <div {...propsPanel("info")} role="dialog" aria-label={tr.info}>
-          <div className="lex-panel-inner">
-            <div className="lex-cabecera">
-              <span className="lex-palabra" style={{ fontSize: 20 }}>
-                {tr.info}
+      {ajustes && (
+        <>
+          <div className="ajustes-velo" onClick={() => setAjustes(null)} aria-hidden="true" />
+          <aside className="ajustes" role="dialog" aria-label="Ajustes">
+            <div className="ajustes-cab">
+              {ajustes !== "menu" && (
+                <button className="icono-btn" onClick={() => setAjustes("menu")} aria-label="Volver a Ajustes" title="Volver">
+                  ←
+                </button>
+              )}
+              <span className="ajustes-titulo">
+                {{ menu: "Ajustes", info: tr.info, fuentes: tr.fuentes, derechos: "Derechos de las traducciones", apoyar: tr.apoyarTitulo }[ajustes]}
               </span>
-              <button className="icono-btn cerrar" onClick={() => setPanelInfo(false)} aria-label={tr.lexCerrar}>
+              <button className="icono-btn cerrar" onClick={() => setAjustes(null)} aria-label={tr.lexCerrar} title={tr.lexCerrar}>
                 ✕
               </button>
             </div>
-            {/* Fuentes del corpus vive ahora dentro de Información: un solo botón
-                arriba en vez de dos iconos en la fila de navegación. Se abre
-                encima (baraja) y la información queda como pestaña detrás. */}
-            <button
-              className="btn-inter"
-              style={{ marginTop: 4 }}
-              onClick={() => {
-                setPanelFuentes(true);
-                setReporteTexto("");
-                setReporteCopiado(false);
-              }}
-            >
-              ≣ {tr.fuentes} →
-            </button>
+            <div className="ajustes-cuerpo cambio-suave" key={ajustes}>
+              {ajustes === "menu" && (
+                <>
+                  <div className="ajustes-fila">
+                    <span>Tema claro / oscuro</span>
+                    <Tema etiqueta={tr.tema} />
+                  </div>
+                  <div className="ajustes-bloque">
+                    <div className="ajustes-rotulo">Tamaño de letra de la Biblia</div>
+                    <div className="ajustes-tams" role="group" aria-label="Tamaño de letra">
+                      {[["−2", "0.86"], ["−1", "0.93"], ["0", "1"], ["+1", "1.09"], ["+2", "1.18"], ["+3", "1.28"]].map(([e, v], i) => (
+                        <button
+                          key={v}
+                          className={`estilo-tam${tamGeneral === v ? " activa" : ""}`}
+                          onClick={() => fijaTamGeneral(v)}
+                          aria-pressed={tamGeneral === v}
+                          style={{ fontSize: 11 + i * 1.6 }}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="lex-meta">Cada cuadro de estudio tiene además su propio tamaño (botón «Aa» del cuadro).</div>
+                  </div>
+                  {([
+                    ["info", "ⓘ", tr.info, "Pasaje, edición y atribución de lo que estás leyendo"],
+                    ["fuentes", "≣", tr.fuentes, "Obras, licencias y cómo reportar un error"],
+                    ["derechos", "©", "Derechos de las traducciones", "Licencia de las traducciones al español"],
+                    ["apoyar", "♥", tr.apoyarTitulo, "Cómo sostener el proyecto"],
+                  ] as const).map(([id, ico, t, d]) => (
+                    <button key={id} className="ajustes-item" onClick={() => setAjustes(id)}>
+                      <span className="ajustes-ico" aria-hidden="true">{ico}</span>
+                      <span className="ajustes-txt">
+                        <b>{t}</b>
+                        <small>{d}</small>
+                      </span>
+                      <span aria-hidden="true">›</span>
+                    </button>
+                  ))}
+                </>
+              )}
+              {ajustes === "info" && (
+                <>
             <div className="info-seccion">
               <div className="info-titulo">{tr.infoReferencia}</div>
               <div className="lex-def">
@@ -3251,8 +3232,109 @@ export default function Lector() {
               )}
               <div className="lex-def">{tr.fuenteNave}</div>
             </div>
-          </div>
-        </div>
+                </>
+              )}
+              {ajustes === "fuentes" && (
+                <>
+            <div className="fuente-item">
+              <b>{manifest?.obra}</b> · {manifest?.licencia}
+              <div className="lex-meta">{manifest?.fuente} · {tr.fuentesEstadoNucleo}</div>
+              {obra === "vbl" && (
+                // CC BY-SA obliga a indicar si el texto se modificó. Mientras se
+                // sirva íntegro, hay que declararlo: no es adorno, es la licencia.
+                <div className="lex-meta">
+                  Traducción desde Nestle-Aland · <b>texto sin modificar</b> ·
+                  freebibleversion.org · ShareAlike: ver ficha legal
+                </div>
+              )}
+            </div>
+            <div className="fuente-item">
+              <b>Interlineal y léxicos</b> — STEPBible-Data (Tyndale House), CC BY 4.0
+              <div className="lex-meta">TAHOT/TAGNT + TBESG/TBESH · autoridad académica Tyndale House, Cambridge · {tr.fuentesEstadoNucleo}</div>
+            </div>
+            <div className="fuente-item">
+              <b>Treasury of Scripture Knowledge</b> — R. A. Torrey, 1907 · dominio público
+              <div className="lex-meta">+ OpenBible.info cross-references (CC BY) · {tr.fuentesEstadoNucleo}</div>
+            </div>
+            <div className="fuente-item">
+              <b>Easton's Bible Dictionary</b> — M. G. Easton, 1897 · dominio público
+              <div className="lex-meta">tradición: presbiteriana evangélica (escocesa-estadounidense) · {tr.fuentesEstadoNucleo} · ES en curso</div>
+            </div>
+            <div className="fuente-item">
+              <b>Matthew Henry, Complete Commentary</b> — Matthew Henry, 1706–1721 · dominio público (edición CC0)
+              <div className="lex-meta">
+                tradición: puritana/noconformista inglesa · {henryEs ? tr.fuentesEstadoEs : tr.fuentesEstadoEn} · JUAN 21/21
+                <br />
+                Traducción ES: obra derivada propia · CC BY 4.0 (decisión B18)
+              </div>
+            </div>
+            <div className="fuente-item">
+              <b>Jamieson, Fausset and Brown Commentary</b> — 1871 · dominio público
+              <div className="lex-meta">
+                tradición: evangélica escocesa-presbiteriana · {tr.fuentesEstadoEn} · texto EN · {tr.fuenteJfbCobertura}
+              </div>
+            </div>
+            <div className="fuente-item">
+              <b>Notes on the New / Old Testament — Albert Barnes</b> — 1832–1872 · dominio público
+              <div className="lex-meta">
+                tradición: presbiteriana americana · {tr.fuentesEstadoEn} · texto EN · {tr.fuenteBarnesCobertura}
+              </div>
+            </div>
+            <div className="nota-editor">
+              <div className="info-titulo">{tr.reportarError}</div>
+              <textarea
+                className="nota-area"
+                placeholder={tr.reportarPlaceholder}
+                value={reporteTexto}
+                onChange={(e) => setReporteTexto(e.target.value)}
+                rows={3}
+              />
+              <div className="notas-acciones">
+                <button className="btn btn-fantasma" onClick={copiarReporte}>
+                  ⧉ {reporteCopiado ? tr.reporteCopiado : tr.copiarReporte}
+                </button>
+              </div>
+              <div className="lex-meta" style={{ marginTop: 8 }}>{tr.fuenteReporte}</div>
+            </div>
+                </>
+              )}
+              {ajustes === "derechos" && (
+                <>
+                  <div className="info-seccion">
+                    <div className="info-titulo">Obras originales</div>
+                    <div className="lex-def">
+                      Los textos originales (Reina-Valera 1909, Biblia del Oso 1569, Matthew Henry, Jamieson-Fausset-Brown,
+                      Barnes, Easton, Nave, Torrey…) son de dominio público. La VBL y los datos de STEPBible y OpenBible
+                      tienen licencia abierta (CC BY-SA / CC BY): ver cada obra en {tr.fuentes}.
+                    </div>
+                  </div>
+                  <div className="info-seccion">
+                    <div className="info-titulo">Traducciones al español de esta obra</div>
+                    <div className="lex-def">
+                      Las traducciones al español de comentarios, diccionarios, léxico y etiquetas son obra derivada propia
+                      de la Biblia de Estudio AION, publicadas con licencia <b>CC BY 4.0</b>: se pueden citar y reutilizar
+                      indicando la fuente. Están hechas con asistencia automática y marcadas «sin revisar» hasta la revisión
+                      humana; cítalas como tales.
+                    </div>
+                  </div>
+                  <div className="info-seccion">
+                    <div className="info-titulo">Uso por IA</div>
+                    <div className="lex-def">
+                      Buscadores y asistentes pueden leer el contenido para responder preguntas. El entrenamiento de modelos
+                      de IA con este contenido no está permitido.
+                    </div>
+                  </div>
+                </>
+              )}
+              {ajustes === "apoyar" && (
+                <div className="info-seccion">
+                  {/* Sin medios de pago hasta tener datos reales y verificados. */}
+                  <div className="lex-def">{tr.apoyarProximamente}</div>
+                </div>
+              )}
+            </div>
+          </aside>
+        </>
       )}
 
       {pasaje && (

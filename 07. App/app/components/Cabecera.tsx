@@ -13,11 +13,14 @@ export default function Cabecera({
   locale,
   extra,
   enLector = false,
+  sinTema = false,
   children,
 }: {
   locale: Locale;
   extra?: React.ReactNode;
   enLector?: boolean;
+  /** el lector lleva el tema dentro de su panel de Ajustes */
+  sinTema?: boolean;
   children?: React.ReactNode;
 }) {
   const tr = t(locale);
@@ -44,7 +47,7 @@ export default function Cabecera({
           </Link>
           )}
           {extra}
-          <Tema etiqueta={tr.tema} />
+          {!sinTema && <Tema etiqueta={tr.tema} />}
         </div>
       </div>
       {children ? <div className="cabecera-sub">{children}</div> : null}
