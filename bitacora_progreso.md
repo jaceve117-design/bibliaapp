@@ -115,6 +115,8 @@ Reglas de uso:
 | D21 | Búsqueda semántica | **pgvector aplazado a post-MVP.** El MVP busca con `tsvector` (spanish/english); la búsqueda "por idea" provisional sale de TSK + Nave's + lemas. *(finalistas: GLM C3)* | 2026-09-17 |
 | D22 | Tercera ola del corpus | **Confesiones y patrística.** Tras la segunda ola (ISBE, Clarke, Gill, Calvino, Keil & Delitzsch, Vulgata/LXX/TR, Sefaria, Pleiades) entra el bloque que hoy falta: confesiones y catecismos históricos (Westminster, Heidelberg, Dordrecht, Segunda Helvética) y padres de la iglesia (edición Schaff). Cubre el hueco de teología sistemática: el corpus actual explica qué dice cada pasaje, no qué cree la tradición ni de dónde sale. | 2026-09-20 |
 | D23 | Prioridad de traducción | **Los gloss del léxico y el vocabulario morfológico se traducen antes que más prosa de comentario.** Unos miles de definiciones breves (TBESH/TBESG) y un vocabulario cerrado de etiquetas morfológicas desbloquean el interlineal completo para el lector hispanohablante; es el mayor valor por palabra traducida de todo el proyecto. | 2026-09-20 |
+| D24 | Sostenimiento | **App 100 % gratuita + donación voluntaria.** El acceso a todo el contenido nunca está condicionado a pago ni a registro. La donación vive como sección informativa discreta dentro del panel ⓘ (transferencia/SINPE, PayPal/QR) — nunca intersticial, nunca sobre la lectura. Gratuidad total hoy; apoyo voluntario si el usuario quiere. Afecta positivamente la petición de permisos a titulares (SBU/RV1960): se declara expresamente que no se cobra por el acceso al texto. | 2026-09-27 |
+| D25 | Distribución | **Play Store vía TWA primero; RV1960 después del permiso.** La PWA se empaqueta como Trusted Web Activity (Bubblewrap/PWABuilder), cuenta de desarrollador a nombre del usuario. La RV1960 (© SBU) solo entra embebida tras autorización escrita de SBU con la app publicada como referencia: atribución correcta, texto sin modificar, acceso gratuito (D24). Otras versiones: dominio público primero (Severiana, Valera 1908), licenciadas después. | 2026-09-27 |
 
 ### Decisiones pendientes
 
@@ -372,3 +374,24 @@ Narra los 13 commits (`8dbf068`→`11cccd3`) que no constaban en esta bitácora;
 3. **Marca:** la app pasa a llamarse «Biblia de Estudio AION» (manifest, i18n). Ratificación formal pendiente del usuario.
 4. **Correcciones de fondo:** bug del índice léxico (resolvía entradas equivocadas — el descubierto el 21-09) corregido; lotes de glosas que se perdían enteros (coste 10×) corregido; ortografía completa con tildes en las glosas.
 5. **El vigilante de 30 min queda ELIMINADO** (orden del usuario del 26-09: «ya con el motor de traducción no es necesario») — 56 ejecuciones, ya estaba pausado. Los incrementos de trabajo dejan de venir de turnos de fondo: corren por el motor contra la API.
+
+### 2026-09-27 · GLM — ★ COLA DE TRADUCCIÓN COMPLETADA: Henry ES desplegado — la biblioteca entera de comentarios, en español · D24 (sostenimiento) y D25 (distribución) registradas
+
+Cierre de la directiva del usuario («los 4 restantes, uno a uno, verificando») con el vigilante horario + calce de finalización. Detalle por obra en `bitacora_progreso_GLM.md` (entradas 26/27-09).
+
+**Resultado final** (gasto total del contador del motor: **$42,65 de $75** — por debajo del presupuesto de ~$45):
+
+| Obra | Cobertura | Coste |
+|---|---|---|
+| Nombres de tema de Nave's → ES | 5.321/5.321 | $0,09 |
+| JFB → ES | 43.213/43.256 párrafos (99,9 %) | $7,88 |
+| Barnes → ES | 58.432/58.478 (99,9 %) | $8,90 |
+| Matthew Henry → ES (resto) | 65 libros · 27.961/28.268 unidades (99 %) | $11,44 |
+
+**Integridad**: el patrón de oro quedó byte-idéntico (`henry-es/JHN.json`, 2.180.903 B — el Juan humano no se tocó). Portones verdes en las tres obras con el validador endurecido durante el proceso (diacríticos griegos, títulos citados, frases-ancla del impreso, fuentes truncadas, citas clásicas). Verificación de producción: lector 200 · henry-es MAT/JHN/PSA/ISA/REV 200 · jfb-es/JHN 200 · barnes-es/JHN 200.
+
+**Deudas no bloqueantes registradas**: ~30 abreviaturas españolas sin alias en `lib/referencias.ts` (Ag, Mi, Jr…); 235+46+43 párrafos caídos al EN por rechazo del validador (rescatables en la consola de revisión); auditoría censal Jev opcional (~$2). La etiqueta «sin revisar» sigue vigente en TODO lo producido por el motor (Política v1.0) — la revisión humana es el acto que constituye la obra.
+
+**Con esto la Biblia de Estudio AION queda**: RV1909 · WEB · VBL · interlineal hebreo/griego con glosas y morfología en ES · **Matthew Henry ES completo** · **JFB ES** · **Barnes ES** · Easton ES · Nave's ES+EN · TSK · Easton EN. Todo embebido, todo offline.
+
+**Decisiones nuevas de este cierre: D24 (sostenimiento: gratuita + donación voluntaria nunca condicionante) y D25 (distribución: Play vía TWA, RV1960 solo tras permiso escrito de SBU).** Roadmap acordado con el usuario: revisión doctrinal (paso 4) → sostenimiento (implementar D24) → Play (D25) → SBU → más obras PD (~$148 medidas) → diseño para tablet/PC/folds.

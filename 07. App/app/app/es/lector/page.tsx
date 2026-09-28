@@ -1826,6 +1826,21 @@ export default function Lector() {
               </div>
               <div className="lex-meta" style={{ marginTop: 8 }}>{tr.fuenteReporte}</div>
             </div>
+            <div className="info-seccion">
+              <div className="info-titulo">{tr.apoyarTitulo}</div>
+              <div className="lex-def">{tr.apoyarTexto}</div>
+              <div className="apoyar-medios">
+                <div className="apoyar-medio">
+                  <span className="apoyar-etiqueta">SINPE Móvil (CR)</span>
+                  <span className="apoyar-dato">8888-8888</span>
+                </div>
+                <div className="apoyar-medio">
+                  <span className="apoyar-etiqueta">PayPal</span>
+                  <span className="apoyar-dato">paypal.me/AIONbiblia</span>
+                </div>
+              </div>
+              <div className="lex-meta">{tr.apoyarNota}</div>
+            </div>
           </div>
         </div>
       )}
