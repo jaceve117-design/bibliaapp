@@ -1234,3 +1234,12 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 - **Segundo comentario** («+ Comentario» en el cuadro principal): su propio cuadro con selector (Henry, JFB, Barnes, Easton, Valdés; ES si existe).
 - **Biblias en paralelo** al lado o apiladas (hasta 3). **Notas** nacen en la zona de abajo.
 - Zonas/cuadros/panel usan geometría calculada (`calcZonas`) con transición de left/top/width/height; `html.mesa-arrastrando` la desactiva durante un arrastre.
+
+## 2026-09-28 — Ajustes de la mesa tras la prueba en 32″ (Claude, audio del usuario)
+- Secciones de comentario **contraídas** por defecto en la columna; al desplegar, su título queda **anclado** arriba del cuadro (sticky dentro del scroll del cuadro).
+- El panel «Versículo» se llama **Notas** y nace **abajo** (también entre 680–1279 px: ahí hay dos zonas, derecha y abajo, arrastrables con el dedo). Citas a la derecha.
+- Cada cuadro de comentario tiene su **propio selector** de recurso (el principal ya no depende sólo de la barra de arriba).
+- Al elegir capítulo en la lista de libros, la cuadrícula se **retrae**.
+- **Paralelo**: hasta 4 extra (5 Biblias) según quepan ~300 px por columna; la Biblia ocupa todo el hueco entre libros y mesa.
+- **Tema**: cambio con View Transitions, un círculo que nace del botón (`components/Tema.tsx`); se congelan las transiciones CSS durante el cambio para que no cambie «por zonas».
+- Pendiente propuesto: temas de **Nave** tocables (índice inverso tema → versículos de toda la Biblia y un cuadro con la lista por libro).
