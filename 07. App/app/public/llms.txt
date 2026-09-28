@@ -20,6 +20,7 @@ Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, 
 
 ## Diccionarios y léxico
 - [Diccionario Easton](https://bibliaapp.pages.dev/data/easton-es/_manifest.json): /data/easton/ (EN) · /data/easton-es/ (ES), un archivo por letra
+- [Diccionario de W. W. Rand (ES)](https://bibliaapp.pages.dev/data/rand-es/rand-es.json): /data/rand/ (EN) · /data/rand-es/rand-es.json (ES), un solo archivo por obra
 - [Léxico STEPBible (hebreo y griego)](https://bibliaapp.pages.dev/data/stepbible/_manifest.json): glosas y definiciones en español en /data/stepbible/
 
 ## Biblias adicionales
