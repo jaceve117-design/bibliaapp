@@ -1292,3 +1292,9 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 - Tira de pestañas: se encogen (72–220 px) y, si no caben, flechas ‹ › + rueda del ratón en horizontal (clase `.desborda` calculada tras cada render).
 - Cabecera del lector de extremo a extremo (`.cabecera.en-lector`).
 - **Contraste de letras** en Ajustes: normal / alto / máximo (`data-contraste` en <html>, anti-parpadeo en layout, `localStorage.contraste`).
+
+## 2026-09-28 — Nave tocable, arrastre que parte la columna, ritmo y móvil (Claude)
+- **Temas de Nave tocables**: `scripts/genera-nave-temas.mjs` → `public/data/nave/_temas/{letra}.json` (4.672 temas, 140.954 refs, 1,3 MB en 25 archivos). En el panel del versículo cada tema abre el cuadro «Tema» (zona der-abajo): versículos por libro; tocar el libro abre sus versículos juntos en Citas (máx. 40), tocar un c:v abre ese. Regenerar si cambian los datos de Nave.
+- **Arrastre**: soltar un cuadro en la mitad libre de su PROPIA columna (que ocupaba todo el alto/ancho) la parte en dos; los demás pasan a la otra mitad. Antes no cambiaba nada y parecía «pegarse».
+- **Ritmo**: todas las transiciones/animaciones CSS ×1,15 (más pausadas, a pedido del usuario), salvo la intro (sincronizada con su sonido). Círculo del tema 750 ms.
+- **Móvil**: ⫴ también en pantallas estrechas, siempre apilado, hasta 3 Biblias; barra del comentarista sin ✎ y con «sin rev.» compacto (antes desbordaba la casilla).
