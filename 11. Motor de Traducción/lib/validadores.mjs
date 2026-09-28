@@ -23,6 +23,21 @@ export function validaUnidad(u, es, glosario) {
     return [{ tipo: 'vacia', grave: true, detalle: 'traducción vacía' }];
   }
 
+  // 0. FICHAS DE MÁSCARA (⟦n⟧). Si el original viene enmascarado, la salida debe
+  //    traer exactamente las mismas fichas, una vez cada una. Es lo que garantiza
+  //    que etiquetas, referencias y griego/hebreo vuelvan intactos.
+  const fichasEn = (en.match(/⟦\d+⟧/g) || []).sort().join(',');
+  if (fichasEn) {
+    const fichasEs = (es.match(/⟦\d+⟧/g) || []).sort().join(',');
+    if (fichasEs !== fichasEn) {
+      const faltan = fichasEn.split(',').filter((f) => !fichasEs.split(',').includes(f));
+      return [{
+        tipo: 'fichas', grave: true,
+        detalle: `fichas de máscara alteradas${faltan.length ? ` (faltan ${faltan.slice(0, 5).join(' ')})` : ' (sobran o se repiten)'}`,
+      }];
+    }
+  }
+
   // 1. Truncamiento / longitud fuera de rango.
   const ratio = es.length / en.length;
   if (en.length > 150 && ratio < 0.7) {

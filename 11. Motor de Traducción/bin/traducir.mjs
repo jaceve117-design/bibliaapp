@@ -37,6 +37,8 @@ const capArg = valor('--cap', null);
 const obraId = valor('--obra', 'henry');
 const dominio = valor('--dominio', null);
 const letra = valor('--letra', null);
+const muestra = valor('--muestra', null);
+const lengua = valor('--lengua', null);
 
 verifica();
 const glosario = cargaGlosario();
@@ -53,7 +55,7 @@ const { impl, nombre: proveedorReal } = traductor(config.traductor.modelo);
 
 // ── cola ───────────────────────────────────────────────────────────────────
 const OBRA = OBRA_TMP;
-const cola = await OBRA.unidades({ libro, cap: capArg, letra, dominio });
+const cola = await OBRA.unidades({ libro, cap: capArg, letra, dominio, muestra, lengua });
 
 const estado = new Estado();
 const contador = new Contador();

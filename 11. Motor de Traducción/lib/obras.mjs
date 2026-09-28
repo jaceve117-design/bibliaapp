@@ -456,7 +456,122 @@ const barnes = comentarioEn(
   'Albert Barnes, Notes on the New / Old Testament (1832–1872) · Dominio público · texto original vía biblehub.com'
 );
 
-export const OBRAS = { henry, easton, glosas, naves, jfb, barnes };
+// ── Definiciones del léxico (TBESH/TBESG) ──────────────────────────────────
+// Texto con MARCADO: <b>, <i>, <BR />, <ref='Luk.7.37'>Luk.7:37;</ref>, y
+// tramos en griego y hebreo. No se le pide al modelo que respete nada de eso:
+// se ENMASCARA. Cada etiqueta, referencia o tramo en lengua original se cambia
+// por una ficha ⟦n⟧, el modelo traduce sólo la prosa inglesa, y al ensamblar se
+// restituye. El validador exige las mismas fichas, una vez cada una: si falta o
+// sobra una, la unidad se rechaza. Formato garantizado por construcción.
+const RE_MASCARA = new RegExp(
+  [
+    "<ref='[^']*'>[\\s\\S]*?</ref>",                 // referencia completa
+    '<[^>]+>',                                        // cualquier otra etiqueta
+    '&[a-z]+;',                                       // entidades HTML
+    // tramos en griego/hebreo, con espacios y signos internos entre palabras
+    '[\\u0370-\\u03FF\\u1F00-\\u1FFF\\u0590-\\u05FF\\uFB1D-\\uFB4F]+' +
+      "(?:[\\s.,·;'’()-]*[\\u0370-\\u03FF\\u1F00-\\u1FFF\\u0590-\\u05FF\\uFB1D-\\uFB4F]+)*",
+  ].join('|'),
+  'g'
+);
+
+export function enmascara(texto) {
+  const fichas = [];
+  const t = String(texto).replace(RE_MASCARA, (m) => {
+    fichas.push(m);
+    return `⟦${fichas.length}⟧`;
+  });
+  return { t, fichas };
+}
+
+export function desenmascara(texto, fichas) {
+  return String(texto).replace(/⟦(\d+)⟧/g, (m, n) => fichas[Number(n) - 1] ?? m);
+}
+
+const lexdef = {
+  id: 'lexdef',
+  nombre: 'Definiciones del léxico (TBESH/TBESG · Tyndale House)',
+  // entradas de hasta 5.000+ chars: lotes pequeños, y las largas van solas
+  lote: { charsPorLote: 3500, maxUnidadesPorLote: 8 },
+
+  prompt: `Eres lexicógrafo bíblico y traduces al español las definiciones de un léxico
+académico de hebreo y griego (TBESH/TBESG, Tyndale House; las griegas proceden de
+Abbott-Smith). Escribes en español culto, claro y exacto, como un buen diccionario.
+
+FICHAS: el texto trae marcas como ⟦1⟧, ⟦2⟧… que ocultan etiquetas, referencias
+bíblicas y palabras en griego o hebreo. Consérvalas EXACTAMENTE, cada una una sola
+vez, en el lugar que exija la sintaxis española. No las traduzcas, no las
+renumeres, no las quites, no inventes otras.
+
+REGLAS:
+1. Traduce toda la prosa inglesa. Los significados («love, goodwill, esteem»)
+   se traducen como acepciones de diccionario: «amor, buena voluntad, estima».
+2. Terminología gramatical en español: noun → sustantivo, verb → verbo,
+   prep → prep., with dative → con dativo, genitive → genitivo, aorist → aoristo,
+   plural intensive → plural intensivo.
+3. NO toques las abreviaturas bibliográficas ni de autoridades: cf., al., cl., sq.,
+   LXX, Heb., Lat., Gk., MM, VGT, LAE, Deiss., Thayer, Cremer, Lft., Hort, WH, RV, AV.
+4. NO toques las transliteraciones (re.shit, ye.ho.vah): son pronunciación.
+5. «LORD» (el Nombre divino) → «Jehová». «God» → «Dios».
+6. Numeración de acepciones (1), 1a), __I., __2.) intacta.
+7. Ortografía española completa, con todas sus tildes.
+8. Una definición no se resume ni se amplía: todo lo que dice el inglés, nada más.
+
+SALIDA: sólo el JSON {"u":[{"id":"...","es":"..."}]}, mismos id, mismo orden,
+en una sola línea.`,
+
+  async unidades(filtro = {}) {
+    const out = [];
+    for (const [pref, archivo] of [['H', 'tbesh.json'], ['G', 'tbesg.json']]) {
+      if (filtro.lengua && filtro.lengua !== pref) continue;
+      const lx = leer(path.join(RUTA_STEP, archivo));
+      for (const [id, e] of Object.entries(lx.entradas ?? {})) {
+        const d = String(e.d ?? '').trim();
+        if (!d) continue;
+        const { t } = enmascara(d);
+        out.push({ id: `lexdef.${pref}.${id}`, obra: 'lexdef', lengua: pref, entrada: id, orig: d, en: t });
+      }
+    }
+    let us = out.map((u) => ({ ...u, h: hash(u.orig), chars: u.en.length }));
+    // muestra determinista para pilotos: variada en longitud, estable entre corridas
+    if (filtro.muestra) {
+      const n = Number(filtro.muestra);
+      const porLengua = (l) => us.filter((u) => u.lengua === l).sort((a, b) => a.chars - b.chars);
+      const escoge = (arr, k) => Array.from({ length: k }, (_, i) => arr[Math.floor(((i + 0.5) * arr.length) / k)]);
+      us = [...escoge(porLengua('H'), Math.ceil(n / 2)), ...escoge(porLengua('G'), Math.floor(n / 2))];
+    }
+    return us;
+  },
+
+  /**
+   * Un archivo por lengua: `lexdef-es-h.json` y `lexdef-es-g.json`, mapa
+   * id de entrada → definición ES YA DESENMASCARADA (con su marcado original).
+   * Separado de tbesh/tbesg porque esos los regenera la ingesta.
+   */
+  ensambla(estado) {
+    let unidades = 0, posibles = 0, escritos = 0;
+    for (const [pref, archivo] of [['H', 'tbesh.json'], ['G', 'tbesg.json']]) {
+      const lx = leer(path.join(RUTA_STEP, archivo));
+      const salida = {};
+      for (const [id, e] of Object.entries(lx.entradas ?? {})) {
+        const d = String(e.d ?? '').trim();
+        if (!d) continue;
+        posibles++;
+        const r = estado.resultados.get(`lexdef.${pref}.${id}`);
+        if (!r || !r.es || r.h !== hash(d)) continue;
+        if (!['traducida', 'auditada', 'aprobada'].includes(r.estado)) continue;
+        salida[id] = desenmascara(r.es, enmascara(d).fichas);
+        unidades++;
+      }
+      if (!Object.keys(salida).length) continue;
+      fs.writeFileSync(path.join(RUTA_STEP, `lexdef-es-${pref.toLowerCase()}.json`), JSON.stringify(salida));
+      escritos++;
+    }
+    return { escritos, unidades, posibles };
+  },
+};
+
+export const OBRAS = { henry, easton, glosas, naves, jfb, barnes, lexdef };
 
 
 export function obra(id) {

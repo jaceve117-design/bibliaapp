@@ -105,7 +105,9 @@ export default function Lector() {
   const [grPal, setGrPal] = useState<
     { g: string; lemma: string; pos: string; ref: string; v: number; i: number } | null
   >(null);
-  const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex } | null>(null);
+  // `defEs`: la definición en español de la traducción propia, si existe para
+  // esa entrada; si no, la ficha muestra la inglesa (nunca un hueco).
+  const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex; defEs?: string } | null>(null);
   const [panelRefs, setPanelRefs] = useState<{ verso: Verso; refs: string[]; cargadas: boolean } | null>(null);
   const [dicPanel, setDicPanel] = useState(false);
   const [dicIndice, setDicIndice] = useState<IndiceItem[] | null>(null);
@@ -813,18 +815,42 @@ export default function Lector() {
     const cargar = (data: { entradas: Record<string, EntradaLex>; indice: Record<string, string[]> }) => {
       const intentos = [p.s, p.s.replace(/[A-Za-z]+$/, ""), p.s.replace(/[A-Za-z]+$/, "") + "G", p.s.replace(/[A-Za-z]+$/, "") + "H"];
       let entrada: EntradaLex | undefined;
+      let idEntrada: string | undefined;
       for (const id of intentos) {
         if (data.entradas[id]) {
           entrada = data.entradas[id];
+          idEntrada = id;
           break;
         }
         const lista = data.indice[id];
         if (lista?.length) {
           entrada = data.entradas[lista[0]];
+          idEntrada = lista[0];
           break;
         }
       }
       setLex({ palabra: p, entrada });
+      // Definición en español (overlay propio, carga perezosa por lengua). Llega
+      // un instante después que la ficha: primero se ve el inglés, y se cambia
+      // en cuanto está; si la entrada no tiene ES, se queda el inglés.
+      if (!idEntrada) return;
+      const claveEs = `lexdef-es:${esGriego ? "g" : "h"}`;
+      const usarEs = (mapa: Record<string, string> | null) => {
+        const defEs = mapa?.[idEntrada as string];
+        if (defEs) setLex((prev) => (prev && prev.palabra === p ? { ...prev, defEs } : prev));
+      };
+      const enCacheEs = cache.get(claveEs) as Record<string, string> | null | undefined;
+      if (enCacheEs !== undefined) {
+        usarEs(enCacheEs);
+        return;
+      }
+      fetch(`/data/stepbible/lexdef-es-${esGriego ? "g" : "h"}.json`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((mapa: Record<string, string> | null) => {
+          cache.set(claveEs, mapa);
+          usarEs(mapa);
+        })
+        .catch(() => cache.set(claveEs, null));
     };
     const enCache = lexCache.current.get(archivo);
     if (enCache) {
@@ -897,15 +923,37 @@ export default function Lector() {
       })
     : parrafosComEn;
 
-  const limpiarDef = (d: string) =>
-    d
+  /**
+   * Definición del léxico (TBESH/TBESG) → nodos.
+   *
+   * Antes: `<ref='Luk.7.37'>Luk.7:37;</ref>` se convertía en «Luk.7.37 Luk.7:37»
+   * —el atributo Y el contenido, duplicado— y como texto muerto; y las negritas
+   * se borraban, cuando en Abbott-Smith son justamente los significados.
+   *
+   * Ahora: la etiqueta `ref` se queda sólo con su texto, que pasa por
+   * `renderMarcado` y se vuelve cita tocable; `<b>` se conserva como negrita.
+   */
+  const limpiarDef = (d: string): React.ReactNode => {
+    const plano = d
       .replace(/<BR\s*\/?>/gi, "\n")
-      .replace(/<ref='([^']+)'>/g, "$1 ")
-      .replace(/<[^>]+>/g, "")
+      .replace(/<ref='[^']*'>([\s\S]*?)<\/ref>/gi, "$1")
+      .replace(/<(?!\/?b>)[^>]+>/gi, "")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
       .replace(/&amp;/g, "&")
+      .replace(/[ \t]+\n/g, "\n")
+      // «1Ch.7.8» (formato OSIS con punto) → «1Ch 7:8»: con punto sólo enlazaba
+      // al capítulo; con dos puntos enlaza al versículo exacto.
+      .replace(/\b([1-3]?[A-Z][a-z]{1,4})\.(\d{1,3})\.(\d{1,3})\b/g, "$1 $2:$3")
       .trim();
+    return plano.split(/(<b>[\s\S]*?<\/b>)/i).map((trozo, i) =>
+      /^<b>/i.test(trozo) ? (
+        <b key={i}>{renderMarcado(trozo.replace(/<\/?b>/gi, ""))}</b>
+      ) : (
+        <span key={i}>{renderMarcado(trozo.replace(/<\/?b>/gi, ""))}</span>
+      )
+    );
+  };
 
   // D22: cita clicable → pop-up con el texto del verso en la obra activa
   const abrirCita = (cita: NonNullable<ReturnType<typeof parseCita>>) => {
@@ -1572,7 +1620,12 @@ export default function Lector() {
                   {glosaLexicoEs(lex.palabra) && <span className="lex-glosa-en"> ({lex.entrada.g})</span>}
                   {lex.palabra.lex && <span> — {lex.palabra.lex}</span>}
                 </div>
-                <div className="lex-def">{limpiarDef(lex.entrada.d)}</div>
+                {lex.defEs && (
+                  <span className="badge-revision" title={tr.estadoNota} style={{ display: "inline-block", marginBottom: 6 }}>
+                    {tr.sinRevisar}
+                  </span>
+                )}
+                <div className="lex-def">{limpiarDef(lex.defEs ?? lex.entrada.d)}</div>
               </>
             ) : (
               <div className="lex-meta">Sin entrada léxica para {lex.palabra.s}.</div>
