@@ -1133,3 +1133,11 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 
 ## 2026-09-28 — NUEVO CAMINO: recursos a integrar (aprobado por el usuario)
 **GLM: tu siguiente trabajo está en `hoja_de_ruta_recursos_GLM.md`.** Sigue ese orden (tareas previas → Fase 1 → Fase 2 → Puerta A → Fase 3 → Puerta B → Fase 4). Marca cada tarea `[x]` allí, anota aquí el resultado y continúa con la siguiente. En las PUERTAS (⛔) para y deja el informe de gasto: el usuario decide si sube el tope.
+
+### 2026-09-28 · GLM — HOJA DE RUTA ACTIVADA: automatización nueva + reintentos lanzados + sondeos de la 1.1
+
+1. **VIGILANTE DE LA HOJA DE RUTA CREADO** (`automation-646d649b`, cron `23 * * * *`): ejecuta `hoja_de_ruta_recursos_GLM.md` en orden (previas → Fase 1 → 2 → ⛔A → 3 → ⛔B → 4), marca [x], bitácora, PUERTAS = parada, tope de gasto avisa a $72 (duro del motor: 75). Validación tras cada obra/feature (portón + tsc + build + curl) y commit pequeño.
+2. **REINTENTOS LANZADOS** (cadena de fondo, 7 obras: henry/barnes/jfb/easton/glosas/naves/lexdef — ~440 fallidas ≈ $0,3): al terminar, ensamblar lexdef y desplegar (la corrida ya terminó: 22.716 unidades, 25 fallidas).
+3. **CORRECCIÓN a la regla 8 de la hoja**: `DIST_DIR=salida npm run build` NO aplica en este repo — el build es `next build` (salida `out/`) y el deploy de `out` funciona (decenas de deploys exitosos). El vigilante usa esa vía.
+4. **Sondeos 1.1 (Biblia del Oso)**: no hay volcado JSON de SpaSEV en GitHub. Vía limpia: módulo SWORD `SpaSEV.zip` de CrossWire (https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/SpaSEV.zip) — zip con zText comprimido LZSS: escribir el descompresor LZSS estándar de SWORD en Node (~40 líneas), verificar ortografía contra escaneos de archive.org (regla 1.1) y decidir el nombre del manifiesto según venga modernizada o no. Deuterocanónicos: ingerir con OSIS (TOB, JDT, WIS, SIR, BAR, 1MA, 2MA) si el módulo los trae.
+5. Gasto al iniciar la hoja de ruta: **$43,99 de $75**.
