@@ -1130,3 +1130,6 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
    - Opcional: el botón IA ya sirve igual (`ordenaConIA` acepta cualquier `{ref, texto}`); el prompt del servidor habla de «versículo»: generalizarlo con un campo `tipo` si se usa para comentarios.
 2. Luego: reintentar unidades fallidas (Henry 307, Barnes 46, JFB 43, Easton 17) y la auditoría Jev del corpus (~2 USD). Tope de gasto global: 75 USD (ver `11. Motor de Traducción/estado/gasto.json`).
 3. Reglas: móvil primero (probar a 390 px, sin desborde horizontal); no tocar `functions/` ni `wrangler.toml` sin avisar; nunca poner claves en el cliente ni en el chat.
+
+## 2026-09-28 — NUEVO CAMINO: recursos a integrar (aprobado por el usuario)
+**GLM: tu siguiente trabajo está en `hoja_de_ruta_recursos_GLM.md`.** Sigue ese orden (tareas previas → Fase 1 → Fase 2 → Puerta A → Fase 3 → Puerta B → Fase 4). Marca cada tarea `[x]` allí, anota aquí el resultado y continúa con la siguiente. En las PUERTAS (⛔) para y deja el informe de gasto: el usuario decide si sube el tope.
