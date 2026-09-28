@@ -61,16 +61,18 @@ const OBRAS = [
 // («Capítulo N — verso a verso (EN) (nº anclas)») — el nombre NUNCA dos veces.
 // Para un comentario EN nuevo: una línea en COMENTARIOS + una entrada en RUTA_COMENTARIO.
 const COMENTARIOS = [
-  { id: "henry", etiqueta: "Matthew Henry", anio: "1706", traducido: true },
-  { id: "jfb", etiqueta: "Jamieson, Fausset y Brown", anio: "1871", traducido: false },
-  { id: "barnes", etiqueta: "Albert Barnes", anio: "1872", traducido: false },
+  { id: "henry", etiqueta: "Matthew Henry", anio: "1706", traducido: true, nativo: false },
+  { id: "jfb", etiqueta: "Jamieson, Fausset y Brown", anio: "1871", traducido: false, nativo: false },
+  { id: "barnes", etiqueta: "Albert Barnes", anio: "1872", traducido: false, nativo: false },
   // Easton es diccionario: aquí se ve por versículo mediante su índice inverso
   // (scripts/genera-easton-pasajes.mjs) — las entradas que citan cada verso
-  { id: "easton", etiqueta: "Diccionario Easton", anio: "1897", traducido: false },
+  { id: "easton", etiqueta: "Diccionario Easton", anio: "1897", traducido: false, nativo: false },
+  // Valdés escribió EN CASTELLANO: insignia ES fija, sin conmutador ni badge EN
+  { id: "valdes", etiqueta: "Juan de Valdés", anio: "1557", traducido: false, nativo: true },
 ] as const;
 type ComFuente = (typeof COMENTARIOS)[number]["id"];
 // obras de comentario EN servidas de /data/{ruta}/{OSIS}.json (misma forma de JSON para todas)
-const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes", easton: "easton-pasajes" };
+const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes", easton: "easton-pasajes", valdes: "valdes" };
 const OSIS_INICIAL = "JHN";
 const CAP_INICIAL = 1;
 const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
@@ -1013,7 +1015,7 @@ export default function Lector() {
   // comentarios EN (JFB/Barnes): párrafos del capítulo, un elemento por ancla de verso («v. texto»)
   const comSel = COMENTARIOS.find((c) => c.id === comFuente) ?? COMENTARIOS[0];
   const capComEn = jfbData?.c[capClave];
-  const parrafosComEn = (capComEn ?? []).flatMap((e) => e.p.map((x) => `${e.v}. ${x}`));
+  const parrafosComEn = (capComEn ?? []).flatMap((e) => e.p.map((x) => (e.v > 0 ? `${e.v}. ` : "") + x));
   // modo ES: el capítulo traducido se sirve del espejo; el ancla sin traducir cae
   // al EN del mismo ancla (la estructura 1:1 lo permite) — el idioma delata el salto
   const capComEs = comEsData?.c[capClave];
@@ -1323,7 +1325,9 @@ export default function Lector() {
                 </span>
               )}
 
-              {recursoTraducido ? (
+              {comSel.nativo ? (
+                <span className="rec-idioma-fijo" title="Obra escrita en castellano por su autor">ES</span>
+              ) : recursoTraducido ? (
                 <span className="rec-idioma" role="group" aria-label="Idioma del recurso">
                   <button
                     type="button"
@@ -1397,7 +1401,7 @@ export default function Lector() {
               {comentario && comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
-                  seccion={{ t: `${tr.capitulo} ${cap} — ${usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
+                  seccion={{ t: `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
                   tr={tr}
                   renderFn={renderMarcado}
                 />
@@ -1521,7 +1525,7 @@ export default function Lector() {
               {comentario && comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
-                  seccion={{ t: `${tr.capitulo} ${cap} — ${usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
+                  seccion={{ t: `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
                   tr={tr}
                   renderFn={renderMarcado}
                 />
