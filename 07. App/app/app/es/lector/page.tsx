@@ -10,6 +10,7 @@ import { buscaEnVarias, cargaIndice, ordenaConIA, tramosResaltados, type Resulta
 import { cargaComentarios, buscaComentarios, contexto } from "@/lib/busqueda";
 import { parseCita, segmentarPorCitas } from "@/lib/referencias";
 import { ANCHO_ESTUDIO, ANCHO_NAV, useAlturaCabecera, useAnchoEstudio, useMedia } from "@/lib/pantalla";
+import { NOMBRE_ZONA, ZONAS, ZONA_POR_DEFECTO, calcZonas, contenidoDe, useGuardado, useVentana, type Zona } from "@/lib/mesa";
 
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
 type Verso = { c: number; v: number; osis: string; t: string };
@@ -171,11 +172,17 @@ export default function Lector() {
   const columna = useRef<HTMLDivElement>(null);
   // ── Mesa de estudio (pantallas ≥ 900 px: plegables, tablets, laptops) ──
   const ancho = useMedia(`(min-width: ${ANCHO_ESTUDIO}px)`);
-  useAlturaCabecera();
+  const altoCab = useAlturaCabecera();
   const [anchoEstudio, setAnchoEstudio] = useAnchoEstudio();
   const [arrastrando, setArrastrando] = useState(false);
-  // qué ocupa la columna de estudio: el comentario o el panel del frente de la pila
-  const [frente, setFrente] = useState<"com" | null>(null);
+  // ── Mesa de trabajo (≥ 1280 px): zonas con cuadros que se arrastran (lib/mesa.ts) ──
+  const trabajo = useMedia("(min-width: 1280px)");
+  const [ventW, ventH] = useVentana();
+  const [zonaDe, setZonaDe] = useGuardado<Record<string, Zona>>("mesa-zonas", {});
+  const [activo, setActivo] = useState<Partial<Record<Zona, string>>>({});
+  const [splitDer, setSplitDer] = useGuardado("mesa-split", 0.55);
+  const [altoAbajo, setAltoAbajo] = useGuardado("mesa-abajo", 300);
+  const [arrastreTab, setArrastreTab] = useState<{ id: string; x: number; y: number; sobre: Zona | null } | null>(null);
   const [versoActual, setVersoActual] = useState(1);
   const estudioRef = useRef<HTMLElement>(null);
   const estudioTocado = useRef(0);
@@ -940,10 +947,12 @@ export default function Lector() {
     if (ancho) {
       // en la mesa de estudio los paneles no se apilan: son pestañas de la
       // columna lateral y sólo el del frente se ve (los demás, en reposo)
-      const alFrente = (frente !== "com" || !comentario) && pila[pila.length - 1] === id;
+      const z = zonaEf(id);
+      const r = rectsZona[z];
+      const alFrente = activoEn(z) === id;
       return {
         className: `lex-panel lateral${alFrente ? " frente" : " detras"}`,
-        style: { zIndex: 60 },
+        style: r ? { zIndex: 60, ...contenidoDe(r) } : { zIndex: 60, display: "none" },
         onPointerDown: undefined,
       };
     }
@@ -1005,7 +1014,10 @@ export default function Lector() {
   const nPila = pila.length;
   const nPilaAntes = useRef(0);
   useEffect(() => {
-    if (nPila > nPilaAntes.current) setFrente(null);
+    if (nPila > nPilaAntes.current) {
+      const id = pila[pila.length - 1];
+      if (id) setActivo((a) => ({ ...a, [zonaEf(id)]: id }));
+    }
     nPilaAntes.current = nPila;
   }, [nPila]);
   useEffect(() => {
@@ -1066,24 +1078,31 @@ export default function Lector() {
   }, []);
 
   const comEnTexto = comentario && !ancho;
-  const estudioVisible = ancho && (comentario || pila.length > 0);
-  const comAlFrente = comentario && (frente === "com" || pila.length === 0);
+  const zonaEf = (id: string): Zona => (trabajo ? zonaDe[id] ?? ZONA_POR_DEFECTO[id] ?? "der-arriba" : "der-arriba");
+  const abiertas = [...(comentario ? ["com"] : []), ...pila];
+  const porZona: Record<Zona, string[]> = { "der-arriba": [], "der-abajo": [], abajo: [] };
+  for (const id of abiertas) porZona[zonaEf(id)].push(id);
+  const activoEn = (z: Zona) => {
+    const ids = porZona[z];
+    const a = activo[z];
+    return a && ids.includes(a) ? a : ids[ids.length - 1];
+  };
+  const navW = anchoNav ? (navPlegada ? 40 : 210) : 0;
+  const baseMesa = { W: ventW, H: ventH, T: altoCab, navW, R: anchoEstudio, B: altoAbajo, trabajo };
+  const mesa = calcZonas({
+    ...baseMesa,
+    split: splitDer,
+    ocupadas: { "der-arriba": porZona["der-arriba"].length > 0, "der-abajo": porZona["der-abajo"].length > 0, abajo: porZona.abajo.length > 0 },
+  });
+  const rectsZona = mesa.zonas;
+  // dónde se puede soltar un cuadro: las tres zonas, estén ocupadas o no
+  const destinos = trabajo ? calcZonas({ ...baseMesa, split: 0.5, ocupadas: { "der-arriba": true, "der-abajo": true, abajo: true } }).zonas : {};
+  const estudioVisible = ancho && abiertas.length > 0;
+  const comAlFrente = comentario && activoEn(zonaEf("com")) === "com";
   // los paneles son hermanos de <main>: el ancho se publica en la raíz
   useEffect(() => {
     document.documentElement.style.setProperty("--estudio-w", `${anchoEstudio}px`);
   }, [anchoEstudio]);
-  const iniciarArrastre = (e: React.PointerEvent) => {
-    e.preventDefault();
-    setArrastrando(true);
-    const mover = (ev: PointerEvent) => setAnchoEstudio(window.innerWidth - ev.clientX);
-    const soltar = () => {
-      setArrastrando(false);
-      window.removeEventListener("pointermove", mover);
-      window.removeEventListener("pointerup", soltar);
-    };
-    window.addEventListener("pointermove", mover);
-    window.addEventListener("pointerup", soltar);
-  };
   // el comentario acompaña la lectura: el versículo que está a media pantalla
   // manda, y la columna se desliza a la sección que lo comenta
   useEffect(() => {
@@ -1125,9 +1144,64 @@ export default function Lector() {
   };
 
   const traerAlFrente = (id: string) => {
-    if (id === "com") return setFrente("com");
-    setFrente(null);
-    setPila((p) => [...p.filter((x) => x !== id), id]);
+    setActivo((a) => ({ ...a, [zonaEf(id)]: id }));
+    if (id !== "com") setPila((p) => [...p.filter((x) => x !== id), id]);
+  };
+
+  /** Pestaña: un toque la trae al frente; arrastrarla (ratón o dedo) mueve el cuadro de zona. */
+  const iniciarTab = (id: string, e: React.PointerEvent) => {
+    if (e.button !== 0) return;
+    const x0 = e.clientX;
+    const y0 = e.clientY;
+    let movido = false;
+    const zonaEn = (x: number, y: number) =>
+      ZONAS.find((z) => {
+        const r = destinos[z];
+        return r && x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height;
+      }) ?? null;
+    const mover = (ev: PointerEvent) => {
+      if (!trabajo) return;
+      if (!movido && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 7) return;
+      movido = true;
+      setArrastreTab({ id, x: ev.clientX, y: ev.clientY, sobre: zonaEn(ev.clientX, ev.clientY) });
+    };
+    const soltar = (ev: PointerEvent) => {
+      window.removeEventListener("pointermove", mover);
+      window.removeEventListener("pointerup", soltar);
+      window.removeEventListener("pointercancel", soltar);
+      if (!movido) return traerAlFrente(id);
+      const z = zonaEn(ev.clientX, ev.clientY);
+      setArrastreTab(null);
+      if (z) {
+        setZonaDe((prev) => ({ ...prev, [id]: z }));
+        setActivo((a) => ({ ...a, [z]: id }));
+      }
+    };
+    window.addEventListener("pointermove", mover);
+    window.addEventListener("pointerup", soltar);
+    window.addEventListener("pointercancel", soltar);
+  };
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("mesa-arrastrando", arrastrando || !!arrastreTab);
+  }, [arrastrando, arrastreTab]);
+
+  /** Bordes entre zonas: v = ancho de la derecha · h = reparto arriba/abajo · b = alto de abajo. */
+  const arrastrarBorde = (tipo: "v" | "h" | "b") => (e: React.PointerEvent) => {
+    e.preventDefault();
+    setArrastrando(true);
+    const mover = (ev: PointerEvent) => {
+      if (tipo === "v") setAnchoEstudio(ventW - ev.clientX);
+      else if (tipo === "h") setSplitDer(Math.min(0.8, Math.max(0.2, (ev.clientY - altoCab) / Math.max(1, ventH - altoCab))));
+      else setAltoAbajo(Math.round(Math.min((ventH - altoCab) * 0.7, Math.max(140, ventH - ev.clientY))));
+    };
+    const soltar = () => {
+      setArrastrando(false);
+      window.removeEventListener("pointermove", mover);
+      window.removeEventListener("pointerup", soltar);
+    };
+    window.addEventListener("pointermove", mover);
+    window.addEventListener("pointerup", soltar);
   };
 
   const abrirLexico = (p: Palabra) => {
@@ -1613,7 +1687,7 @@ export default function Lector() {
 
       <main
         className={[estudioVisible && "con-estudio", arrastrando && "arrastrando", navVisible && "con-nav"].filter(Boolean).join(" ") || undefined}
-        style={{ "--estudio-w": `${anchoEstudio}px` } as React.CSSProperties}
+        style={{ "--estudio-w": `${anchoEstudio}px`, ...(ancho ? { marginRight: mesa.mr, paddingBottom: mesa.pb } : {}) } as React.CSSProperties}
       >
         <div
           className={`lector-columna${pila.length && !ancho ? ` con-panel pila-${Math.min(pila.length, 2)}` : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
@@ -1958,39 +2032,44 @@ export default function Lector() {
       )}
 
       {estudioVisible && (
-        <aside
-          ref={estudioRef}
-          className={`estudio${arrastrando ? " arrastrando" : ""}`}
-          aria-label="Mesa de estudio"
-          onWheel={() => (estudioTocado.current = Date.now())}
-          onPointerDown={() => (estudioTocado.current = Date.now())}
-        >
-          <div
-            className="estudio-asa"
-            role="separator"
-            aria-orientation="vertical"
-            aria-label="Ajustar el ancho de la columna de estudio"
-            title="Arrastra para ajustar el ancho"
-            onPointerDown={iniciarArrastre}
-            onDoubleClick={() => setAnchoEstudio(Math.min(420, window.innerWidth * 0.46))}
-          />
-          <div className="estudio-pestanas" role="tablist">
-            {comentario && (
-              <button role="tab" aria-selected={comAlFrente} className={`estudio-pestana${comAlFrente ? " activa" : ""}`} onClick={() => traerAlFrente("com")}>
-                {comSel.etiqueta}
-              </button>
-            )}
-            {pila.map((id) => {
-              const activa = !comAlFrente && pila[pila.length - 1] === id;
-              return (
-                <button key={id} role="tab" aria-selected={activa} className={`estudio-pestana${activa ? " activa" : ""}`} onClick={() => traerAlFrente(id)}>
-                  {ETIQUETA_PANEL[id] ?? id}
-                </button>
-              );
-            })}
-          </div>
-          {comentario && (
-            <div className={`estudio-com${comAlFrente ? " visible" : ""}`}>
+        <>
+          {ZONAS.map((z) => {
+            const r = rectsZona[z];
+            if (!r) return null;
+            const act = activoEn(z);
+            return (
+              <div key={z} className={`zona zona-${z}`} style={r} data-zona={z}>
+                <div className="estudio-pestanas" role="tablist" aria-label={NOMBRE_ZONA[z]}>
+                  {porZona[z].map((id) => (
+                    <button
+                      key={id}
+                      role="tab"
+                      aria-selected={act === id}
+                      className={`estudio-pestana${act === id ? " activa" : ""}${arrastreTab?.id === id ? " arrastrada" : ""}`}
+                      onPointerDown={(e) => iniciarTab(id, e)}
+                      onClick={(e) => {
+                        if (e.detail === 0) traerAlFrente(id); // teclado
+                      }}
+                      title={trabajo ? "Toca para ver · arrastra para mover el cuadro" : undefined}
+                    >
+                      {trabajo && <span className="pestana-asidero" aria-hidden="true">⠿</span>}
+                      {id === "com" ? comSel.etiqueta : ETIQUETA_PANEL[id] ?? id}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+          {comentario && rectsZona[zonaEf("com")] && (
+            <section
+              ref={estudioRef}
+              className={`tarjeta-com${comAlFrente ? " visible" : ""}`}
+              style={contenidoDe(rectsZona[zonaEf("com")]!)}
+              aria-label={comSel.etiqueta}
+              onWheel={() => (estudioTocado.current = Date.now())}
+              onPointerDown={() => (estudioTocado.current = Date.now())}
+            >
+              <div className="estudio-com visible">
               <div className="estudio-autor">
                 {comSel.etiqueta} · {comSel.anio}
                 {recursoTraducido && (comFuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : usarEsCom) && (
@@ -2025,8 +2104,56 @@ export default function Lector() {
                 <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
               )}
             </div>
+            </section>
           )}
-        </aside>
+          {mesa.mr > 0 && (
+            <div
+              className={`asa asa-v${arrastrando ? " activa" : ""}`}
+              style={{ left: ventW - mesa.mr - 5, top: altoCab, height: ventH - altoCab }}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Ajustar el ancho de la columna de estudio"
+              onPointerDown={arrastrarBorde("v")}
+              onDoubleClick={() => setAnchoEstudio(Math.min(420, window.innerWidth * 0.46))}
+            />
+          )}
+          {rectsZona["der-arriba"] && rectsZona["der-abajo"] && (
+            <div
+              className="asa asa-h"
+              style={{ left: ventW - mesa.mr, width: mesa.mr, top: rectsZona["der-abajo"]!.top - 5 }}
+              role="separator"
+              aria-label="Repartir la columna derecha"
+              onPointerDown={arrastrarBorde("h")}
+              onDoubleClick={() => setSplitDer(0.55)}
+            />
+          )}
+          {rectsZona.abajo && (
+            <div
+              className="asa asa-h"
+              style={{ left: rectsZona.abajo.left, width: rectsZona.abajo.width, top: rectsZona.abajo.top - 5 }}
+              role="separator"
+              aria-label="Ajustar el alto de la zona de abajo"
+              onPointerDown={arrastrarBorde("b")}
+              onDoubleClick={() => setAltoAbajo(300)}
+            />
+          )}
+        </>
+      )}
+
+      {arrastreTab && (
+        <>
+          {ZONAS.map((z) => {
+            const r = destinos[z];
+            return r ? (
+              <div key={z} className={`destino${arrastreTab.sobre === z ? " sobre" : ""}`} style={r}>
+                <span>{NOMBRE_ZONA[z]}</span>
+              </div>
+            ) : null;
+          })}
+          <div className="fantasma" style={{ left: arrastreTab.x + 14, top: arrastreTab.y + 10 }}>
+            {arrastreTab.id === "com" ? comSel.etiqueta : ETIQUETA_PANEL[arrastreTab.id] ?? arrastreTab.id}
+          </div>
+        </>
       )}
 
       {busPanel && (

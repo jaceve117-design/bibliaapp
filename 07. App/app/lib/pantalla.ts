@@ -28,16 +28,22 @@ export function useMedia(consulta: string): boolean {
  * Publica la altura real de la cabecera en `--cab-h`: la columna de estudio y
  * la navegación se pegan justo debajo, aunque la cabecera cambie de filas.
  */
-export function useAlturaCabecera() {
+export function useAlturaCabecera(): number {
+  const [alto, setAlto] = useState(120);
   useEffect(() => {
     const cab = document.querySelector<HTMLElement>(".cabecera");
     if (!cab) return;
-    const fija = () => document.documentElement.style.setProperty("--cab-h", `${Math.round(cab.getBoundingClientRect().height)}px`);
+    const fija = () => {
+      const h = Math.round(cab.getBoundingClientRect().height);
+      document.documentElement.style.setProperty("--cab-h", `${h}px`);
+      setAlto(h);
+    };
     fija();
     const ro = new ResizeObserver(fija);
     ro.observe(cab);
     return () => ro.disconnect();
   }, []);
+  return alto;
 }
 
 /** Ancho de la columna de estudio, ajustable arrastrando su borde y recordado. */

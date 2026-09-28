@@ -5873,3 +5873,100 @@ html.sin-intro .intro { display: none; }
   .com-strip-fila { border-top: 0; flex: 0 1 380px; min-width: 250px; }
   .com-strip-fila .rec-barra { max-width: none; margin: 0; padding: 5px 8px; border-radius: 10px; }
 }
+
+/* ═══ Mesa de trabajo: zonas, cuadros, bordes y arrastre (lib/mesa.ts) ═══
+   Las zonas y los cuadros se posicionan con coordenadas calculadas; al cambiar
+   de sitio o de tamaño se DESLIZAN (left/top/width/height con transición),
+   salvo mientras se arrastra un borde, donde siguen al puntero sin retardo. */
+@media (min-width: 680px) {
+  .zona, .tarjeta-com, .lex-panel.lateral {
+    position: fixed;
+    transition: left 0.42s cubic-bezier(0.32, 0.72, 0, 1), top 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+                width 0.42s cubic-bezier(0.32, 0.72, 0, 1), height 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+                opacity 0.3s ease, transform 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  html.mesa-arrastrando .zona, html.mesa-arrastrando .tarjeta-com, html.mesa-arrastrando .lex-panel.lateral,
+  html.mesa-arrastrando main { transition: none !important; }
+  html.mesa-arrastrando { user-select: none; }
+  .zona {
+    background: var(--bg-elev);
+    border-left: 1px solid var(--line);
+    z-index: 30;
+    animation: estudio-entra 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .zona-der-abajo { border-top: 1px solid var(--line); }
+  .zona-abajo { border-left: 0; border-top: 1px solid var(--line); animation-name: zona-sube; }
+  @keyframes zona-sube { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .zona .estudio-pestanas { position: absolute; top: 0; left: 0; right: 0; height: 46px; }
+  .tarjeta-com {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--bg-elev);
+    z-index: 31;
+    scroll-behavior: smooth;
+  }
+  .tarjeta-com:not(.visible) { opacity: 0; transform: translateX(10px); pointer-events: none; }
+  .tarjeta-com .com-toggle { position: static; }
+  .lex-panel.lateral { right: auto; bottom: auto; }
+
+  .asa { position: fixed; z-index: 62; touch-action: none; }
+  .asa-v { width: 10px; cursor: col-resize; }
+  .asa-h { height: 10px; cursor: row-resize; }
+  .asa::after {
+    content: "";
+    position: absolute;
+    background: var(--accent);
+    opacity: 0;
+    border-radius: 2px;
+    transition: opacity 0.25s ease;
+  }
+  .asa-v::after { left: 4px; top: 0; bottom: 0; width: 2px; }
+  .asa-h::after { top: 4px; left: 0; right: 0; height: 2px; }
+  .asa:hover::after, .asa.activa::after { opacity: 0.55; }
+}
+@media (min-width: 1280px) {
+  .zona .estudio-pestana { touch-action: none; user-select: none; }
+  .pestana-asidero { opacity: 0.35; margin-right: 6px; font-size: 11px; transition: opacity 0.2s ease; }
+  .estudio-pestana:hover .pestana-asidero { opacity: 0.8; }
+  .estudio-pestana.arrastrada { opacity: 0.4; }
+}
+.destino {
+  position: fixed;
+  z-index: 95;
+  pointer-events: none;
+  border: 2px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  border-radius: 14px;
+  margin: 6px;
+  box-sizing: border-box;
+  max-width: calc(100% - 12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: vistazo-entra 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.destino span {
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong, var(--accent));
+  background: var(--bg-elev);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+.destino.sobre { border-style: solid; border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
+.fantasma {
+  position: fixed;
+  z-index: 96;
+  pointer-events: none;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--bg-elev);
+  border: 1px solid var(--accent);
+  box-shadow: var(--shadow);
+}
