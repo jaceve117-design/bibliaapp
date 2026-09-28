@@ -1177,3 +1177,6 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 - Easton aparece ahora en el selector de comentarios («Diccionario Easton · 1897»): índice inverso versículo → entradas que lo citan, con la oración pertinente. Generador: `07. App/app/scripts/genera-easton-pasajes.mjs` (salida `public/data/easton-pasajes/` y `easton-pasajes-es/`; ~25.500 citas, 66 libros). **Regenerarlo si cambia `easton-es`.** Resuelve citas elípticas («(Ex 6:20) … (2:1, 4)»).
 - **Fix en `lib/referencias.ts` (afecta a TODOS los comentarios):** «Lc 24:48; 1 Ts 2:5» se leía como Lc 24:48 + Lc 24:1 y se perdía 1 Ts. Ahora un «1–3» seguido de nombre de libro no se toma como verso extra.
 - Pendiente menor: «2 Sam 7:12» (número + espacio + «Sam») no enlaza; falta la clave con espacio en MAPA.
+
+## 2026-09-28 — NUEVA PRIORIDAD para GLM
+Arriba de `hoja_de_ruta_recursos_GLM.md` hay dos tareas **⚑ PRIORIDAD** que van antes de seguir con la fase en curso: **P.1** barrido profundo de citas bíblicas en todas las obras (medir, corregir por frecuencia, agrupar como en cb6e839, casos de prueba, meta ≥98 %) y **P.2** Easton como diccionario de verdad (términos del texto enlazados a su entrada + renombrar la vista actual).

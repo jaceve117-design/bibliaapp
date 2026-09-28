@@ -1,5 +1,58 @@
 # Hoja de ruta — Nuevos recursos para la Biblia de Estudio AION
 
+> ## ⚑ PRIORIDAD — hacer ANTES de seguir con la fase en curso (añadido 2026-09-28)
+>
+> ### [ ] P.1 Barrido profundo de citas bíblicas (todas las obras, EN y ES)
+> **Problema:** comentarios y diccionarios citan con muchísimas abreviaturas y formas, y el lector
+> (`07. App/app/lib/referencias.ts`, `RE_CITA` + `parseCita` + `MAPA`) no detecta parte de ellas:
+> esas citas quedan como texto muerto. Ya corregido por Claude: «Lc 24:48; 1 Ts 2:5» ya no inventa
+> «Lc 24:1» ni pierde 1 Ts. Conocido y sin corregir: «2 Sam 7:12» (número + espacio + «Sam»).
+>
+> **Paso 1 — medir (script nuevo `scripts/audita-citas.mjs`):** recorrer TODAS las obras
+> (`henry`, `henry-es`, `jfb`, `jfb-es`, `barnes`, `barnes-es`, `easton`, `easton-es`, `nave`,
+> `tsk`, léxico `lexdef-es-*`, y cada obra nueva que se ingiera). Con un patrón AMPLIO de «cosa que
+> parece cita» (`palabra/abreviatura + capítulo:verso`, `cap. 3`, `ver. 5`, `vv. 3-5`, `ch. 4`),
+> comparar contra lo que `RE_CITA` sí captura. Informe: formas NO capturadas ordenadas por
+> frecuencia, con 3 ejemplos cada una y el total por obra. Guardarlo en `05. Datos/auditoria-citas.md`.
+>
+> **Paso 2 — corregir por frecuencia.** Casos esperables:
+> - número + espacio + nombre: «2 Sam», «1 Chr.», «1 Cor.», «2 Kings», «1 Tes», «2 Cr»;
+> - nombres completos y abreviaturas ES: «Génesis», «Gén.», «Éxodo», «Juan», «Mat.», «Apoc.», «Ecles.»,
+>   «Cnt», «Rom.», «Heb.», «Sant.», «1 Ped.»; y EN: «Gen.», «Exod.», «Matt.», «Rev.», «Cant.»;
+> - **citas elípticas** que heredan el libro de la cita anterior: «(Ex 6:20) … (2:1, 4; 7:7)».
+>   Ya resuelto sólo en el generador de Easton (`scripts/genera-easton-pasajes.mjs`, función
+>   `refsDe`: una cita desnuda hereda libro salvo que la preceda una palabra). Llevar esa lógica
+>   al lector para todas las obras;
+> - rangos que cruzan capítulo «5:18-6:2» y rangos largos (hoy >12 versos se corta al primero);
+> - referencias al capítulo entero «Jn 3», «Salmo 23»;
+> - referencias internas del comentario «ver. 5», «v. 12», «vv. 3-5» → libro y capítulo en curso.
+> - **Cuidado con falsos positivos**: «Job» es libro y nombre, «Is», «Am», «Os», «Col» son palabras
+>   comunes. Exigir capítulo:verso para las ambiguas. Cada regla nueva, probada con casos.
+>
+> **Paso 3 — agrupación (mantener la idea ya hecha por GLM, commit cb6e839):** varias citas del
+> mismo libro en una sola muestra. «Jn 1:2, 4, 5:6» → una tarjeta con Jn 1:2, Jn 1:4 y Jn 5:6
+> juntos, con su chip cap:v y encabezado de capítulo. Las citas elípticas nuevas deben entrar en
+> ese mismo grupo, no crear tarjetas sueltas.
+>
+> **Paso 4 — pruebas y cierre.** Un archivo de casos (`scripts/casos-citas.json`: entrada →
+> refs esperadas, mínimo 60 casos EN y ES, incluidos los de arriba) que se ejecute antes de cada
+> despliegue. Re-ejecutar el paso 1: objetivo **≥ 98 %** de las citas reales capturadas, **0**
+> regresiones en los casos. Regenerar `easton-pasajes` (el generador usa `referencias.ts`).
+> Anotar en la bitácora el antes/después por obra.
+>
+> ### [ ] P.2 Easton como diccionario de verdad (no como comentario)
+> Easton es un **diccionario temático** (personas, lugares, objetos, doctrinas); hoy se ve en el
+> selector de comentarios como índice inverso versículo → entradas que lo citan, y parece un
+> comentario. Hacer las dos cosas:
+> 1. **Enlazar el texto bíblico a sus entradas.** Interruptor «Diccionario en el texto»: los nombres
+>    y términos del capítulo que tienen entrada en Easton (en español, vía los titulares `e` de
+>    `public/data/easton/_indice.json`; también plurales y formas con/sin tilde) se subrayan
+>    discretamente; tocar abre la ficha en el panel del diccionario. Apagado por defecto. Evitar
+>    palabras vacías y ambiguas («a», «era», «luz» sólo si hay entrada exacta). Probar a 390 px.
+> 2. **Renombrar la vista actual** para que no se confunda con un comentario: «Easton · temas que
+>    citan este versículo», cada tema como titular que abre la entrada completa en el diccionario.
+> 3. Hacer lo mismo con Rand (Fase 1.4) cuando esté ingerido.
+
 Encargo para GLM, redactado por Claude (2026-09-28) y aprobado por el usuario.
 Trabajar las tareas **en el orden en que aparecen**. Al terminar una, marcarla
 `[x]` aquí, anotar el resultado en `bitacora_progreso_GLM.md` y pasar a la
@@ -47,7 +100,8 @@ parar y dejar el informe para el usuario.
 
 ## FASE 1 — Casi sin costo, todo en español o casi (≈2 USD)
 
-### [ ] 1.1 Biblia del Oso (1569) — nueva versión en el selector
+### [x] 1.1 Biblia del Oso (1569) — nueva versión en el selector
+- **HECHA 2026-09-28 (GLM)**: fuente real = getbible.net v2 `sse` (CrossWire no publica SpaSEV.zip — 404 en rawzip/strict/common/beta). 66 libros · 31.098 versos · 0 incidentes de capítulos vs RV1909. **Ortografía actualizada** confirmada (Gn 1:1 «creó») → nombre «Biblia del Oso 1569 (ortografía actualizada)». **Sin deuterocanónicos**: la edición no los trae. Texto propio verificado en el lector («En el principio ya era el Verbo» ≠ RV1909). Cotejo con escaneos: pendiente de registrar muestra formal.
 - **Fuente:** módulo SWORD **SpaSEV** de CrossWire («Sagradas Escrituras Versión Antigua 1569»),
   declarado dominio público. Lista: https://www.crosswire.org/sword/modules/ModDisp.jsp?modType=Bibles ·
   licencia: http://www.bible-discovery.com/bible-license-spasev.php
