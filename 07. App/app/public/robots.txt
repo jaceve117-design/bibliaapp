@@ -1,7 +1,21 @@
 # Biblia de Estudio AION — https://bibliaapp.pages.dev
-# Buscadores e IAs pueden leer el sitio y sus datos. Guía para IAs: /llms.txt
-# Content-Signal: search=yes permite indexar; ai-input=yes permite usar el
-# contenido para responder (RAG, búsqueda con IA). Entrenamiento: sin señal.
+# Buscadores e IAs pueden leer el sitio para indexarlo y para responder
+# preguntas (guía para IAs: /llms.txt). El ENTRENAMIENTO de modelos NO está
+# permitido: ai-train=no, y se cierran los rastreadores dedicados a entrenar.
+# Los de consulta en vivo (ChatGPT-User, OAI-SearchBot, Claude-User,
+# Claude-SearchBot, PerplexityBot…) siguen permitidos.
+
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: Bytespider
+User-agent: Amazonbot
+User-agent: cohere-training-data-crawler
+Disallow: /
+
 User-agent: *
-Content-Signal: search=yes, ai-input=yes
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 Allow: /
