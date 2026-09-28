@@ -5401,3 +5401,11 @@ body {
   border-radius: 3px;
   padding: 0 1px;
 }
+
+.bus-ia { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 4px; }
+.bus-ia-boton {
+  font: inherit; font-size: 0.85rem; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  background: transparent; color: var(--accent); border: 1px solid currentColor;
+}
+.bus-ia-boton:disabled { opacity: 0.6; cursor: wait; }
+.bus-prob { opacity: 0.7; font-weight: normal; }

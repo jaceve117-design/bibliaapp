@@ -6,7 +6,7 @@ import TamTexto from "@/components/TamTexto";
 import { t } from "@/lib/i18n";
 import { parejaDe } from "@/lib/alinea-gr";
 import { morfGntEs } from "@/lib/morfgnt";
-import { buscaEnVarias, cargaIndice, tramosResaltados, type Resultado } from "@/lib/busqueda";
+import { buscaEnVarias, cargaIndice, ordenaConIA, tramosResaltados, type Resultado } from "@/lib/busqueda";
 import { parseCita, segmentarPorCitas } from "@/lib/referencias";
 
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
@@ -635,13 +635,15 @@ export default function Lector() {
   // ── Buscador de pasajes (paso 1: en el dispositivo, sin coste) ──────────────
   const [busPanel, setBusPanel] = useState(false);
   const [busQ, setBusQ] = useState("");
-  const [busRes, setBusRes] = useState<Resultado[] | null>(null);
+  const [busRes, setBusRes] = useState<Array<Resultado & { ia?: number }> | null>(null);
+  const [busIa, setBusIa] = useState<"" | "pensando" | "hecho" | string>("");
   const [busEstado, setBusEstado] = useState<"" | "cargando" | "error">("");
   const busIndices = useRef<Array<{ obra: string; versos: Awaited<ReturnType<typeof cargaIndice>> }> | null>(null);
 
   useEffect(() => {
     if (!busPanel) return;
     const q = busQ.trim();
+    setBusIa("");
     if (q.length < 3) { setBusRes(null); return; }
     let vivo = true;
     // espera a que el lector deje de teclear: recorrer 62.000 versos en cada
@@ -664,6 +666,17 @@ export default function Lector() {
     }, 280);
     return () => { vivo = false; clearTimeout(t); };
   }, [busQ, busPanel, obra]);
+
+  const ordenarPorSentido = async () => {
+    if (!busRes?.length) return;
+    setBusIa("pensando");
+    try {
+      setBusRes(await ordenaConIA(busQ.trim(), busRes));
+      setBusIa("hecho");
+    } catch (e) {
+      setBusIa(e instanceof Error ? e.message : "La IA no está disponible ahora.");
+    }
+  };
 
   const nombreLibro = (o: string) => manifest?.libros.find((l) => l.osis === o)?.nombre ?? o;
 
@@ -1536,6 +1549,18 @@ export default function Lector() {
             {busRes && busRes.length === 0 && busEstado === "" && (
               <div className="lex-meta">Sin resultados. Prueba con menos palabras o con otras que recuerdes.</div>
             )}
+            {busRes && busRes.length > 1 && (
+              <div className="bus-ia">
+                {busIa === "hecho" ? (
+                  <span className="lex-meta">✦ Ordenado por sentido (IA). Porcentaje = probabilidad de que sea el pasaje buscado.</span>
+                ) : (
+                  <button className="bus-ia-boton" onClick={ordenarPorSentido} disabled={busIa === "pensando"}>
+                    {busIa === "pensando" ? "Ordenando…" : "✦ Ordenar por sentido (IA)"}
+                  </button>
+                )}
+                {busIa && busIa !== "hecho" && busIa !== "pensando" && <span className="lex-meta">{busIa}</span>}
+              </div>
+            )}
             {busRes && busRes.length > 0 && (
               <ol className="bus-resultados">
                 {busRes.map((r) => (
@@ -1546,7 +1571,10 @@ export default function Lector() {
                         abrirCita({ etiqueta: `${nombreLibro(r.osis)} ${r.c}:${r.v}`, refs: [{ osis: r.osis, c: r.c, v: r.v }] })
                       }
                     >
-                      <span className="bus-ref">{nombreLibro(r.osis)} {r.c}:{r.v}</span>
+                      <span className="bus-ref">
+                        {nombreLibro(r.osis)} {r.c}:{r.v}
+                        {r.ia !== undefined && <span className="bus-prob"> · {Math.round(r.ia * 100)}%</span>}
+                      </span>
                       <span className="bus-texto">
                         {tramosResaltados(r.texto, busQ).map((tr2, i) =>
                           tr2.marca ? <mark key={i}>{tr2.t}</mark> : <span key={i}>{tr2.t}</span>

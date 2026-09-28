@@ -139,3 +139,22 @@ export function buscaEnVarias(indices: Array<{ obra: string; versos: Verso[] }>,
   const porRef = new Map(pref.versos.map((v) => [v.ref, v.texto]));
   return orden.map((r) => ({ ...r, texto: porRef.get(r.ref) ?? r.texto }));
 }
+
+/**
+ * Paso 2: Jev reordena por SENTIDO los mejores candidatos locales
+ * (functions/api/busca-ia.ts). Devuelve la lista reordenada con la
+ * probabilidad de Jev en `ia`; los que no se enviaron quedan detrás.
+ */
+export async function ordenaConIA(consulta: string, res: Resultado[], n = 20): Promise<Array<Resultado & { ia?: number }>> {
+  const envio = res.slice(0, n);
+  const r = await fetch("/api/busca-ia", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ consulta, candidatos: envio.map((x) => ({ ref: x.ref, texto: x.texto })) }),
+  });
+  if (!r.ok) throw new Error(r.status === 429 ? "Demasiadas búsquedas: espera un minuto." : "La IA no está disponible ahora.");
+  const { orden } = (await r.json()) as { orden: Array<{ ref: string; p: number }> };
+  const porRef = new Map(envio.map((x) => [x.ref, x]));
+  const arriba = orden.filter((o) => porRef.has(o.ref)).map((o) => ({ ...porRef.get(o.ref)!, ia: o.p }));
+  return [...arriba, ...res.slice(n)];
+}

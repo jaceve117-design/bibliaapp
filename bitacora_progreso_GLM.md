@@ -1115,3 +1115,18 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 - UI: botón ⌕ → panel Buscar con pestañas Pasajes | Diccionario; resaltado de coincidencias; tocar un resultado abre la tarjeta de cita. Verificado a 390 px: «la mujer estaba vestida de escarlata» → Ap 17:4 primero, sin desborde horizontal.
 - Desplegado: https://3eaacc0e.bibliaapp.pages.dev (build con `DIST_DIR=salida` por el bloqueo EBUSY de `out`).
 - Pendiente: paso 2 (Jev reordena candidatos vía Pages Function con la clave en el servidor y límite de uso); búsqueda en comentarios; ensamblar y desplegar definiciones del léxico en español cuando termine la corrida (`node bin/ensamblar.mjs --obra lexdef`).
+
+## 2026-09-28 — Buscador paso 2: Jev ordena por sentido (Claude)
+- `07. App/app/functions/api/busca-ia.ts` (Pages Function) + `wrangler.toml` con binding `AI` → **ninguna clave en el cliente ni en el repo**. Por cada candidato Jev responde una probabilidad `noul` («¿es el pasaje buscado?»); hasta 20 candidatos, ≈0,0001 USD por búsqueda. Tope 12/min por IP, caché de 24 h por consulta+candidatos, límites de tamaño.
+- Cliente: `ordenaConIA()` en `lib/busqueda.ts`; botón «✦ Ordenar por sentido (IA)» (a demanda, no automático, para controlar gasto) y porcentaje junto a cada referencia.
+- Verificado en producción: «cuando Jesús lloró por su amigo» → Jn 11:35 al 90%. Desplegado: https://c57c9ce4.bibliaapp.pages.dev
+- Nota de despliegue: `wrangler.toml` declara `pages_build_output_dir = "out"`; con el bloqueo EBUSY se sigue usando `DIST_DIR=salida` y `wrangler pages deploy salida`.
+
+## ENCARGO PARA GLM — Buscador paso 3 y siguientes
+1. **Búsqueda en comentarios y recursos** (Henry ES, JFB ES, Barnes ES, Nave's ES, Easton ES, léxico): nueva pestaña «Comentarios» en el panel Buscar.
+   - Generar índices por obra con un script tipo `scripts/genera-busqueda.mjs` (párrafo → `OSIS.c.v|obra|texto` recortado). Vigilar el tamaño: cargar un índice por obra sólo cuando se busque en ella; si pasa de ~3 MB gzip, trocear por testamento.
+   - Reutilizar `busca()`/`tramosResaltados()` de `lib/busqueda.ts` (sin tildes, prefijos, proximidad). Mostrar fragmento con contexto alrededor de la coincidencia, no el párrafo entero.
+   - Tocar un resultado abre la tarjeta del pasaje comentado en la obra correspondiente. Mantener «sin revisar» en todo texto traducido por máquina.
+   - Opcional: el botón IA ya sirve igual (`ordenaConIA` acepta cualquier `{ref, texto}`); el prompt del servidor habla de «versículo»: generalizarlo con un campo `tipo` si se usa para comentarios.
+2. Luego: reintentar unidades fallidas (Henry 307, Barnes 46, JFB 43, Easton 17) y la auditoría Jev del corpus (~2 USD). Tope de gasto global: 75 USD (ver `11. Motor de Traducción/estado/gasto.json`).
+3. Reglas: móvil primero (probar a 390 px, sin desborde horizontal); no tocar `functions/` ni `wrangler.toml` sin avisar; nunca poner claves en el cliente ni en el chat.

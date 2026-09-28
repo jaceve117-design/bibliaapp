@@ -1,0 +1,8 @@
+# Configuración de Cloudflare Pages. El sitio es estático (next export);
+# sólo functions/ corre en el servidor, con el binding AI para Jev.
+name = "bibliaapp"
+pages_build_output_dir = "out"
+compatibility_date = "2026-09-01"
+
+[ai]
+binding = "AI"
