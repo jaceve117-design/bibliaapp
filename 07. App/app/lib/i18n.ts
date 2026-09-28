@@ -43,7 +43,9 @@ export const T = {
     fuenteDic: "Easton's Bible Dictionary (1897) · Dominio público · traducción ES en curso",
     comentario: "Comentario de Matthew Henry",
     comentarioDe: "Comentario de Matthew Henry",
-    resumenCapitulo: "Resumen del capítulo",
+    resumenCapitulo: "Resumen del capítulo",
+
+
     fuenteJfbCobertura: "toda la Biblia, comentada por anclas de versículo",
     fuenteBarnesCobertura: "NT completo + Génesis, Job, Salmos, Isaías y Daniel (Barnes no escribió los demás libros del AT; se excluyen)",
     jfbModo: "verso a verso (texto EN)",
@@ -52,6 +54,7 @@ export const T = {
     apoyarSinpe: "SINPE Móvil (Costa Rica)",
     apoyarPaypal: "PayPal (internacional)",
     apoyarNota: "La donación es 100% voluntaria y nunca condiciona el acceso a nada. Gracias por sostener la biblioteca.",
+    apoyarProximamente: "Esta biblioteca es y seguirá siendo gratuita: todo el contenido, todo offline, sin condiciones. Próximamente habilitaremos esta sección para quien quiera apoyar el proyecto de forma voluntaria.",
     comModoEs: "verso a verso (traducción automática, sin revisar)",
     estadoNota: "Traducción asistida según glosario v1 — «sin revisar»: pendiente de revisión editorial humana (B2) y puerta D20. El original EN está siempre a un clic.",
     sinTraducir: "sección aún sin traducir",
@@ -141,7 +144,9 @@ export const T = {
     fuenteDic: "Easton's Bible Dictionary (1897) · Public domain · ES translation in progress",
     comentario: "Matthew Henry's commentary",
     comentarioDe: "Matthew Henry's commentary",
-    resumenCapitulo: "Chapter summary",
+    resumenCapitulo: "Chapter summary",
+
+
     fuenteJfbCobertura: "whole Bible, commented on key verses",
     fuenteBarnesCobertura: "complete NT + Genesis, Job, Psalms, Isaiah and Daniel (Barnes never wrote the other OT books; they are excluded)",
     jfbModo: "verse by verse (EN text)",
@@ -150,6 +155,7 @@ export const T = {
     apoyarSinpe: "SINPE Móvil (Costa Rica)",
     apoyarPaypal: "PayPal (international)",
     apoyarNota: "Donations are 100% voluntary and never condition access to anything. Thank you for supporting the library.",
+    apoyarProximamente: "This library is and will remain free: all content, fully offline, no strings attached. We will soon open this section for anyone who wishes to support the project voluntarily.",
     comModoEs: "verse by verse (machine translation, unreviewed)",
     estadoNota: "Assisted translation per glossary v1 — «unreviewed»: pending human editorial review (B2) and gate D20. The EN original is one click away.",
     sinTraducir: "section not yet translated",
