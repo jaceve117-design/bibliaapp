@@ -89,8 +89,8 @@ const GRUPOS_LIBROS = [
 ];
 /** Nombre de cada panel como pestaña de la mesa de estudio (pantallas anchas). */
 const ETIQUETA_PANEL: Record<string, string> = {
-  dic: "Diccionario", busqueda: "Buscar", griego: "Griego", lex: "Léxico", refs: "Versículo",
-  cita: "Citas", termino: "Término", fuentes: "Fuentes", notas: "Notas", info: "Info",
+  dic: "Diccionario", busqueda: "Buscar", griego: "Griego", lex: "Léxico", refs: "Notas",
+  cita: "Citas", termino: "Término", fuentes: "Fuentes", notas: "Mis notas", info: "Info",
 };
 const CAP_INICIAL = 1;
 const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
@@ -143,6 +143,8 @@ export default function Lector() {
   const [dicPanel, setDicPanel] = useState(false);
   const [dicIndice, setDicIndice] = useState<IndiceItem[] | null>(null);
   const [dicQuery, setDicQuery] = useState("");
+  // P.2: interruptor «Diccionario en el texto» — subraya nombres con entrada en Easton
+  const [dicEnTexto, setDicEnTexto] = useState(false);
   const [dicEntrada, setDicEntrada] = useState<EntradaDic | null>(null);
   // si la entrada mostrada viene de la traducción propia (para la insignia)
   const [dicEnEs, setDicEnEs] = useState(false);
@@ -812,6 +814,75 @@ export default function Lector() {
     return [...empiezan, ...contiene].slice(0, 40);
   })();
 
+  // mapa titular normalizado → entrada del diccionario (para «Diccionario en el texto»)
+  const indiceDicTitulo = (() => {
+    if (!dicIndice) return null;
+    const mapa = new Map<string, IndiceItem>();
+    for (const item of dicIndice) {
+      const formas = [normalizar(item.n)];
+      if (item.e) formas.push(normalizar(item.e));
+      for (const f of formas) if (f.length >= 4 && !mapa.has(f)) mapa.set(f, item);
+    }
+    return mapa;
+  })();
+
+  /** Trocea el texto del verso envolviendo los nombres con entrada en Easton. */
+  const textoConDiccionario = (texto: string, claveBase: string): React.ReactNode => {
+    if (!dicEnTexto || !indiceDicTitulo || texto.length < 4) return texto;
+    const nodos: React.ReactNode[] = [];
+    const palabras = texto.split(/(\s+)/);
+    let i = 0;
+    for (const w of palabras) {
+      const clave = `${claveBase}-${i++}`;
+      const desnuda = w.replace(/^[«"('¡¿]+/, "").replace(/[»"'),;.:!?]+$/, "");
+      if (desnuda.length >= 4) {
+        const item = indiceDicTitulo.get(normalizar(desnuda)) ?? indiceDicTitulo.get(normalizar(desnuda) + "s") ?? indiceDicTitulo.get(normalizar(desnuda) + "es");
+        if (item) {
+          nodos.push(
+            <span
+              key={clave}
+              className="dic-en-texto"
+              title={tr.verTexto}
+              onClick={(e) => { e.stopPropagation(); setDicPanel(true); abrirEntradaDic(item); }}
+            >
+              {w}
+            </span>
+          );
+          continue;
+        }
+      }
+      nodos.push(<span key={clave}>{w}</span>);
+    }
+    return nodos;
+  };
+
+  /** P.2: en la vista de Easton, el tema («Tema — texto») es un titular clicable que
+      abre la entrada completa en el diccionario. */
+  const renderEaston = (texto: string): React.ReactNode => {
+    const i = texto.indexOf(" — ");
+    if (i < 0) return renderMarcado(texto);
+    const tema = texto.slice(0, i);
+    const rest = texto.slice(i + 3);
+    const norm = normalizar(tema);
+    const item = dicIndice?.find((x) => normalizar(x.n) === norm || normalizar(x.e ?? "") === norm);
+    return (
+      <>
+        {item ? (
+          <button
+            className="cita"
+            onClick={(e) => { e.stopPropagation(); setDicPanel(true); abrirEntradaDic(item); }}
+          >
+            {tema}
+          </button>
+        ) : (
+          <b>{tema}</b>
+        )}
+        {" — "}
+        {renderMarcado(rest)}
+      </>
+    );
+  };
+
   const abrirEntradaDic = (item: IndiceItem) => {
     const clave = `dic:${item.l}`;
     // Se piden las dos ediciones a la vez: la inglesa (completa) y la propia en
@@ -986,7 +1057,7 @@ export default function Lector() {
     setParalelo(v);
     try { v ? localStorage.setItem("paralelo", JSON.stringify(v)) : localStorage.removeItem("paralelo"); } catch {}
   };
-  const extrasPar = (paralelo ?? []).filter((o) => o !== obra && (o !== "sblgnt" || NT.has(osis)));
+  const extrasPar = (paralelo ?? []).filter((o) => o !== obra && (o !== "sblgnt" || NT.has(osis))).slice(0, 4);
   const paraleloActivo = anchoParalelo && paralelo !== null;
   // cada versión extra se carga por libro y se indexa «c.v» → texto
   useEffect(() => {
@@ -1102,7 +1173,11 @@ export default function Lector() {
       ? (com2Data.json.c[String(cap)] ?? []).flatMap((a) => a.p.filter(Boolean).map((x) => (a.v > 0 ? `${a.v}. ${x}` : x)))
       : [];
 
-  const zonaEf = (id: string): Zona => (trabajo ? zonaDe[id] ?? ZONA_POR_DEFECTO[id] ?? "der-arriba" : "der-arriba");
+  const zonaEf = (id: string): Zona => {
+    const z = zonaDe[id] ?? ZONA_POR_DEFECTO[id] ?? "der-arriba";
+    // entre 680 y 1279 px hay dos zonas: la columna derecha y la de abajo
+    return trabajo ? z : z === "abajo" ? "abajo" : "der-arriba";
+  };
   const abiertas = [...(comentario ? ["com"] : []), ...(com2Activo ? ["com2"] : []), ...pila];
   const porZona: Record<Zona, string[]> = { "der-arriba": [], "der-abajo": [], abajo: [] };
   for (const id of abiertas) porZona[zonaEf(id)].push(id);
@@ -1120,8 +1195,10 @@ export default function Lector() {
   });
   const rectsZona = mesa.zonas;
   // dónde se puede soltar un cuadro: las tres zonas, estén ocupadas o no
-  const destinos = trabajo ? calcZonas({ ...baseMesa, split: 0.5, ocupadas: { "der-arriba": true, "der-abajo": true, abajo: true } }).zonas : {};
+  const destinos = ancho ? calcZonas({ ...baseMesa, split: 0.5, ocupadas: { "der-arriba": true, "der-abajo": true, abajo: true } }).zonas : {};
   const estudioVisible = ancho && abiertas.length > 0;
+  // cuántas Biblias caben lado a lado en el hueco que deja la mesa (mín. 2 extra, máx. 4)
+  const maxPar = Math.max(2, Math.min(4, Math.floor((ventW - navW - (ancho ? mesa.mr : 0) - 64) / 300) - 1));
   const comAlFrente = comentario && activoEn(zonaEf("com")) === "com";
   // los paneles son hermanos de <main>: el ancho se publica en la raíz
   useEffect(() => {
@@ -1184,7 +1261,7 @@ export default function Lector() {
         return r && x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height;
       }) ?? null;
     const mover = (ev: PointerEvent) => {
-      if (!trabajo) return;
+      if (!ancho) return;
       if (!movido && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 7) return;
       movido = true;
       setArrastreTab({ id, x: ev.clientX, y: ev.clientY, sobre: zonaEn(ev.clientX, ev.clientY) });
@@ -1591,6 +1668,18 @@ export default function Lector() {
                   interlineal TRANSFORMA el texto. Mezclarlos haría ambiguo el
                   checkbox y quitaría la combinación más útil de estudio
                   (interlineal arriba + comentario abajo). */}
+              <button
+                className={`rec-original rec-original-nav${dicEnTexto ? " activa" : ""}`}
+                onClick={() => {
+                  setDicEnTexto(!dicEnTexto);
+                  // el índice de titulares se necesita tanto como el interruptor
+                  if (!dicEnTexto && !dicIndice) abrirDic();
+                }}
+                aria-pressed={dicEnTexto}
+                title={tr.dicEnTexto}
+              >
+                📖 {tr.dicEnTexto}
+              </button>
               <span className={`rec-original rec-original-nav${interlineal || griego ? " activa" : ""}`}>
                 <span className="rec-icono rec-icono-orig" aria-hidden="true">
                   {griego ? "Ξ" : "Ω"}
@@ -1747,7 +1836,7 @@ export default function Lector() {
                     key={o.id}
                     className={`par-chip${on ? " activa" : ""}`}
                     aria-pressed={on}
-                    disabled={!on && extrasPar.length >= 2}
+                    disabled={!on && extrasPar.length >= maxPar}
                     onClick={() => fijaParalelo(on ? extrasPar.filter((x) => x !== o.id) : [...extrasPar, o.id])}
                   >
                     {on ? "✓ " : "+ "}
@@ -1789,7 +1878,7 @@ export default function Lector() {
                       }}
                     >
                       <sup className={`num${nVerso ? " con-nota" : ""}`}>{v.v}</sup>
-                      {v.t}
+                      {textoConDiccionario(v.t, v.osis)}
                     </span>
                     {extrasPar.map((o) => (
                       <span key={o} className="par-otra" lang={o === "sblgnt" ? "el" : o === "web" ? "en" : "es"}>
@@ -1820,9 +1909,9 @@ export default function Lector() {
               {comEnTexto && comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
-                  seccion={{ t: `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
+                  seccion={{ t: comFuente === "easton" ? tr.eastonTemasTitulo : `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
                   tr={tr}
-                  renderFn={renderMarcado}
+                  renderFn={comFuente === "easton" ? renderEaston : renderMarcado}
                 />
               )}
               {(grData?.versos ?? [])
@@ -1944,9 +2033,9 @@ export default function Lector() {
               {comEnTexto && comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
-                  seccion={{ t: `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
+                  seccion={{ t: comFuente === "easton" ? tr.eastonTemasTitulo : `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
                   tr={tr}
-                  renderFn={renderMarcado}
+                  renderFn={comFuente === "easton" ? renderEaston : renderMarcado}
                 />
               )}
               {versos.map((v) => {
@@ -1973,7 +2062,7 @@ export default function Lector() {
                       }}
                     >
                       <sup className={`num${nVerso ? " con-nota" : ""}`}>{v.v}</sup>
-                      {v.t}
+                      {textoConDiccionario(v.t, v.osis)}
                     </span>{" "}
                     {secciones.map((s, i) => (
                       <ComentarioBloque key={`${v.osis}-${i}`} seccion={s} tr={tr} renderFn={renderMarcado} />
@@ -2035,6 +2124,7 @@ export default function Lector() {
                                         setPendiente(null);
                                         if (l.osis !== osis) setOsis(l.osis);
                                         setCap(n);
+                                        setNavLibro(null);
                                         window.scrollTo({ top: 0, behavior: "smooth" });
                                       }}
                                     >
@@ -2086,9 +2176,9 @@ export default function Lector() {
                       onClick={(e) => {
                         if (e.detail === 0) traerAlFrente(id); // teclado
                       }}
-                      title={trabajo ? "Toca para ver · arrastra para mover el cuadro" : undefined}
+                      title="Toca para ver · arrastra para mover el cuadro"
                     >
-                      {trabajo && <span className="pestana-asidero" aria-hidden="true">⠿</span>}
+                      {ancho && <span className="pestana-asidero" aria-hidden="true">⠿</span>}
                       {id === "com" ? comSel.etiqueta : id === "com2" ? com2Sel?.etiqueta ?? "Comentario 2" : ETIQUETA_PANEL[id] ?? id}
                     </button>
                   ))}
@@ -2107,7 +2197,18 @@ export default function Lector() {
             >
               <div className="estudio-com visible">
               <div className="estudio-autor">
-                {comSel.etiqueta} · {comSel.anio}
+                <select
+                  className="sel sel-mini"
+                  aria-label="Comentario de este cuadro"
+                  value={comFuente}
+                  onChange={(e) => setComFuente(e.target.value as ComFuente)}
+                >
+                  {COMENTARIOS.filter((c) => c.id === comFuente || c.id !== com2).map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.etiqueta} · {c.anio}
+                    </option>
+                  ))}
+                </select>
                 {trabajo && com2 === null && (
                   <button
                     className="com-anadir"
@@ -2129,17 +2230,16 @@ export default function Lector() {
               )}
               {comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
-                  abiertoInicial
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
-                  seccion={{ t: `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
+                  seccion={{ t: comFuente === "easton" ? tr.eastonTemasTitulo : `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
                   tr={tr}
-                  renderFn={renderMarcado}
+                  renderFn={comFuente === "easton" ? renderEaston : renderMarcado}
                 />
               )}
               {comFuente === "henry" &&
                 seccionesCom.map((sec, i) => (
                   <div key={`${osis}.${cap}-${i}`} data-v={sec.v ?? undefined} className={`estudio-seccion${sec.v != null && sec.v === seccionActiva ? " activa" : ""}`}>
-                    <ComentarioBloque abiertoInicial seccion={sec} tr={tr} renderFn={renderMarcado} />
+                    <ComentarioBloque seccion={sec} tr={tr} renderFn={renderMarcado} />
                   </div>
                 ))}
               {comFuente === "henry" && !rCom && seccionesCom.length === 0 && (
@@ -2188,14 +2288,13 @@ export default function Lector() {
                     )}
                     {seccionesCom.map((sec, i) => (
                       <div key={`c2-${osis}.${cap}-${i}`} className="estudio-seccion">
-                        <ComentarioBloque abiertoInicial seccion={sec} tr={tr} renderFn={renderMarcado} />
+                        <ComentarioBloque seccion={sec} tr={tr} renderFn={renderMarcado} />
                       </div>
                     ))}
                   </>
                 ) : parrafosCom2.length ? (
                   <ComentarioBloque
                     key={`${com2}-${osis}-${cap}`}
-                    abiertoInicial
                     autor={`${com2Sel?.etiqueta} · ${com2Sel?.anio}`}
                     seccion={{ t: `${tr.capitulo} ${cap}`, v: null, p: parrafosCom2, sinTraducir: false }}
                     tr={tr}
@@ -2247,7 +2346,7 @@ export default function Lector() {
             const r = destinos[z];
             return r ? (
               <div key={z} className={`destino${arrastreTab.sobre === z ? " sobre" : ""}`} style={r}>
-                <span>{NOMBRE_ZONA[z]}</span>
+                <span>{!trabajo && z === "der-arriba" ? "Derecha" : NOMBRE_ZONA[z]}</span>
               </div>
             ) : null;
           })}

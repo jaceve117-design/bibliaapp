@@ -8,8 +8,8 @@
  *   │        │                        ├─ der-abajo ──┤
  *   │        ├──────── abajo ─────────┤              │
  *
- * Entre 680 y 1279 px no hay sitio para tres zonas: todo va a una sola columna
- * derecha (`der-arriba`) con pestañas, como en un plegable.
+ * Entre 680 y 1279 px (tablet, plegable) hay dos zonas: la columna derecha y la
+ * de abajo, bajo el texto; también se arrastran con el dedo.
  *
  * Aquí sólo hay geometría pura: la página decide QUÉ cuadros hay abiertos.
  */
@@ -33,7 +33,7 @@ export const ZONA_POR_DEFECTO: Record<string, Zona> = {
   busqueda: "der-arriba",
   fuentes: "der-arriba",
   info: "der-arriba",
-  refs: "der-abajo",
+  refs: "abajo",
   cita: "der-abajo",
   citas: "der-abajo",
   dic: "abajo",
@@ -66,9 +66,13 @@ export function calcZonas(o: {
   const zonas: Partial<Record<Zona, Rect>> = {};
   const hDer = Math.max(0, H - T);
   if (!trabajo) {
-    const hay = ocupadas["der-arriba"] || ocupadas["der-abajo"] || ocupadas.abajo;
-    if (hay) zonas["der-arriba"] = { left: W - R, top: T, width: R, height: hDer };
-    return { mr: hay ? R : 0, pb: 0, zonas };
+    // tablet / plegable: la columna derecha (der-arriba + der-abajo juntas) y la zona de abajo
+    const der = ocupadas["der-arriba"] || ocupadas["der-abajo"];
+    const Rc = der ? R : 0;
+    const Bc = ocupadas.abajo ? Math.min(B, Math.round(hDer * 0.45)) : 0;
+    if (der) zonas["der-arriba"] = { left: W - Rc, top: T, width: Rc, height: hDer };
+    if (Bc) zonas.abajo = { left: 0, top: H - Bc, width: W - Rc, height: Bc };
+    return { mr: Rc, pb: Bc, zonas };
   }
   const derA = ocupadas["der-arriba"];
   const derB = ocupadas["der-abajo"];

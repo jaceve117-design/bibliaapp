@@ -6051,3 +6051,28 @@ html.sin-intro .intro { display: none; }
     margin-right: 8px;
   }
 }
+
+/* P.2 — Diccionario en el texto: subrayado discreto de nombres con entrada */
+.dic-en-texto {
+  text-decoration: underline dotted;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+
+/* ── Ajustes tras la prueba en 32″ (audio del usuario, 2026-09-28) ── */
+/* el título de la sección desplegada se ANCLA arriba del cuadro mientras se lee */
+@media (min-width: 680px) {
+  .tarjeta-com .com-toggle.abierto { position: sticky; top: 0; z-index: 3; box-shadow: 0 6px 12px -8px rgba(0, 0, 0, 0.35); }
+  .zona .estudio-pestana { touch-action: none; user-select: none; }
+  .pestana-asidero { opacity: 0.35; margin-right: 6px; font-size: 11px; transition: opacity 0.2s ease; }
+}
+/* en paralelo la Biblia ocupa TODO el hueco entre los libros y la mesa */
+@media (min-width: 1000px) {
+  .lector-columna.ancha { max-width: none; padding-inline: 32px; }
+}
+/* cambio de tema: el círculo que nace del botón es lo único que se mueve */
+html.cambiando-tema *, html.cambiando-tema *::before, html.cambiando-tema *::after { transition: none !important; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { z-index: 9999; }
