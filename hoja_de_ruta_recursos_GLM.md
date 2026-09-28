@@ -45,7 +45,13 @@
 > regresiones en los casos. Regenerar `easton-pasajes` (el generador usa `referencias.ts`).
 > Anotar en la bitácora el antes/después por obra.
 >
-> ### [ ] P.2 Easton como diccionario de verdad (no como comentario)
+> ### [~] P.2 Easton como diccionario de verdad (no como comentario)
+> **1/2 HECHO 2026-09-28 (GLM)**: (2) la vista del selector renombrada a «temas que citan este
+> versículo» con cada tema como titular clicable que abre la entrada completa en el diccionario.
+> (1) «Diccionario en el texto»: interruptor activo + subrayado punteado de nombres con entrada
+> (índice de titulares normalizados, plurales incluidos; tap abre la ficha ES). Verificado en
+> el navegador: 98 subrayados en Gen 1 («Dios», «tierra», «Espíritu»…), tap en «Dios» abre la
+> entrada. PENDIENTE (3): aplicar lo mismo a Rand (1.4) cuando esté ingerido.
 > Easton es un **diccionario temático** (personas, lugares, objetos, doctrinas); hoy se ve en el
 > selector de comentarios como índice inverso versículo → entradas que lo citan, y parece un
 > comentario. Hacer las dos cosas:

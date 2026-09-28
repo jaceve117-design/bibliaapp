@@ -1243,3 +1243,11 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 - **Paralelo**: hasta 4 extra (5 Biblias) según quepan ~300 px por columna; la Biblia ocupa todo el hueco entre libros y mesa.
 - **Tema**: cambio con View Transitions, un círculo que nace del botón (`components/Tema.tsx`); se congelan las transiciones CSS durante el cambio para que no cambie «por zonas».
 - Pendiente propuesto: temas de **Nave** tocables (índice inverso tema → versículos de toda la Biblia y un cuadro con la lista por libro).
+
+### 2026-09-28 · GLM (vigilante) — P.2 (1/2): Easton como diccionario de verdad
+
+1. **(2) HECHO**: la vista de Easton en el selector renombrada «temas que citan este versículo» — cada tema es titular clicable que abre la entrada completa en el diccionario (renderEaston separa «Tema — texto» y convierte el tema en botón que busca la entrada en _indice.json).
+2. **(1) HECHO**: «Diccionario en el texto» — interruptor en la fila de navegación que subraya con puntos los nombres del capítulo con entrada en Easton (índice de titulares normalizado con ES+EN, plurales; mínimo 4 letras; tap abre la ficha ES con caída al EN). **98 subrayados en Gen 1**. Apagado por defecto.
+3. **Verificado en navegador**: tap en «Dios» (Gen 1) abre la ficha del diccionario con la entrada y la insignia «sin revisar». Deploy `71fbd82b` (el toggle recarga el índice _indice.json al activarse — fix del ciclo de carga).
+4. **Lección de depuración**: los tests con element.click() en una página con muchos clicks acumulados daban resultados falsos negativos (estado sucio del IAB) — la recarga limpia del despliegue correcto funcionó a la primera. Verificar SIEMPRE la URL del despliegue antes de culpar al código.
+- Gasto: $48,61 (P.2 = $0).
