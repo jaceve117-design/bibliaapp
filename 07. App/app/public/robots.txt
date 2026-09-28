@@ -1,0 +1,7 @@
+# Biblia de Estudio AION — https://bibliaapp.pages.dev
+# Buscadores e IAs pueden leer el sitio y sus datos. Guía para IAs: /llms.txt
+# Content-Signal: search=yes permite indexar; ai-input=yes permite usar el
+# contenido para responder (RAG, búsqueda con IA). Entrenamiento: sin señal.
+User-agent: *
+Content-Signal: search=yes, ai-input=yes
+Allow: /
