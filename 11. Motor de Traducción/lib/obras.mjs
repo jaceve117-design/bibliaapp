@@ -571,7 +571,71 @@ en una sola línea.`,
   },
 };
 
-export const OBRAS = { henry, easton, glosas, naves, jfb, barnes, lexdef };
+// ── Diccionario de W. W. Rand ──────────────────────────────────────────────
+// Un solo archivo EN (public/data/rand/rand.json: {total, entradas: [{s, n, d}]})
+// y un ES espejo (rand-es.json: {total, entradas: [{s, n, d}]}) con caída al EN
+// por entrada. Modelo easton: unidades n + d con el prefijo de prosa por defecto.
+const RUTA_RAND_EN = path.join(DATA, 'rand', 'rand.json');
+const RUTA_RAND_ES = path.join(DATA, 'rand-es', 'rand-es.json');
+
+const rand = {
+  id: 'rand',
+  nombre: "Diccionario bíblico de W. W. Rand (American Tract Society, 1859)",
+  dirEs: path.join(DATA, 'rand-es'),
+
+  async unidades() {
+    const j = leer(RUTA_RAND_EN);
+    const es = fs.existsSync(RUTA_RAND_ES) ? leer(RUTA_RAND_ES).entradas ?? {} : {};
+    const out = [];
+    for (const e of j.entradas ?? []) {
+      if (e.n && e.n.trim() && !es[e.s]?.n) {
+        out.push({ id: `rand.${e.s}.n`, obra: 'rand', slug: e.s, campo: 'n', en: e.n });
+      }
+      if (e.d && e.d.trim() && !es[e.s]?.d) {
+        out.push({ id: `rand.${e.s}.d`, obra: 'rand', slug: e.s, campo: 'd', en: e.d });
+      }
+    }
+    return out.map((u) => ({ ...u, h: hash(u.en), chars: u.en.length }));
+  },
+
+  ensambla(estado) {
+    const j = leer(RUTA_RAND_EN);
+    const previo = fs.existsSync(RUTA_RAND_ES) ? leer(RUTA_RAND_ES).entradas ?? [] : [];
+    const previas = new Map(previo.map((e) => [e.s, e]));
+    const entradas = [];
+    let unidades = 0;
+    for (const e of j.entradas ?? []) {
+      const r = estado.resultados.get(`rand.${e.s}.n`);
+      const rd = estado.resultados.get(`rand.${e.s}.d`);
+      const okN = r && r.es && ['traducida', 'auditada', 'aprobada'].includes(r.estado);
+      const okD = rd && rd.es && ['traducida', 'auditada', 'aprobada'].includes(rd.estado);
+      if (!okN && !okD) continue;
+      const previa = previas.get(e.s);
+      entradas.push({
+        s: e.s,
+        n: okN ? r.es : previa?.n ?? '',
+        d: okD ? rd.es : previa?.d ?? '',
+      });
+      unidades++;
+    }
+    fs.mkdirSync(path.dirname(RUTA_RAND_ES), { recursive: true });
+    fs.writeFileSync(
+      RUTA_RAND_ES,
+      JSON.stringify({
+        obra: this.nombre,
+        licencia: 'Traducción propia CC BY 4.0 (B18) · obra original de dominio público',
+        revisado_humano: false,
+        origen: 'motor automático (sin revisar)',
+        fecha: new Date().toISOString().slice(0, 10),
+        total: entradas.length,
+        entradas,
+      })
+    );
+    return { escritos: 1, unidades, posibles: unidades };
+  },
+};
+
+export const OBRAS = { henry, easton, glosas, naves, jfb, barnes, lexdef, rand };
 
 
 export function obra(id) {

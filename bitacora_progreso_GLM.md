@@ -1279,3 +1279,9 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 - **Línea 2**: Biblia ▾ (select) · ⫴ paralelo · Libro ▾ · Cap ▾ · **Capas ▾** (casillas: Diccionario en el texto, Interlineal, Griego SBLGNT, Mis notas; interlineal y griego se excluyen) · ⌕ ← → ····· Comentarista ▾. En móvil 3 filas (⌕←→ comparten fila con el comentarista).
 - Fix: el menú «Aa» del cuadro se pinta `position: fixed` por encima del contenido (antes quedaba debajo de la tarjeta). Los menús flotantes se cierran al tocar fuera.
 - Validado a 390 / 950 / 1920 / 2560 px: cabecera, Ajustes (4 vistas, letra, tema, Esc), capas (4), Aa (color+letra), paralelo, acordeón, teclado, «＋», arrastre a 4 zonas, citas, sincronización del comentario, sin desbordes.
+
+### 2026-09-29 · GLM (vigilante) — 1.3 Respondida la pregunta del usuario sobre imágenes del 1597 · RAND lanzado por el motor
+
+1. **Pregunta del usuario: ¿se pueden escanear las imágenes del 1597? ¿Cuántas hay?** Respuesta verificada: el ítem de archive.org **NO tiene imágenes de página** — son 5 MP3 (lecturas en audio), videos de hojeo, 10 PNG de cubierta y miniaturas. **No hay nada que OCR-able**: la vía del escaneo del 1597 queda descartada. La única transcripción ES es la revisión 1967/1999 (licencia dudosa, descartada por regla). 1.3 queda bloqueada salvo que el usuario pida permiso al editor o aparezca otra transcripción.
+2. **RAND LANZADO** (`obra rand` en el motor, modelo easton, un solo archivo EN público/data/rand/rand.json): 3.544 unidades (n+d), **1.281 resueltas gratis por memoria de traducción** (coinciden con Easton), 2.263 a traducir ≈ **$1,75**. Corrida completa en segundo plano (ETA ~1-2 h). Al terminar: ensamblar rand-es.json + desplegar + integrar en el panel del diccionario (junto a Easton, P.2 punto 3).
+- Gasto: $48,61 → ~$50,4 al terminar Rand. Pendiente en hoja: integración lector de Rand → Fase 2 → ⛔Puerta A.

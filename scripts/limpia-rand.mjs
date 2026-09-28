@@ -1,77 +1,98 @@
 /**
- * Limpieza del OCR del Diccionario de W. W. Rand (American Tract Society, PD)
- * → 05. Datos/corpus_crudo/rand/entradas.json
+ * Limpieza v2 del OCR del Diccionario de Rand → entradas.json
  *
- * Estructura del OCR:
- *   - cabeceras de página: líneas de 3 letras (ABA, ABE…) y «BIBLE DICTIONARY.»
- *   - entradas: líneas que empiezan con NOMBRE EN MAYÚSCULAS con acentos de
- *     fuerza (ABAD'DON) y coma; la definición fluye a continuación y entre líneas.
- *   - palabras cortadas por guion de línea (Da-  mascascus) y espacios dobles.
+ * Detector de entradas: línea que EMPIEZA con nombre EN MAYÚSCULAS (con
+ * apóstrofos de fuerza tipo ABAD'DON, guiones ABEL-BETH, y los espacios dobles
+ * del OCR) seguido de coma. Las cabeceras de página (3 letras: ABA/ABE/ABI)
+ * y «BIBLE DICTIONARY.» se filtran antes. La portada se descarta entera
+ * (hasta la línea «ENTERED according…» + 6 líneas).
  *
- * Uso: node scripts/limpia-rand.mjs
+ * Los nombres traen acentos de fuerza (ABAD'DON → Abaddon). El OCR mete
+ * errores propios («AAR'OX» por AARON): se reportan pero no se corrigen aquí
+ * (corresponden al pase de revisión).
  */
 import fs from "node:fs";
 
 const raw = fs.readFileSync("05. Datos/corpus_crudo/rand/rand-djvu.txt", "utf8");
+
+// 1) líneas limpias (espacios dobles del OCR a uno)
 const lineas = raw.split(/\r?\n/).map((l) => l.replace(/\s+/g, " ").trim());
 
-// 1) filtrar ruido: portada, cabeceras de página, ilustraciones
-const cuerpo = [];
-for (const l of lineas) {
-  if (!l) continue;
-  if (/^BIBLE\s+DICTIONARY\.?$/i.test(l)) continue;
-  if (/^[A-Z]{3}$/.test(l)) continue;                 // ABA, ABE, ABI… cabecera de página
-  if (/^(SEE|IL|ENGRAV|MAP|TABLE|PUBLISHED|NEW YORK|ENTERED|DRAWN|SCANNED|THE LIBRARY|THE UNIVERSITY|OF CALIFORNIA|GIFT|ESTATE|PREFACE)/i.test(l)) continue;
-  if (l.length <= 3 && !/\./.test(l)) continue;       // fragmentos sueltos
-  cuerpo.push(l);
+// 2) localizar el arranque real de entradas: la primera «AB, father…»
+//    (todo el bloque de portada + prefacio + lista de láminas va antes)
+let inicio = 0;
+for (let i = 0; i < lineas.length; i++) {
+  if (/^AB,\s+father/i.test(lineas[i])) { inicio = Math.max(0, i - 1); break; }
+}
+// red de seguridad: si no aparece, tras el último PREFACE
+if (inicio === 0) {
+  for (let i = 0; i < lineas.length; i++) {
+    if (/^PREFACE/i.test(lineas[i])) inicio = i + 1;
+  }
 }
 
-// 2) unir líneas: guion de fin de línea une; las entradas arrancan con
-//    NOMBRE EN MAYÚSCULAS + coma al principio de línea
-const RE_ENTRADA = /^([A-Z][A-ZÀ-Þ'’.\- ]{1,45}),\s*(.+)$/;
+// 3) detector de línea-entrada:
+//    comienza con 2+ MAYÚSCULAS (admite ' - y espacios del OCR), sigue solo
+//    mayúsculas/espacios/apóstrofes/guiones/puntos hasta una coma.
+const RE_ENTRADA = /^([A-Z][A-Z'’\-]*(?:\s+[A-Z'’\-]+)*\.?)\s*,\s*(.+)$/;
+const esCabeceraPagina = (l) => /^[A-Z]{3}$/.test(l) || /^BIBLE DICTIONARY/i.test(l);
+
 const entradas = [];
 let actual = null;
 let texto = "";
-const cerrar = () => {
-  if (actual && texto.trim().length >= 40) entradas.push({ nombre: actual, texto: texto.trim() });
-  actual = null;
-  texto = "";
-};
-for (const l of cuerpo) {
-  const m = l.match(RE_ENTRADA);
-  if (m) {
-    cerrar();
-    actual = m[1];
+let pagina = null;
+
+const nombreLimpio = (n) =>
+  n
+    .replace(/'/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const titleCase = (n) =>
+  nombreLimpio(n)
+    .toLowerCase()
+    .replace(/(^|[\s\-])([a-záéíóúñü])/g, (_, p, c) => p + c.toUpperCase());
+
+for (let i = inicio; i < lineas.length; i++) {
+  const l = lineas[i];
+  if (!l) continue;
+  if (esCabeceraPagina(l)) continue;
+
+  // trozo previo a la coma, y el resto
+  const m = l.match(/^([A-Z][A-Z'’.\- ]*?),\s*(.*)$/);
+  if (m && m[1].length >= 2 && /[A-Z]{2}/.test(m[1])) {
+    // cierra la entrada anterior
+    if (actual && texto.replace(/\s+/g, " ").trim().length >= 40) {
+      entradas.push({ nombre: titleCase(actual), texto: texto.replace(/\s+/g, " ").trim() });
+    }
+    actual = nombreLimpio(m[1]);
     texto = m[2];
     continue;
   }
-  if (actual) {
-    // unir: guion de línea → sin espacio; si no, con espacio
-    texto += texto.endsWith("-") ? l : " " + l;
-  }
-  // líneas fuera de entrada (p. ej. índice de ilustraciones) se descartan
+  if (actual) texto += texto.endsWith("-") ? l : " " + l;
 }
-cerrar();
+if (actual && texto.trim().length >= 40) {
+  entradas.push({ nombre: titleCase(actual), texto: texto.replace(/\s+/g, " ").trim() });
+}
 
-// 3) normalizar el nombre: quitar acentos de fuerza, Title Case, conservar guiones
-const titleCase = (s) =>
-  s
-    .toLowerCase()
-    .replace(/(^|[\s\-'])([a-záéíóúñü])/g, (_, p, c) => p + c.toUpperCase())
-    .replace(/'/g, "");
+// 4) deduplicar por slug
 const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-
+const RUIDO_NOMBRE = /^(New York|D\. D\.|Society|American Tract)/i;
 const salida = [];
 const vistos = new Set();
 for (const e of entradas) {
-  const nombre = titleCase(e.nombre.replace(/'/g, "").replace(/\s+/g, " ").trim());
-  const s = slug(nombre);
+  if (RUIDO_NOMBRE.test(e.nombre) || e.texto.length < 60) continue;
+  const s = slug(e.nombre);
   if (!s || vistos.has(s)) continue;
   vistos.add(s);
-  salida.push({ s, n: nombre, d: e.texto });
+  salida.push({ s, n: e.nombre, d: e.texto });
 }
 
 fs.writeFileSync("05. Datos/corpus_crudo/rand/entradas.json", JSON.stringify({ total: salida.length, entradas: salida }, null, 1));
-console.log(`entradas limpias: ${salida.length}`);
-console.log("primeras 6:", salida.slice(0, 6).map((e) => e.n).join(" | "));
-console.log("muestra Aarón:", JSON.stringify((salida.find((e) => e.s === "aaron") || {}).d?.slice(0, 150) || "no está"));
+console.log(`entradas: ${salida.length}`);
+console.log("primeras 8:", salida.slice(0, 8).map((e) => e.n).join(" | "));
+const muestras = ["Aaron", "Abaddon", "Abana", "Abel", "Abel-beth-maachah", "Abraham"];
+for (const m of muestras) {
+  const e = salida.find((x) => x.n === m);
+  console.log(`  ${m}: ${e ? e.d.slice(0, 80) + "…" : "NO ESTÁ"}`);
+}
