@@ -62,7 +62,7 @@ body {
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.287s ease, color 0.287s ease;
 }
 
 ::selection { background: var(--accent-soft); color: var(--ink); }
@@ -95,7 +95,7 @@ body {
   border-radius: 999px;
   padding: 12px 26px;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.207s ease;
   text-decoration: none;
 }
 .btn-primario {
@@ -124,7 +124,7 @@ body {
   justify-content: center;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.173s ease;
 }
 .icono-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
 /* botón de cierre: rojo con X blanca (misma forma) */
@@ -144,7 +144,7 @@ body {
   border-radius: 10px;
   padding: 9px 12px;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.173s ease;
 }
 .sel:hover, .sel:focus { border-color: var(--accent); outline: none; }
 
@@ -206,7 +206,7 @@ body {
   font-family: var(--sans);
   font-size: 12.5px;
   color: var(--muted);
-  transition: background 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.207s ease, box-shadow 0.207s ease;
 }
 .rec-barra.activa {
   background: var(--accent-soft);
@@ -217,7 +217,7 @@ body {
   width: 21px; height: 21px; border-radius: 6px; flex-shrink: 0;
   border: 1px solid var(--line-strong); color: var(--muted);
   font-size: 11.5px;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease, color 0.207s ease;
 }
 .rec-barra.activa .rec-icono {
   background: var(--accent); border-color: var(--accent); color: var(--bg);
@@ -242,7 +242,7 @@ body {
   background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
-  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+  transition: border-color 0.207s ease, background-color 0.207s ease, color 0.207s ease;
 }
 .rec-sel:hover { border-color: var(--line-strong); background-color: var(--hover); }
 .rec-sel:focus-visible { outline: none; border-color: var(--accent); }
@@ -286,7 +286,7 @@ body {
   padding: 3px 9px;
   border: none; background: transparent; color: var(--muted);
   cursor: pointer; line-height: 1.4;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.184s ease, color 0.184s ease;
 }
 .rec-idioma-tab:hover { color: var(--ink-soft); background: var(--hover); }
 .rec-idioma-tab.activa { background: var(--accent); color: var(--bg); }
@@ -311,7 +311,7 @@ body {
   width: 17px; height: 17px; border-radius: 5px;
   border: 1.5px solid var(--line-strong);
   background: var(--bg-elev);
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease;
 }
 .rec-check-caja::after {
   content: ""; position: absolute;
@@ -319,7 +319,7 @@ body {
   border: solid var(--bg); border-width: 0 2px 2px 0;
   transform: rotate(45deg) scale(0.4);
   opacity: 0;
-  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.34, 1.6, 0.64, 1);
+  transition: opacity 0.184s ease, transform 0.184s cubic-bezier(0.34, 1.6, 0.64, 1);
 }
 .rec-check:hover .rec-check-caja { border-color: var(--accent); }
 .rec-check input:checked + .rec-check-caja {
@@ -402,7 +402,7 @@ body {
   display: flex;
   flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  animation: split-entra 0.22s ease;
+  animation: split-entra 0.253s ease;
 }
 @keyframes split-entra {
   from { transform: translateY(24px); opacity: 0; }
@@ -543,7 +543,7 @@ body {
   border: none;
   padding: 8px 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.173s ease;
 }
 .obras-tab + .obras-tab { border-left: 1px solid var(--line); }
 .obras-tab.activa {
@@ -595,7 +595,7 @@ body {
 }
 
 .verso {
-  transition: background 0.12s ease;
+  transition: background 0.138s ease;
   border-radius: 3px;
   padding: 1px 0;
 }
@@ -684,7 +684,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  transition: border-color 0.14s ease, transform 0.14s ease;
+  transition: border-color 0.161s ease, transform 0.161s ease;
 }
 .palabra:hover { border-color: var(--accent); transform: translateY(-1px); }
 .palabra .w { font-size: 1.08rem; color: var(--ink); }
@@ -712,11 +712,11 @@ body {
   max-height: 58vh;
   overflow: auto;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  animation: panel-entra 0.24s ease;
+  animation: panel-entra 0.276s ease;
   /* la coreografía de la pila: subir y encoger, nunca saltar */
-  transition: bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-              max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-              box-shadow 0.3s ease;
+  transition: bottom 0.345s cubic-bezier(0.32, 0.72, 0, 1),
+              max-height 0.345s cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 0.345s ease;
 }
 
 /* ── Pila de paneles (baraja) ───────────────────────────────────────────────
@@ -787,7 +787,7 @@ body {
   from { transform: translateY(18px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-.com-info-popo { animation: panel-entra 0.2s ease; }
+.com-info-popo { animation: panel-entra 0.23s ease; }
 .lex-panel-inner {
   max-width: 720px;
   margin: 0 auto;
@@ -869,7 +869,7 @@ body {
   padding: 8px 11px;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.14s ease;
+  transition: border-color 0.161s ease;
 }
 .ref-item b { color: var(--ink); font-weight: 600; }
 .ref-item:hover { border-color: var(--accent); }
@@ -898,7 +898,7 @@ body {
   cursor: pointer;
   text-align: left;
   position: relative;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color 0.173s ease, background 0.173s ease;
 }
 .com-toggle:hover { border-color: var(--accent); }
 .com-toggle .com-flecha { flex-shrink: 0; font-size: 10px; }
@@ -969,7 +969,7 @@ body {
   grid-template-rows: 0fr;
   opacity: 0;
   margin: 0 0 0 0;
-  transition: grid-template-rows 0.32s ease, opacity 0.26s ease, margin 0.32s ease;
+  transition: grid-template-rows 0.368s ease, opacity 0.299s ease, margin 0.368s ease;
 }
 .com-bloque.abierto {
   grid-template-rows: 1fr;
@@ -1100,7 +1100,7 @@ body {
   /* el borde transparente adelgaza el pulgar sin estrechar la zona de agarre */
   border: 3px solid transparent;
   background-clip: content-box;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.23s ease;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
 ::-webkit-scrollbar-thumb:active { background: var(--accent); background-clip: content-box; }
@@ -1111,9 +1111,9 @@ body {
 /* Quien prefiera menos movimiento, no lo tiene. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 0ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0ms !important;
   }
 }
 
@@ -1135,7 +1135,7 @@ body {
   color: var(--ink);
   line-height: 1.62;
   cursor: pointer;
-  transition: background 0.14s ease;
+  transition: background 0.161s ease;
 }
 .gr-es:hover { background: var(--hover); }
 .gr-es:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -1164,7 +1164,7 @@ body {
   margin: 0 1px;
   color: inherit;
   cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background 0.161s ease, color 0.161s ease;
 }
 .palabra-g:hover { background: var(--hover); color: var(--accent-strong); }
 .palabra-g.activa { background: var(--accent); color: var(--bg); }
@@ -1183,7 +1183,7 @@ body {
   margin-inline-end: 6px;
   cursor: pointer;
   vertical-align: top;
-  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+  transition: background 0.161s ease, color 0.161s ease, border-color 0.161s ease;
 }
 .interlin-num:hover {
   background: var(--accent-soft);
@@ -1204,7 +1204,7 @@ body {
   background: transparent;
   color: var(--accent-strong);
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.184s ease, color 0.184s ease;
 }
 .btn-inter:hover { background: var(--accent); color: var(--bg); }
 
@@ -1233,7 +1233,7 @@ body {
   color: var(--muted);
   cursor: pointer;
   text-align: start;
-  transition: color 0.16s ease;
+  transition: color 0.184s ease;
 }
 .btn-inter-sec:hover { color: var(--accent-strong); text-decoration: underline; }
 .btn-inter-sec:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -1378,7 +1378,7 @@ body {
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.287s ease, color 0.287s ease;
 }
 
 ::selection { background: var(--accent-soft); color: var(--ink); }
@@ -1411,7 +1411,7 @@ body {
   border-radius: 999px;
   padding: 12px 26px;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.207s ease;
   text-decoration: none;
 }
 .btn-primario {
@@ -1440,7 +1440,7 @@ body {
   justify-content: center;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.173s ease;
 }
 .icono-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
 /* botón de cierre: rojo con X blanca (misma forma) */
@@ -1460,7 +1460,7 @@ body {
   border-radius: 10px;
   padding: 9px 12px;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.173s ease;
 }
 .sel:hover, .sel:focus { border-color: var(--accent); outline: none; }
 
@@ -1522,7 +1522,7 @@ body {
   font-family: var(--sans);
   font-size: 12.5px;
   color: var(--muted);
-  transition: background 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.207s ease, box-shadow 0.207s ease;
 }
 .rec-barra.activa {
   background: var(--accent-soft);
@@ -1533,7 +1533,7 @@ body {
   width: 21px; height: 21px; border-radius: 6px; flex-shrink: 0;
   border: 1px solid var(--line-strong); color: var(--muted);
   font-size: 11.5px;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease, color 0.207s ease;
 }
 .rec-barra.activa .rec-icono {
   background: var(--accent); border-color: var(--accent); color: var(--bg);
@@ -1558,7 +1558,7 @@ body {
   background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
-  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+  transition: border-color 0.207s ease, background-color 0.207s ease, color 0.207s ease;
 }
 .rec-sel:hover { border-color: var(--line-strong); background-color: var(--hover); }
 .rec-sel:focus-visible { outline: none; border-color: var(--accent); }
@@ -1602,7 +1602,7 @@ body {
   padding: 3px 9px;
   border: none; background: transparent; color: var(--muted);
   cursor: pointer; line-height: 1.4;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.184s ease, color 0.184s ease;
 }
 .rec-idioma-tab:hover { color: var(--ink-soft); background: var(--hover); }
 .rec-idioma-tab.activa { background: var(--accent); color: var(--bg); }
@@ -1627,7 +1627,7 @@ body {
   width: 17px; height: 17px; border-radius: 5px;
   border: 1.5px solid var(--line-strong);
   background: var(--bg-elev);
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease;
 }
 .rec-check-caja::after {
   content: ""; position: absolute;
@@ -1635,7 +1635,7 @@ body {
   border: solid var(--bg); border-width: 0 2px 2px 0;
   transform: rotate(45deg) scale(0.4);
   opacity: 0;
-  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.34, 1.6, 0.64, 1);
+  transition: opacity 0.184s ease, transform 0.184s cubic-bezier(0.34, 1.6, 0.64, 1);
 }
 .rec-check:hover .rec-check-caja { border-color: var(--accent); }
 .rec-check input:checked + .rec-check-caja {
@@ -1718,7 +1718,7 @@ body {
   display: flex;
   flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  animation: split-entra 0.22s ease;
+  animation: split-entra 0.253s ease;
 }
 @keyframes split-entra {
   from { transform: translateY(24px); opacity: 0; }
@@ -1859,7 +1859,7 @@ body {
   border: none;
   padding: 8px 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.173s ease;
 }
 .obras-tab + .obras-tab { border-left: 1px solid var(--line); }
 .obras-tab.activa {
@@ -1911,7 +1911,7 @@ body {
 }
 
 .verso {
-  transition: background 0.12s ease;
+  transition: background 0.138s ease;
   border-radius: 3px;
   padding: 1px 0;
 }
@@ -2000,7 +2000,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  transition: border-color 0.14s ease, transform 0.14s ease;
+  transition: border-color 0.161s ease, transform 0.161s ease;
 }
 .palabra:hover { border-color: var(--accent); transform: translateY(-1px); }
 .palabra .w { font-size: 1.08rem; color: var(--ink); }
@@ -2028,11 +2028,11 @@ body {
   max-height: 58vh;
   overflow: auto;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  animation: panel-entra 0.24s ease;
+  animation: panel-entra 0.276s ease;
   /* la coreografía de la pila: subir y encoger, nunca saltar */
-  transition: bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-              max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-              box-shadow 0.3s ease;
+  transition: bottom 0.345s cubic-bezier(0.32, 0.72, 0, 1),
+              max-height 0.345s cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 0.345s ease;
 }
 
 /* ── Pila de paneles (baraja) ───────────────────────────────────────────────
@@ -2103,7 +2103,7 @@ body {
   from { transform: translateY(18px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-.com-info-popo { animation: panel-entra 0.2s ease; }
+.com-info-popo { animation: panel-entra 0.23s ease; }
 .lex-panel-inner {
   max-width: 720px;
   margin: 0 auto;
@@ -2185,7 +2185,7 @@ body {
   padding: 8px 11px;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.14s ease;
+  transition: border-color 0.161s ease;
 }
 .ref-item b { color: var(--ink); font-weight: 600; }
 .ref-item:hover { border-color: var(--accent); }
@@ -2214,7 +2214,7 @@ body {
   cursor: pointer;
   text-align: left;
   position: relative;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color 0.173s ease, background 0.173s ease;
 }
 .com-toggle:hover { border-color: var(--accent); }
 .com-toggle .com-flecha { flex-shrink: 0; font-size: 10px; }
@@ -2285,7 +2285,7 @@ body {
   grid-template-rows: 0fr;
   opacity: 0;
   margin: 0 0 0 0;
-  transition: grid-template-rows 0.32s ease, opacity 0.26s ease, margin 0.32s ease;
+  transition: grid-template-rows 0.368s ease, opacity 0.299s ease, margin 0.368s ease;
 }
 .com-bloque.abierto {
   grid-template-rows: 1fr;
@@ -2416,7 +2416,7 @@ body {
   /* el borde transparente adelgaza el pulgar sin estrechar la zona de agarre */
   border: 3px solid transparent;
   background-clip: content-box;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.23s ease;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
 ::-webkit-scrollbar-thumb:active { background: var(--accent); background-clip: content-box; }
@@ -2427,9 +2427,9 @@ body {
 /* Quien prefiera menos movimiento, no lo tiene. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 0ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0ms !important;
   }
 }
 
@@ -2451,7 +2451,7 @@ body {
   color: var(--ink);
   line-height: 1.62;
   cursor: pointer;
-  transition: background 0.14s ease;
+  transition: background 0.161s ease;
 }
 .gr-es:hover { background: var(--hover); }
 .gr-es:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -2480,7 +2480,7 @@ body {
   margin: 0 1px;
   color: inherit;
   cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background 0.161s ease, color 0.161s ease;
 }
 .palabra-g:hover { background: var(--hover); color: var(--accent-strong); }
 .palabra-g.activa { background: var(--accent); color: var(--bg); }
@@ -2499,7 +2499,7 @@ body {
   margin-inline-end: 6px;
   cursor: pointer;
   vertical-align: top;
-  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+  transition: background 0.161s ease, color 0.161s ease, border-color 0.161s ease;
 }
 .interlin-num:hover {
   background: var(--accent-soft);
@@ -2520,7 +2520,7 @@ body {
   background: transparent;
   color: var(--accent-strong);
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.184s ease, color 0.184s ease;
 }
 .btn-inter:hover { background: var(--accent); color: var(--bg); }
 
@@ -2549,7 +2549,7 @@ body {
   color: var(--muted);
   cursor: pointer;
   text-align: start;
-  transition: color 0.16s ease;
+  transition: color 0.184s ease;
 }
 .btn-inter-sec:hover { color: var(--accent-strong); text-decoration: underline; }
 .btn-inter-sec:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -2722,7 +2722,7 @@ body {
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.287s ease, color 0.287s ease;
 }
 
 ::selection { background: var(--accent-soft); color: var(--ink); }
@@ -2755,7 +2755,7 @@ body {
   border-radius: 999px;
   padding: 12px 26px;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.207s ease;
   text-decoration: none;
 }
 .btn-primario {
@@ -2784,7 +2784,7 @@ body {
   justify-content: center;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.173s ease;
 }
 .icono-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
 /* botón de cierre: rojo con X blanca (misma forma) */
@@ -2804,7 +2804,7 @@ body {
   border-radius: 10px;
   padding: 9px 12px;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.173s ease;
 }
 .sel:hover, .sel:focus { border-color: var(--accent); outline: none; }
 
@@ -2866,7 +2866,7 @@ body {
   font-family: var(--sans);
   font-size: 12.5px;
   color: var(--muted);
-  transition: background 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.207s ease, box-shadow 0.207s ease;
 }
 .rec-barra.activa {
   background: var(--accent-soft);
@@ -2877,7 +2877,7 @@ body {
   width: 21px; height: 21px; border-radius: 6px; flex-shrink: 0;
   border: 1px solid var(--line-strong); color: var(--muted);
   font-size: 11.5px;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease, color 0.207s ease;
 }
 .rec-barra.activa .rec-icono {
   background: var(--accent); border-color: var(--accent); color: var(--bg);
@@ -2902,7 +2902,7 @@ body {
   background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
-  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+  transition: border-color 0.207s ease, background-color 0.207s ease, color 0.207s ease;
 }
 .rec-sel:hover { border-color: var(--line-strong); background-color: var(--hover); }
 .rec-sel:focus-visible { outline: none; border-color: var(--accent); }
@@ -2946,7 +2946,7 @@ body {
   padding: 3px 9px;
   border: none; background: transparent; color: var(--muted);
   cursor: pointer; line-height: 1.4;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.184s ease, color 0.184s ease;
 }
 .rec-idioma-tab:hover { color: var(--ink-soft); background: var(--hover); }
 .rec-idioma-tab.activa { background: var(--accent); color: var(--bg); }
@@ -2971,7 +2971,7 @@ body {
   width: 17px; height: 17px; border-radius: 5px;
   border: 1.5px solid var(--line-strong);
   background: var(--bg-elev);
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease;
 }
 .rec-check-caja::after {
   content: ""; position: absolute;
@@ -2979,7 +2979,7 @@ body {
   border: solid var(--bg); border-width: 0 2px 2px 0;
   transform: rotate(45deg) scale(0.4);
   opacity: 0;
-  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.34, 1.6, 0.64, 1);
+  transition: opacity 0.184s ease, transform 0.184s cubic-bezier(0.34, 1.6, 0.64, 1);
 }
 .rec-check:hover .rec-check-caja { border-color: var(--accent); }
 .rec-check input:checked + .rec-check-caja {
@@ -3062,7 +3062,7 @@ body {
   display: flex;
   flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  animation: split-entra 0.22s ease;
+  animation: split-entra 0.253s ease;
 }
 @keyframes split-entra {
   from { transform: translateY(24px); opacity: 0; }
@@ -3203,7 +3203,7 @@ body {
   border: none;
   padding: 8px 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.173s ease;
 }
 .obras-tab + .obras-tab { border-left: 1px solid var(--line); }
 .obras-tab.activa {
@@ -3255,7 +3255,7 @@ body {
 }
 
 .verso {
-  transition: background 0.12s ease;
+  transition: background 0.138s ease;
   border-radius: 3px;
   padding: 1px 0;
 }
@@ -3344,7 +3344,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  transition: border-color 0.14s ease, transform 0.14s ease;
+  transition: border-color 0.161s ease, transform 0.161s ease;
 }
 .palabra:hover { border-color: var(--accent); transform: translateY(-1px); }
 .palabra .w { font-size: 1.08rem; color: var(--ink); }
@@ -3372,11 +3372,11 @@ body {
   max-height: 58vh;
   overflow: auto;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  animation: panel-entra 0.24s ease;
+  animation: panel-entra 0.276s ease;
   /* la coreografía de la pila: subir y encoger, nunca saltar */
-  transition: bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-              max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-              box-shadow 0.3s ease;
+  transition: bottom 0.345s cubic-bezier(0.32, 0.72, 0, 1),
+              max-height 0.345s cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 0.345s ease;
 }
 
 /* ── Pila de paneles (baraja) ───────────────────────────────────────────────
@@ -3447,7 +3447,7 @@ body {
   from { transform: translateY(18px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-.com-info-popo { animation: panel-entra 0.2s ease; }
+.com-info-popo { animation: panel-entra 0.23s ease; }
 .lex-panel-inner {
   max-width: 720px;
   margin: 0 auto;
@@ -3529,7 +3529,7 @@ body {
   padding: 8px 11px;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.14s ease;
+  transition: border-color 0.161s ease;
 }
 .ref-item b { color: var(--ink); font-weight: 600; }
 .ref-item:hover { border-color: var(--accent); }
@@ -3558,7 +3558,7 @@ body {
   cursor: pointer;
   text-align: left;
   position: relative;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color 0.173s ease, background 0.173s ease;
 }
 .com-toggle:hover { border-color: var(--accent); }
 .com-toggle .com-flecha { flex-shrink: 0; font-size: 10px; }
@@ -3629,7 +3629,7 @@ body {
   grid-template-rows: 0fr;
   opacity: 0;
   margin: 0 0 0 0;
-  transition: grid-template-rows 0.32s ease, opacity 0.26s ease, margin 0.32s ease;
+  transition: grid-template-rows 0.368s ease, opacity 0.299s ease, margin 0.368s ease;
 }
 .com-bloque.abierto {
   grid-template-rows: 1fr;
@@ -3760,7 +3760,7 @@ body {
   /* el borde transparente adelgaza el pulgar sin estrechar la zona de agarre */
   border: 3px solid transparent;
   background-clip: content-box;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.23s ease;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
 ::-webkit-scrollbar-thumb:active { background: var(--accent); background-clip: content-box; }
@@ -3771,9 +3771,9 @@ body {
 /* Quien prefiera menos movimiento, no lo tiene. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 0ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0ms !important;
   }
 }
 
@@ -3795,7 +3795,7 @@ body {
   color: var(--ink);
   line-height: 1.62;
   cursor: pointer;
-  transition: background 0.14s ease;
+  transition: background 0.161s ease;
 }
 .gr-es:hover { background: var(--hover); }
 .gr-es:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -3824,7 +3824,7 @@ body {
   margin: 0 1px;
   color: inherit;
   cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background 0.161s ease, color 0.161s ease;
 }
 .palabra-g:hover { background: var(--hover); color: var(--accent-strong); }
 .palabra-g.activa { background: var(--accent); color: var(--bg); }
@@ -3843,7 +3843,7 @@ body {
   margin-inline-end: 6px;
   cursor: pointer;
   vertical-align: top;
-  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+  transition: background 0.161s ease, color 0.161s ease, border-color 0.161s ease;
 }
 .interlin-num:hover {
   background: var(--accent-soft);
@@ -3864,7 +3864,7 @@ body {
   background: transparent;
   color: var(--accent-strong);
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.184s ease, color 0.184s ease;
 }
 .btn-inter:hover { background: var(--accent); color: var(--bg); }
 
@@ -3893,7 +3893,7 @@ body {
   color: var(--muted);
   cursor: pointer;
   text-align: start;
-  transition: color 0.16s ease;
+  transition: color 0.184s ease;
 }
 .btn-inter-sec:hover { color: var(--accent-strong); text-decoration: underline; }
 .btn-inter-sec:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -4038,7 +4038,7 @@ body {
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.287s ease, color 0.287s ease;
 }
 
 ::selection { background: var(--accent-soft); color: var(--ink); }
@@ -4071,7 +4071,7 @@ body {
   border-radius: 999px;
   padding: 12px 26px;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.207s ease;
   text-decoration: none;
 }
 .btn-primario {
@@ -4100,7 +4100,7 @@ body {
   justify-content: center;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.173s ease;
 }
 .icono-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
 /* botón de cierre: rojo con X blanca (misma forma) */
@@ -4120,7 +4120,7 @@ body {
   border-radius: 10px;
   padding: 9px 12px;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.173s ease;
 }
 .sel:hover, .sel:focus { border-color: var(--accent); outline: none; }
 
@@ -4182,7 +4182,7 @@ body {
   font-family: var(--sans);
   font-size: 12.5px;
   color: var(--muted);
-  transition: background 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.207s ease, box-shadow 0.207s ease;
 }
 .rec-barra.activa {
   background: var(--accent-soft);
@@ -4193,7 +4193,7 @@ body {
   width: 21px; height: 21px; border-radius: 6px; flex-shrink: 0;
   border: 1px solid var(--line-strong); color: var(--muted);
   font-size: 11.5px;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease, color 0.207s ease;
 }
 .rec-barra.activa .rec-icono {
   background: var(--accent); border-color: var(--accent); color: var(--bg);
@@ -4218,7 +4218,7 @@ body {
   background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
-  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+  transition: border-color 0.207s ease, background-color 0.207s ease, color 0.207s ease;
 }
 .rec-sel:hover { border-color: var(--line-strong); background-color: var(--hover); }
 .rec-sel:focus-visible { outline: none; border-color: var(--accent); }
@@ -4262,7 +4262,7 @@ body {
   padding: 3px 9px;
   border: none; background: transparent; color: var(--muted);
   cursor: pointer; line-height: 1.4;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.184s ease, color 0.184s ease;
 }
 .rec-idioma-tab:hover { color: var(--ink-soft); background: var(--hover); }
 .rec-idioma-tab.activa { background: var(--accent); color: var(--bg); }
@@ -4287,7 +4287,7 @@ body {
   width: 17px; height: 17px; border-radius: 5px;
   border: 1.5px solid var(--line-strong);
   background: var(--bg-elev);
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease;
 }
 .rec-check-caja::after {
   content: ""; position: absolute;
@@ -4295,7 +4295,7 @@ body {
   border: solid var(--bg); border-width: 0 2px 2px 0;
   transform: rotate(45deg) scale(0.4);
   opacity: 0;
-  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.34, 1.6, 0.64, 1);
+  transition: opacity 0.184s ease, transform 0.184s cubic-bezier(0.34, 1.6, 0.64, 1);
 }
 .rec-check:hover .rec-check-caja { border-color: var(--accent); }
 .rec-check input:checked + .rec-check-caja {
@@ -4378,7 +4378,7 @@ body {
   display: flex;
   flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  animation: split-entra 0.22s ease;
+  animation: split-entra 0.253s ease;
 }
 @keyframes split-entra {
   from { transform: translateY(24px); opacity: 0; }
@@ -4519,7 +4519,7 @@ body {
   border: none;
   padding: 8px 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.173s ease;
 }
 .obras-tab + .obras-tab { border-left: 1px solid var(--line); }
 .obras-tab.activa {
@@ -4571,7 +4571,7 @@ body {
 }
 
 .verso {
-  transition: background 0.12s ease;
+  transition: background 0.138s ease;
   border-radius: 3px;
   padding: 1px 0;
 }
@@ -4660,7 +4660,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  transition: border-color 0.14s ease, transform 0.14s ease;
+  transition: border-color 0.161s ease, transform 0.161s ease;
 }
 .palabra:hover { border-color: var(--accent); transform: translateY(-1px); }
 .palabra .w { font-size: 1.08rem; color: var(--ink); }
@@ -4688,11 +4688,11 @@ body {
   max-height: 58vh;
   overflow: auto;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  animation: panel-entra 0.24s ease;
+  animation: panel-entra 0.276s ease;
   /* la coreografía de la pila: subir y encoger, nunca saltar */
-  transition: bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-              max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-              box-shadow 0.3s ease;
+  transition: bottom 0.345s cubic-bezier(0.32, 0.72, 0, 1),
+              max-height 0.345s cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 0.345s ease;
 }
 
 /* ── Pila de paneles (baraja) ───────────────────────────────────────────────
@@ -4763,7 +4763,7 @@ body {
   from { transform: translateY(18px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-.com-info-popo { animation: panel-entra 0.2s ease; }
+.com-info-popo { animation: panel-entra 0.23s ease; }
 .lex-panel-inner {
   max-width: 720px;
   margin: 0 auto;
@@ -4845,7 +4845,7 @@ body {
   padding: 8px 11px;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.14s ease;
+  transition: border-color 0.161s ease;
 }
 .ref-item b { color: var(--ink); font-weight: 600; }
 .ref-item:hover { border-color: var(--accent); }
@@ -4874,7 +4874,7 @@ body {
   cursor: pointer;
   text-align: left;
   position: relative;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color 0.173s ease, background 0.173s ease;
 }
 .com-toggle:hover { border-color: var(--accent); }
 .com-toggle .com-flecha { flex-shrink: 0; font-size: 10px; }
@@ -4945,7 +4945,7 @@ body {
   grid-template-rows: 0fr;
   opacity: 0;
   margin: 0 0 0 0;
-  transition: grid-template-rows 0.32s ease, opacity 0.26s ease, margin 0.32s ease;
+  transition: grid-template-rows 0.368s ease, opacity 0.299s ease, margin 0.368s ease;
 }
 .com-bloque.abierto {
   grid-template-rows: 1fr;
@@ -5076,7 +5076,7 @@ body {
   /* el borde transparente adelgaza el pulgar sin estrechar la zona de agarre */
   border: 3px solid transparent;
   background-clip: content-box;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.23s ease;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
 ::-webkit-scrollbar-thumb:active { background: var(--accent); background-clip: content-box; }
@@ -5087,9 +5087,9 @@ body {
 /* Quien prefiera menos movimiento, no lo tiene. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 0ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0ms !important;
   }
 }
 
@@ -5111,7 +5111,7 @@ body {
   color: var(--ink);
   line-height: 1.62;
   cursor: pointer;
-  transition: background 0.14s ease;
+  transition: background 0.161s ease;
 }
 .gr-es:hover { background: var(--hover); }
 .gr-es:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -5140,7 +5140,7 @@ body {
   margin: 0 1px;
   color: inherit;
   cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background 0.161s ease, color 0.161s ease;
 }
 .palabra-g:hover { background: var(--hover); color: var(--accent-strong); }
 .palabra-g.activa { background: var(--accent); color: var(--bg); }
@@ -5159,7 +5159,7 @@ body {
   margin-inline-end: 6px;
   cursor: pointer;
   vertical-align: top;
-  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+  transition: background 0.161s ease, color 0.161s ease, border-color 0.161s ease;
 }
 .interlin-num:hover {
   background: var(--accent-soft);
@@ -5180,7 +5180,7 @@ body {
   background: transparent;
   color: var(--accent-strong);
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background 0.184s ease, color 0.184s ease;
 }
 .btn-inter:hover { background: var(--accent); color: var(--bg); }
 
@@ -5209,7 +5209,7 @@ body {
   color: var(--muted);
   cursor: pointer;
   text-align: start;
-  transition: color 0.16s ease;
+  transition: color 0.184s ease;
 }
 .btn-inter-sec:hover { color: var(--accent-strong); text-decoration: underline; }
 .btn-inter-sec:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -5481,7 +5481,7 @@ html.sin-intro .intro { display: none; }
    Cada cambio se desliza o se funde; nada salta. */
 @media (min-width: 680px) {
   main {
-    transition: margin-right 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: margin-right 0.483s cubic-bezier(0.32, 0.72, 0, 1);
   }
   main.con-estudio { margin-right: var(--estudio-w, 420px); }
   main.arrastrando { transition: none; }
@@ -5498,7 +5498,7 @@ html.sin-intro .intro { display: none; }
     overflow-y: auto;
     overscroll-behavior: contain;
     z-index: 30;
-    animation: estudio-entra 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    animation: estudio-entra 0.483s cubic-bezier(0.32, 0.72, 0, 1);
     scroll-behavior: smooth;
   }
   .estudio.arrastrando { user-select: none; }
@@ -5527,7 +5527,7 @@ html.sin-intro .intro { display: none; }
     width: 2px;
     background: var(--accent);
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.287s ease;
   }
   .estudio-asa:hover::after, .estudio.arrastrando .estudio-asa::after { opacity: 0.55; }
 
@@ -5556,8 +5556,8 @@ html.sin-intro .intro { display: none; }
     background: none;
     color: var(--muted);
     cursor: pointer;
-    transition: background 0.28s ease, color 0.28s ease, border-color 0.28s ease;
-    animation: pestana-entra 0.3s ease;
+    transition: background 0.322s ease, color 0.322s ease, border-color 0.322s ease;
+    animation: pestana-entra 0.345s ease;
   }
   .estudio-pestana:hover { color: var(--ink); background: var(--hover); }
   .estudio-pestana.activa {
@@ -5572,7 +5572,7 @@ html.sin-intro .intro { display: none; }
 
   .estudio-com {
     padding: 18px 22px 64px;
-    transition: opacity 0.3s ease, transform 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: opacity 0.345s ease, transform 0.414s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .estudio-com:not(.visible) { opacity: 0; transform: translateX(10px); pointer-events: none; }
   .estudio-autor {
@@ -5591,7 +5591,7 @@ html.sin-intro .intro { display: none; }
     border-radius: 10px;
     margin: 0 -10px 6px;
     padding: 2px 10px;
-    transition: background 0.5s ease;
+    transition: background 0.575s ease;
   }
   .estudio-seccion.activa { background: color-mix(in srgb, var(--accent) 7%, transparent); }
   /* dentro de la columna la barra del comentario no se clava bajo la cabecera */
@@ -5612,10 +5612,10 @@ html.sin-intro .intro { display: none; }
     box-shadow: none;
     animation: none;
     overscroll-behavior: contain;
-    transition: opacity 0.3s ease, transform 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: opacity 0.345s ease, transform 0.414s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .lex-panel.lateral.detras { opacity: 0; transform: translateX(14px); pointer-events: none; }
-  .lex-panel.lateral.frente { opacity: 1; transform: none; animation: estudio-entra 0.34s cubic-bezier(0.32, 0.72, 0, 1); }
+  .lex-panel.lateral.frente { opacity: 1; transform: none; animation: estudio-entra 0.391s cubic-bezier(0.32, 0.72, 0, 1); }
   .lex-panel.lateral .lex-panel-inner { padding: 4px 22px 40px; max-width: none; }
 }
 @media (min-width: 680px) and (prefers-reduced-motion: reduce) {
@@ -5637,14 +5637,14 @@ html.sin-intro .intro { display: none; }
 .solo-paralelo { display: none; }
 @media (min-width: 1000px) {
   .solo-paralelo { display: inline-flex; }
-  .lector-columna { transition: max-width 0.45s cubic-bezier(0.32, 0.72, 0, 1); }
+  .lector-columna { transition: max-width 0.518s cubic-bezier(0.32, 0.72, 0, 1); }
   .lector-columna.ancha { max-width: 1180px; }
   .par-elige {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     margin: 14px 0 4px;
-    animation: pestana-entra 0.3s ease;
+    animation: pestana-entra 0.345s ease;
   }
   .par-chip {
     font-family: var(--sans);
@@ -5655,7 +5655,7 @@ html.sin-intro .intro { display: none; }
     background: none;
     color: var(--muted);
     cursor: pointer;
-    transition: background 0.28s ease, color 0.28s ease, border-color 0.28s ease, opacity 0.28s ease;
+    transition: background 0.322s ease, color 0.322s ease, border-color 0.322s ease, opacity 0.322s ease;
   }
   .par-chip:hover:not(:disabled) { color: var(--ink); border-color: var(--accent); }
   .par-chip.activa {
@@ -5665,7 +5665,7 @@ html.sin-intro .intro { display: none; }
     border-color: color-mix(in srgb, var(--accent) 45%, transparent);
   }
   .par-chip:disabled { opacity: 0.35; cursor: default; }
-  .paralelo { margin-top: 10px; animation: estudio-entra 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+  .paralelo { margin-top: 10px; animation: estudio-entra 0.46s cubic-bezier(0.32, 0.72, 0, 1); }
   .par-fila {
     display: grid;
     grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
@@ -5688,7 +5688,7 @@ html.sin-intro .intro { display: none; }
     color: var(--muted);
     padding: 10px 0 8px;
   }
-  .par-otra { color: color-mix(in srgb, var(--ink) 88%, transparent); animation: pestana-entra 0.35s ease; }
+  .par-otra { color: color-mix(in srgb, var(--ink) 88%, transparent); animation: pestana-entra 0.402s ease; }
   .par-otra[lang="el"] { font-size: 1.04em; }
   .par-falta { color: var(--muted); }
 }
@@ -5697,7 +5697,7 @@ html.sin-intro .intro { display: none; }
    Libros por grupo del canon y la cuadrícula de capítulos del libro abierto.
    Se pliega a una tira con « / » y la app lo recuerda. */
 @media (min-width: 1280px) {
-  main { transition: margin-right 0.42s cubic-bezier(0.32, 0.72, 0, 1), margin-left 0.42s cubic-bezier(0.32, 0.72, 0, 1); }
+  main { transition: margin-right 0.483s cubic-bezier(0.32, 0.72, 0, 1), margin-left 0.483s cubic-bezier(0.32, 0.72, 0, 1); }
   main.con-nav { margin-left: 210px; }
   .nav-lateral {
     position: fixed;
@@ -5713,8 +5713,8 @@ html.sin-intro .intro { display: none; }
     z-index: 30;
     font-family: var(--sans);
     scrollbar-width: thin;
-    transition: width 0.4s cubic-bezier(0.32, 0.72, 0, 1), padding 0.4s ease;
-    animation: nav-entra 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: width 0.46s cubic-bezier(0.32, 0.72, 0, 1), padding 0.46s ease;
+    animation: nav-entra 0.483s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .nav-lateral.plegada { width: 40px; padding: 44px 0 0; overflow: hidden; }
   @keyframes nav-entra { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -5729,7 +5729,7 @@ html.sin-intro .intro { display: none; }
     background: var(--bg-elev);
     color: var(--muted);
     cursor: pointer;
-    transition: color 0.25s ease, border-color 0.25s ease;
+    transition: color 0.287s ease, border-color 0.287s ease;
   }
   .nav-plegar:hover { color: var(--ink); border-color: var(--accent); }
   .nav-grupo { margin-bottom: 14px; }
@@ -5752,7 +5752,7 @@ html.sin-intro .intro { display: none; }
     background: none;
     color: var(--ink-soft, var(--ink));
     cursor: pointer;
-    transition: background 0.22s ease, color 0.22s ease;
+    transition: background 0.253s ease, color 0.253s ease;
   }
   .nav-libro:hover { background: var(--hover); }
   .nav-libro.activo { color: var(--accent-strong, var(--accent)); font-weight: 600; }
@@ -5761,7 +5761,7 @@ html.sin-intro .intro { display: none; }
     grid-template-columns: repeat(5, 1fr);
     gap: 3px;
     padding: 4px 4px 8px 8px;
-    animation: pestana-entra 0.3s ease;
+    animation: pestana-entra 0.345s ease;
   }
   .nav-cap {
     font: inherit;
@@ -5772,7 +5772,7 @@ html.sin-intro .intro { display: none; }
     background: none;
     color: var(--muted);
     cursor: pointer;
-    transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+    transition: background 0.253s ease, color 0.253s ease, border-color 0.253s ease;
   }
   .nav-cap:hover { background: var(--hover); color: var(--ink); }
   .nav-cap.activo {
@@ -5793,7 +5793,7 @@ html.sin-intro .intro { display: none; }
   border-radius: 12px;
   box-shadow: var(--shadow);
   padding: 12px 14px 13px;
-  animation: vistazo-entra 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  animation: vistazo-entra 0.253s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .vistazo.arriba { transform: translateY(-100%); animation-name: vistazo-entra-arriba; }
 .vistazo-ref {
@@ -5825,15 +5825,15 @@ html.sin-intro .intro { display: none; }
     padding: 4px 6px;
     border-radius: 6px;
     font-family: var(--sans);
-    transition: color 0.22s ease, background 0.22s ease;
+    transition: color 0.253s ease, background 0.253s ease;
   }
   .nav-grupo-t:hover { color: var(--ink); background: var(--hover); }
-  .nav-flecha { display: inline-block; font-size: 9px; transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+  .nav-flecha { display: inline-block; font-size: 9px; transition: transform 0.345s cubic-bezier(0.32, 0.72, 0, 1); }
   .nav-grupo.cerrado .nav-flecha { transform: rotate(-90deg); }
   .nav-grupo-libros {
     display: grid;
     grid-template-rows: 1fr;
-    transition: grid-template-rows 0.36s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
+    transition: grid-template-rows 0.414s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.345s ease;
   }
   .nav-grupo.cerrado .nav-grupo-libros { grid-template-rows: 0fr; opacity: 0; }
   .nav-grupo-int { overflow: hidden; min-height: 0; }
@@ -5843,14 +5843,14 @@ html.sin-intro .intro { display: none; }
     font-size: 10.5px;
     color: var(--muted);
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.23s ease;
   }
   .nav-libro:hover .nav-libro-caps, .nav-libro.abierto .nav-libro-caps { opacity: 1; }
   .nav-libro.abierto { background: var(--hover); }
   .nav-caps-caja {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: grid-template-rows 0.414s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .nav-caps-caja.abierta { grid-template-rows: 1fr; }
   .nav-caps-caja > .nav-caps { overflow: hidden; min-height: 0; animation: none; }
@@ -5865,9 +5865,9 @@ html.sin-intro .intro { display: none; }
 @media (min-width: 680px) {
   .zona, .tarjeta-com, .lex-panel.lateral {
     position: fixed;
-    transition: left 0.42s cubic-bezier(0.32, 0.72, 0, 1), top 0.42s cubic-bezier(0.32, 0.72, 0, 1),
-                width 0.42s cubic-bezier(0.32, 0.72, 0, 1), height 0.42s cubic-bezier(0.32, 0.72, 0, 1),
-                opacity 0.3s ease, transform 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: left 0.483s cubic-bezier(0.32, 0.72, 0, 1), top 0.483s cubic-bezier(0.32, 0.72, 0, 1),
+                width 0.483s cubic-bezier(0.32, 0.72, 0, 1), height 0.483s cubic-bezier(0.32, 0.72, 0, 1),
+                opacity 0.345s ease, transform 0.414s cubic-bezier(0.32, 0.72, 0, 1);
   }
   html.mesa-arrastrando .zona, html.mesa-arrastrando .tarjeta-com, html.mesa-arrastrando .lex-panel.lateral,
   html.mesa-arrastrando main { transition: none !important; }
@@ -5876,7 +5876,7 @@ html.sin-intro .intro { display: none; }
     background: var(--bg-elev);
     border-left: 1px solid var(--line);
     z-index: 30;
-    animation: estudio-entra 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    animation: estudio-entra 0.483s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .zona-der-abajo { border-top: 1px solid var(--line); }
   .zona-abajo { border-left: 0; border-top: 1px solid var(--line); animation-name: zona-sube; }
@@ -5902,7 +5902,7 @@ html.sin-intro .intro { display: none; }
     background: var(--accent);
     opacity: 0;
     border-radius: 2px;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.287s ease;
   }
   .asa-v::after { left: 4px; top: 0; bottom: 0; width: 2px; }
   .asa-h::after { top: 4px; left: 0; right: 0; height: 2px; }
@@ -5910,7 +5910,7 @@ html.sin-intro .intro { display: none; }
 }
 @media (min-width: 1280px) {
   .zona .estudio-pestana { touch-action: none; user-select: none; }
-  .pestana-asidero { opacity: 0.35; margin-right: 6px; font-size: 11px; transition: opacity 0.2s ease; }
+  .pestana-asidero { opacity: 0.35; margin-right: 6px; font-size: 11px; transition: opacity 0.23s ease; }
   .estudio-pestana:hover .pestana-asidero { opacity: 0.8; }
   .estudio-pestana.arrastrada { opacity: 0.4; }
 }
@@ -5927,8 +5927,8 @@ html.sin-intro .intro { display: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: vistazo-entra 0.2s ease;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  animation: vistazo-entra 0.23s ease;
+  transition: background 0.23s ease, border-color 0.23s ease;
 }
 .destino span {
   font-family: var(--sans);
@@ -5976,8 +5976,8 @@ html.sin-intro .intro { display: none; }
   background: none;
   color: var(--muted);
   cursor: pointer;
-  animation: pestana-entra 0.3s ease;
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  animation: pestana-entra 0.345s ease;
+  transition: background 0.287s ease, color 0.287s ease, border-color 0.287s ease;
 }
 .cita-chip:hover { color: var(--ink); border-color: var(--accent); }
 .cita-chip.activa {
@@ -5999,7 +5999,7 @@ html.sin-intro .intro { display: none; }
   background: none;
   color: var(--muted);
   cursor: pointer;
-  transition: color 0.25s ease, border-color 0.25s ease;
+  transition: color 0.287s ease, border-color 0.287s ease;
 }
 .com-anadir:hover { color: var(--ink); border-color: var(--accent); }
 .com2-cerrar { margin-left: auto; }
@@ -6012,7 +6012,7 @@ html.sin-intro .intro { display: none; }
   background: none;
   color: var(--muted);
   cursor: pointer;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.287s ease, color 0.287s ease;
 }
 .par-disp button.activa { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--ink); }
 @media (min-width: 1000px) {
@@ -6050,7 +6050,7 @@ html.sin-intro .intro { display: none; }
 @media (min-width: 680px) {
   .tarjeta-com .com-toggle.abierto { position: sticky; top: 0; z-index: 3; box-shadow: 0 6px 12px -8px rgba(0, 0, 0, 0.35); }
   .zona .estudio-pestana { touch-action: none; user-select: none; }
-  .pestana-asidero { opacity: 0.35; margin-right: 6px; font-size: 11px; transition: opacity 0.2s ease; }
+  .pestana-asidero { opacity: 0.35; margin-right: 6px; font-size: 11px; transition: opacity 0.23s ease; }
 }
 /* en paralelo la Biblia ocupa TODO el hueco entre los libros y la mesa */
 @media (min-width: 1000px) {
@@ -6065,12 +6065,12 @@ html.cambiando-tema *, html.cambiando-tema *::before, html.cambiando-tema *::aft
 /* transiciones más ágiles: la geometría en 0,24 s; sólo opacidad y transform en los cambios de recurso */
 @media (min-width: 680px) {
   .zona, .tarjeta-com, .lex-panel.lateral {
-    transition-duration: 0.24s, 0.24s, 0.24s, 0.24s, 0.18s, 0.2s;
+    transition-duration: 0.276s, 0.276s, 0.276s, 0.276s, 0.207s, 0.23s;
   }
-  main { transition-duration: 0.26s; }
+  main { transition-duration: 0.299s; }
   .tarjeta-com, .lex-panel.lateral { will-change: opacity, transform; }
 }
-.cambio-suave { animation: cambio-suave 0.18s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.cambio-suave { animation: cambio-suave 0.207s cubic-bezier(0.2, 0.8, 0.2, 1); }
 @keyframes cambio-suave { from { opacity: 0; transform: translate3d(0, 5px, 0); } to { opacity: 1; transform: none; } }
 
 .pestana-rec {
@@ -6107,7 +6107,7 @@ html.cambiando-tema *, html.cambiando-tema *::before, html.cambiando-tema *::aft
   height: 20px;
   border-radius: 50%;
   cursor: pointer;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background 0.207s ease, color 0.207s ease;
 }
 .pestana-x:hover { background: var(--hover); color: var(--ink); }
 .pestana-mas {
@@ -6125,7 +6125,7 @@ html.cambiando-tema *, html.cambiando-tema *::before, html.cambiando-tema *::aft
   text-align: center;
   text-align-last: center;
   cursor: pointer;
-  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  transition: color 0.207s ease, border-color 0.207s ease, background 0.207s ease;
 }
 .pestana-mas:hover { color: var(--ink); border-color: var(--accent); background: var(--hover); }
 
@@ -6139,7 +6139,7 @@ button.rec-original[aria-pressed]::before {
   border-radius: 4px;
   border: 1.5px solid var(--muted);
   box-sizing: border-box;
-  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.207s ease, border-color 0.207s ease, box-shadow 0.207s ease;
 }
 button.rec-original[aria-pressed="true"]::before {
   background: var(--accent);
@@ -6185,7 +6185,7 @@ button.rec-original[aria-pressed="true"]::before {
   font-family: var(--serif);
   font-size: 14px;
   cursor: pointer;
-  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  transition: color 0.207s ease, border-color 0.207s ease, background 0.207s ease;
 }
 .pestana-estilo:hover, .pestana-estilo.activa { color: var(--ink); border-color: var(--line); background: var(--hover); }
 .estilo-popo {
@@ -6201,7 +6201,7 @@ button.rec-original[aria-pressed="true"]::before {
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: var(--shadow);
-  animation: vistazo-entra 0.16s ease;
+  animation: vistazo-entra 0.184s ease;
 }
 .estilo-fila { display: flex; gap: 6px; align-items: center; }
 .estilo-color {
@@ -6210,7 +6210,7 @@ button.rec-original[aria-pressed="true"]::before {
   border-radius: 50%;
   border: 1px solid var(--line);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.173s ease, box-shadow 0.173s ease;
 }
 .estilo-color:hover { transform: scale(1.1); }
 .estilo-color.activa { box-shadow: 0 0 0 2px var(--bg-elev), 0 0 0 4px var(--accent); }
@@ -6229,7 +6229,7 @@ button.rec-original[aria-pressed="true"]::before {
   color: var(--muted);
   font-family: var(--sans);
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: color 0.173s ease, border-color 0.173s ease, background 0.173s ease;
 }
 .estilo-tam:hover { color: var(--ink); }
 .estilo-tam.activa { color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
@@ -6284,7 +6284,7 @@ button.rec-original[aria-pressed="true"]::before {
   font-family: var(--sans);
   font-size: 13px;
   cursor: pointer;
-  transition: border-color 0.18s ease, background 0.18s ease;
+  transition: border-color 0.207s ease, background 0.207s ease;
 }
 .capas-btn:hover { border-color: var(--accent); }
 .capas-btn.activa { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
@@ -6313,7 +6313,7 @@ button.rec-original[aria-pressed="true"]::before {
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: var(--shadow);
-  animation: vistazo-entra 0.16s ease;
+  animation: vistazo-entra 0.184s ease;
 }
 .capa-op {
   display: flex;
@@ -6325,7 +6325,7 @@ button.rec-original[aria-pressed="true"]::before {
   font-size: 14px;
   color: var(--ink);
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.173s ease;
 }
 .capa-op:hover { background: var(--hover); }
 .capa-op input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
@@ -6339,7 +6339,7 @@ button.rec-original[aria-pressed="true"]::before {
   inset: 0;
   z-index: 140;
   background: rgba(0, 0, 0, 0.32);
-  animation: velo-entra 0.2s ease;
+  animation: velo-entra 0.23s ease;
 }
 @keyframes velo-entra { from { opacity: 0; } to { opacity: 1; } }
 .ajustes {
@@ -6355,7 +6355,7 @@ button.rec-original[aria-pressed="true"]::before {
   border-left: 1px solid var(--line);
   box-shadow: var(--shadow);
   padding-top: env(safe-area-inset-top, 0);
-  animation: ajustes-entra 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+  animation: ajustes-entra 0.299s cubic-bezier(0.32, 0.72, 0, 1);
 }
 @keyframes ajustes-entra { from { transform: translate3d(40px, 0, 0); opacity: 0; } to { transform: none; opacity: 1; } }
 .ajustes-cab {
@@ -6393,7 +6393,7 @@ button.rec-original[aria-pressed="true"]::before {
   color: var(--ink);
   cursor: pointer;
   border-radius: 0;
-  transition: background 0.15s ease;
+  transition: background 0.173s ease;
 }
 .ajustes-item:hover { background: var(--hover); }
 .ajustes-ico { width: 28px; text-align: center; font-size: 17px; color: var(--accent-strong, var(--accent)); }
@@ -6427,7 +6427,7 @@ button.rec-original[aria-pressed="true"]::before {
   color: var(--muted);
   font-size: 10px;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.2s ease;
+  transition: background 0.173s ease, color 0.173s ease, transform 0.23s ease;
 }
 .pestana-flecha:hover { background: var(--hover); color: var(--ink); }
 .pestana-flecha.activa { color: var(--ink); transform: rotate(180deg); }
@@ -6440,7 +6440,7 @@ button.rec-original[aria-pressed="true"]::before {
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: var(--shadow);
-  animation: vistazo-entra 0.14s ease;
+  animation: vistazo-entra 0.161s ease;
 }
 .recurso-op {
   display: flex;
@@ -6457,7 +6457,7 @@ button.rec-original[aria-pressed="true"]::before {
   font-size: 14px;
   text-align: left;
   cursor: pointer;
-  transition: background 0.12s ease;
+  transition: background 0.138s ease;
 }
 .recurso-op small { color: var(--muted); font-size: 12px; }
 .recurso-op:hover { background: var(--hover); }
@@ -6499,3 +6499,85 @@ button.rec-original[aria-pressed="true"]::before {
 [data-theme="oscuro"][data-contraste="maximo"] { --ink: #ffffff; --ink-soft: #f3eee4; --muted: #d8cfbd; }
 .contraste-alto { font-weight: 600; }
 .contraste-maximo { font-weight: 700; }
+
+/* ── Temas de Nave tocables: cuadro con los versículos del tema por libro ── */
+.ref-item.tema-nave { cursor: pointer; transition: border-color 0.173s ease, background 0.173s ease; }
+.ref-item.tema-nave:hover, .ref-item.tema-nave.activa { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.tema-libros { display: flex; flex-direction: column; gap: 12px; margin: 12px 0 16px; }
+.tema-libro { border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+.tema-libro-nombre {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border: 0;
+  background: none;
+  padding: 2px 0 6px;
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--accent-strong, var(--accent));
+  cursor: pointer;
+}
+.tema-libro-nombre small { font-family: var(--sans); font-size: 11px; color: var(--muted); }
+.tema-libro-nombre:hover { text-decoration: underline; text-underline-offset: 3px; }
+.tema-versos { display: flex; flex-wrap: wrap; gap: 5px; }
+.tema-verso {
+  font-family: var(--sans);
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--ink-soft, var(--ink));
+  cursor: pointer;
+  transition: border-color 0.138s ease, background 0.138s ease;
+}
+.tema-verso:hover { border-color: var(--accent); background: var(--hover); }
+
+/* ═══ Biblias apiladas también en pantallas estrechas (hasta 3) ═══ */
+.solo-paralelo { display: inline-flex; }
+@media (max-width: 999px) {
+  .par-elige { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+  .par-chip {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px dashed var(--line);
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .par-chip.activa { border-style: solid; color: var(--ink); background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+  .par-chip:disabled { opacity: 0.35; }
+  .paralelo { margin-top: 8px; }
+  .par-fila {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding: 10px 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+    font-size: calc(17px * var(--factor-texto, 1));
+    line-height: 1.7;
+  }
+  .par-fila > .verso { display: block; }
+  .par-cabeza { display: none; }
+  .par-otra { font-size: 0.92em; padding-left: 12px; border-left: 2px solid color-mix(in srgb, var(--accent) 30%, transparent); color: color-mix(in srgb, var(--ink) 88%, transparent); }
+  .par-sigla { font-family: var(--sans); font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-right: 8px; }
+}
+
+/* ═══ Móvil: la barra del comentarista cabe entera ═══
+   Sin el ✎ (sobra), «sin revisar» compacto y el nombre del comentarista visible. */
+@media (max-width: 679px) {
+  .com-strip-fila .rec-barra > .rec-icono { display: none; }
+  .com-strip-fila .rec-barra { gap: 5px; padding: 4px 6px; }
+  .com-strip-fila .rec-sel { flex: 1 1 auto; min-width: 0; width: auto; }
+  .com-strip-fila .rec-der { gap: 5px; flex: none; }
+  .com-strip-fila .badge-revision { font-size: 8.5px; padding: 2px 5px; letter-spacing: 0.04em; }
+  .com-strip-fila .rec-idioma-tab { padding: 0 7px; }
+  .barra-lectura .lector-acciones .icono-btn { width: 34px; }
+}
+@media (max-width: 679px) {
+  .com-strip-fila .badge-revision { font-size: 0; padding: 2px 6px; }
+  .com-strip-fila .badge-revision::after { content: "sin rev."; font-size: 9px; letter-spacing: 0.03em; }
+}

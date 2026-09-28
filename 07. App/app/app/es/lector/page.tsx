@@ -91,7 +91,7 @@ const GRUPOS_LIBROS = [
 /** Nombre de cada panel como pestaña de la mesa de estudio (pantallas anchas). */
 const ETIQUETA_PANEL: Record<string, string> = {
   dic: "Diccionario", busqueda: "Buscar", griego: "Griego", lex: "Léxico", refs: "Notas",
-  cita: "Citas", termino: "Término", fuentes: "Fuentes", notas: "Mis notas", info: "Info",
+  tema: "Tema", cita: "Citas", termino: "Término", fuentes: "Fuentes", notas: "Mis notas", info: "Info",
 };
 const CAP_INICIAL = 1;
 const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
@@ -126,6 +126,8 @@ export default function Lector() {
     lexicoG: Record<string, string>;
   } | null>(null);
   const [naveTemas, setNaveTemas] = useState<string[] | null>(null);
+  // tema de Nave abierto: todos sus versículos de la Biblia, agrupados por libro
+  const [panelTema, setPanelTema] = useState<{ tema: string; libros: Record<string, string[]> | null } | null>(null);
   // nombres de tema de Nave's en español (motor, sin revisar): slug → nombre
   const [naveNombresEs, setNaveNombresEs] = useState<Record<string, string> | null>(null);
   const [copiado, setCopiado] = useState(false);
@@ -1053,6 +1055,7 @@ export default function Lector() {
     fuentes: !!panelFuentes,
     notas: !!panelNotas,
     info: !!panelInfo,
+    tema: !!panelTema,
   };
   const firmaPila = Object.entries(ABIERTOS).filter(([, v]) => v).map(([k]) => k).join(",");
   const [pila, setPila] = useState<string[]>([]);
@@ -1107,7 +1110,9 @@ export default function Lector() {
     try { v ? localStorage.setItem("paralelo", JSON.stringify(v)) : localStorage.removeItem("paralelo"); } catch {}
   };
   const extrasPar = (paralelo ?? []).filter((o) => o !== obra && (o !== "sblgnt" || NT.has(osis))).slice(0, 4);
-  const paraleloActivo = anchoParalelo && paralelo !== null;
+  // en pantallas estrechas (móvil, tablet vertical) el paralelo existe, pero siempre APILADO
+  const paraleloActivo = paralelo !== null;
+  const dispPar: "lado" | "apilado" = anchoParalelo ? parDisp : "apilado";
   // cada versión extra se carga por libro y se indexa «c.v» → texto
   useEffect(() => {
     if (!paraleloActivo) return;
@@ -1280,7 +1285,7 @@ export default function Lector() {
   const destinos = ancho ? calcZonas({ ...baseMesa, split: 0.5, splitAbajo: 0.5, ocupadas: { "der-arriba": true, "der-abajo": true, abajo: true, "abajo-der": true } }).zonas : {};
   const estudioVisible = ancho && abiertas.length > 0;
   // cuántas Biblias caben lado a lado en el hueco que deja la mesa (mín. 2 extra, máx. 4)
-  const maxPar = Math.max(2, Math.min(4, Math.floor((ventW - navW - (ancho ? mesa.mr : 0) - 64) / 300) - 1));
+  const maxPar = !anchoParalelo ? 2 : Math.max(2, Math.min(4, Math.floor((ventW - navW - (ancho ? mesa.mr : 0) - 64) / 300) - 1));
   const comAlFrente = comentario && activoEn(zonaEf("com")) === "com";
   // los paneles son hermanos de <main>: el ancho se publica en la raíz
   useEffect(() => {
@@ -1317,7 +1322,7 @@ export default function Lector() {
         dic: () => setDicPanel(false), busqueda: () => setBusPanel(false), griego: () => setGrPal(null),
         lex: () => setLex(null), refs: () => setPanelRefs(null), cita: () => setPanelCita(null),
         termino: () => setPanelTermino(null), fuentes: () => setPanelFuentes(false),
-        notas: () => setPanelNotas(false), info: () => setPanelInfo(false),
+        notas: () => setPanelNotas(false), info: () => setPanelInfo(false), tema: () => setPanelTema(null),
       };
       if (id && cerrar[id]) cerrar[id]();
     } else if (ancho && /^[1-9]$/.test(e.key)) {
@@ -1357,8 +1362,16 @@ export default function Lector() {
       const z = zonaEn(ev.clientX, ev.clientY);
       setArrastreTab(null);
       if (z) {
-        setZonaDe((prev) => ({ ...prev, [id]: z }));
-        setActivo((a) => ({ ...a, [z]: id }));
+        // Soltar en la mitad libre de su PROPIA columna (que ocupaba todo el alto
+        // o todo el ancho) la parte en dos: el cuadro queda donde se soltó y los
+        // demás pasan a la otra mitad. Antes no cambiaba nada y el cuadro parecía
+        // «pegarse» a los de su zona.
+        const PAR: Record<Zona, Zona> = { "der-arriba": "der-abajo", "der-abajo": "der-arriba", abajo: "abajo-der", "abajo-der": "abajo" };
+        const otra = PAR[z];
+        const companeros = porZona[z].filter((x) => x !== id);
+        const partir = trabajo && zonaEf(id) === z && companeros.length > 0 && porZona[otra].length === 0;
+        setZonaDe((prev) => ({ ...prev, [id]: z, ...(partir ? Object.fromEntries(companeros.map((c) => [c, otra])) : {}) }));
+        setActivo((a) => ({ ...a, [z]: id, ...(partir ? { [otra]: companeros[companeros.length - 1] } : {}) }));
       }
     };
     window.addEventListener("pointermove", mover);
@@ -1575,6 +1588,33 @@ export default function Lector() {
   };
 
   // D22: cita clicable → pop-up con el texto del verso en la obra activa
+  const abrirTema = (tema: string) => {
+    setPanelTema({ tema, libros: null });
+    const letra = /^[a-z]/.test(tema) ? tema[0] : "_";
+    const clave = `nave-temas:${letra}`;
+    const usar = (j: Record<string, Record<string, string[]>>) =>
+      setPanelTema((prev) => (prev && prev.tema === tema ? { tema, libros: j[tema] ?? {} } : prev));
+    const enCache = cache.get(clave) as Record<string, Record<string, string[]>> | undefined;
+    if (enCache) return usar(enCache);
+    fetch(`/data/nave/_temas/${letra}.json`)
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((j) => {
+        cache.set(clave, j);
+        usar(j);
+      })
+      .catch(() => usar({}));
+  };
+  /** Versículos de un libro (o uno solo) del tema → cuadro de Citas, agrupados como una cita múltiple. */
+  const citaDeTema = (osis: string, cvs: string[]) => {
+    const refs = cvs.slice(0, 40).map((cv) => {
+      const [c, v] = cv.split(".").map(Number);
+      return { osis, c, v };
+    });
+    const nombre = manifest?.libros.find((l) => l.osis === osis)?.nombre ?? osis;
+    const etiqueta = cvs.length === 1 ? `${nombre} ${cvs[0].replace(".", ":")}` : `${nombre} (${cvs.length})`;
+    abrirCita({ etiqueta, refs });
+  };
+
   const abrirCita = (cita: NonNullable<ReturnType<typeof parseCita>>) => {
     const primero = cita.refs[0];
     // las citas se van guardando: en el cuadro de Citas quedan a mano para volver a ellas
@@ -1946,6 +1986,7 @@ export default function Lector() {
 
           {paraleloActivo && !cargando && !griego && !interlineal && (
             <div className="par-elige" role="group" aria-label="Versiones en paralelo">
+              {anchoParalelo && (
               <span className="par-disp" role="group" aria-label="Disposición">
                 <button className={parDisp === "lado" ? "activa" : ""} onClick={() => setParDisp("lado")} aria-pressed={parDisp === "lado"} title="Una junto a otra">
                   ▥ Al lado
@@ -1954,6 +1995,7 @@ export default function Lector() {
                   ☰ Apiladas
                 </button>
               </span>
+              )}
               {OPCIONES_PAR.map((o) => {
                 const on = extrasPar.includes(o.id);
                 return (
@@ -1977,7 +2019,7 @@ export default function Lector() {
             /* Versiones en paralelo: una fila por versículo, alineadas; la
                primera columna es la versión principal y sigue siendo tocable
                (notas, referencias, comentario lateral) como en la vista normal. */
-            <div className={`paralelo${parDisp === "apilado" ? " apilado" : ""}`} style={{ "--cols": extrasPar.length + 1 } as React.CSSProperties}>
+            <div className={`paralelo${dispPar === "apilado" ? " apilado" : ""}`} style={{ "--cols": extrasPar.length + 1 } as React.CSSProperties}>
               <div className="par-fila par-cabeza">
                 <span>{nombreObra(obra)}</span>
                 {extrasPar.map((o) => (
@@ -2007,7 +2049,7 @@ export default function Lector() {
                     </span>
                     {extrasPar.map((o) => (
                       <span key={o} className="par-otra" lang={o === "sblgnt" ? "el" : o === "web" ? "en" : "es"}>
-                        {parDisp === "apilado" ? <b className="par-sigla">{nombreObra(o)}</b> : <sup className="num">{v.v}</sup>}
+                        {dispPar === "apilado" ? <b className="par-sigla">{nombreObra(o)}</b> : <sup className="num">{v.v}</sup>}
                         {textosPar[o]?.[`${v.c}.${v.v}`] ?? <span className="par-falta">—</span>}
                       </span>
                     ))}
@@ -2979,9 +3021,14 @@ export default function Lector() {
                 {naveTemas.length ? (
                   <div className="refs-lista">
                     {naveTemas.map((t) => (
-                      <span key={t} className="ref-item" style={{ cursor: "default" }}>
+                      <button
+                        key={t}
+                        className={`ref-item tema-nave${panelTema?.tema === t ? " activa" : ""}`}
+                        onClick={() => abrirTema(t)}
+                        title="Ver todos los versículos de la Biblia sobre este tema"
+                      >
                         {naveNombresEs?.[t] ?? t.replace(/-/g, " ")}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 ) : (
@@ -3122,6 +3169,51 @@ export default function Lector() {
             <div className="lex-meta">{panelTermino.idioma}</div>
             <div className="lex-def">{panelTermino.sig}</div>
             <div className="lex-fuente">Curaduría editorial · {tr.fuenteRefs}</div>
+          </div>
+        </div>
+      )}
+
+      {panelTema && (
+        <div {...propsPanel("tema")} role="dialog" aria-label="Tema de Nave">
+          <div className="lex-panel-inner">
+            <div className="lex-cabecera">
+              <span className="lex-palabra" style={{ fontSize: 20 }}>
+                {naveNombresEs?.[panelTema.tema] ?? panelTema.tema.replace(/-/g, " ")}
+              </span>
+              <button className="icono-btn cerrar" onClick={() => setPanelTema(null)} aria-label={tr.lexCerrar}>
+                ✕
+              </button>
+            </div>
+            {panelTema.libros === null ? (
+              <div className="lex-meta">…</div>
+            ) : Object.keys(panelTema.libros).length === 0 ? (
+              <div className="lex-meta">{tr.sinTemas}</div>
+            ) : (
+              <>
+                <div className="lex-meta">
+                  {Object.values(panelTema.libros).reduce((n, a) => n + a.length, 0)} versículos en{" "}
+                  {Object.keys(panelTema.libros).length} libros · toca un libro para leer sus versículos juntos, o un versículo suelto
+                </div>
+                <div className="tema-libros cambio-suave">
+                  {Object.entries(panelTema.libros).map(([o, cvs]) => (
+                    <div key={o} className="tema-libro">
+                      <button className="tema-libro-nombre" onClick={() => citaDeTema(o, cvs)}>
+                        {manifest?.libros.find((l) => l.osis === o)?.nombre ?? o}
+                        <small>{cvs.length}</small>
+                      </button>
+                      <div className="tema-versos">
+                        {cvs.map((cv) => (
+                          <button key={cv} className="tema-verso" onClick={() => citaDeTema(o, [cv])}>
+                            {cv.replace(".", ":")}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            <div className="lex-fuente">{tr.fuenteNave}</div>
           </div>
         </div>
       )}

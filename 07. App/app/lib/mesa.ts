@@ -36,6 +36,7 @@ export const ZONA_POR_DEFECTO: Record<string, Zona> = {
   info: "der-arriba",
   refs: "abajo",
   cita: "der-abajo",
+  tema: "der-abajo",
   citas: "der-abajo",
   dic: "abajo-der",
   notas: "abajo",

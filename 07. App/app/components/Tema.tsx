@@ -47,7 +47,7 @@ export default function Tema({ etiqueta }: { etiqueta: string }) {
     vt.ready.then(() => {
       html.animate(
         { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radio}px at ${x}px ${y}px)`] },
-        { duration: 650, easing: "cubic-bezier(0.32, 0.72, 0, 1)", pseudoElement: "::view-transition-new(root)" }
+        { duration: 750, easing: "cubic-bezier(0.32, 0.72, 0, 1)", pseudoElement: "::view-transition-new(root)" }
       );
     });
     vt.finished.finally(() => html.classList.remove("cambiando-tema"));
