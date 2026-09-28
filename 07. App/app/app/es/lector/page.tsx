@@ -186,6 +186,9 @@ export default function Lector() {
   // ── Navegación lateral (≥ 1280 px) y vistazo de citas al pasar el ratón ──
   const anchoNav = useMedia(`(min-width: ${ANCHO_NAV}px)`);
   const [navPlegada, setNavPlegada] = useState(false);
+  // acordeón: sólo un libro muestra sus capítulos, y sólo cuando se toca
+  const [navLibro, setNavLibro] = useState<string | null>(null);
+  const [gruposCerrados, setGruposCerrados] = useState<string[]>([]);
   const conRaton = useMedia("(hover: hover) and (pointer: fine)");
   const [vistazo, setVistazo] = useState<{ x: number; y: number; arriba: boolean; etiqueta: string; texto: string | null } | null>(null);
   const tVistazo = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1006,8 +1009,17 @@ export default function Lector() {
     nPilaAntes.current = nPila;
   }, [nPila]);
   useEffect(() => {
-    try { setNavPlegada(localStorage.getItem("nav-plegada") === "1"); } catch {}
+    try {
+      setNavPlegada(localStorage.getItem("nav-plegada") === "1");
+      setGruposCerrados(JSON.parse(localStorage.getItem("nav-grupos-cerrados") ?? "[]"));
+    } catch {}
   }, []);
+  const alternarGrupo = (g: string) =>
+    setGruposCerrados((prev) => {
+      const v = prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g];
+      try { localStorage.setItem("nav-grupos-cerrados", JSON.stringify(v)); } catch {}
+      return v;
+    });
   const plegarNav = (v: boolean) => {
     setNavPlegada(v);
     try { localStorage.setItem("nav-plegada", v ? "1" : "0"); } catch {}
@@ -1879,33 +1891,53 @@ export default function Lector() {
               const libros = (manifest?.libros ?? []).filter((l) => g.osis.includes(l.osis));
               if (!libros.length) return null;
               return (
-                <div key={g.nombre} className="nav-grupo">
-                  <div className="nav-grupo-t">{g.nombre}</div>
-                  {libros.map((l) => (
-                    <div key={l.osis}>
-                      <button
-                        className={`nav-libro${l.osis === osis ? " activo" : ""}`}
-                        onClick={() => {
-                          setPendiente(null);
-                          if (l.osis !== osis) {
-                            setOsis(l.osis);
-                            setCap(1);
-                          }
-                        }}
-                      >
-                        {l.nombre}
-                      </button>
-                      {l.osis === osis && (
-                        <div className="nav-caps">
-                          {Array.from({ length: l.caps }, (_, i) => i + 1).map((n) => (
-                            <button key={n} className={`nav-cap${n === cap ? " activo" : ""}`} onClick={() => setCap(n)}>
-                              {n}
+                <div key={g.nombre} className={`nav-grupo${gruposCerrados.includes(g.nombre) ? " cerrado" : ""}`}>
+                  <button
+                    className="nav-grupo-t"
+                    onClick={() => alternarGrupo(g.nombre)}
+                    aria-expanded={!gruposCerrados.includes(g.nombre)}
+                  >
+                    <span className="nav-flecha" aria-hidden="true">▾</span>
+                    {g.nombre}
+                  </button>
+                  <div className="nav-grupo-libros">
+                    <div className="nav-grupo-int">
+                      {libros.map((l) => {
+                        const abierto = navLibro === l.osis;
+                        return (
+                          <div key={l.osis}>
+                            <button
+                              className={`nav-libro${l.osis === osis ? " activo" : ""}${abierto ? " abierto" : ""}`}
+                              aria-expanded={abierto}
+                              onClick={() => setNavLibro(abierto ? null : l.osis)}
+                            >
+                              {l.nombre}
+                              <span className="nav-libro-caps">{l.caps}</span>
                             </button>
-                          ))}
-                        </div>
-                      )}
+                            <div className={`nav-caps-caja${abierto ? " abierta" : ""}`}>
+                              <div className="nav-caps">
+                                {abierto &&
+                                  Array.from({ length: l.caps }, (_, i) => i + 1).map((n) => (
+                                    <button
+                                      key={n}
+                                      className={`nav-cap${l.osis === osis && n === cap ? " activo" : ""}`}
+                                      onClick={() => {
+                                        setPendiente(null);
+                                        if (l.osis !== osis) setOsis(l.osis);
+                                        setCap(n);
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
+                                      }}
+                                    >
+                                      {n}
+                                    </button>
+                                  ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
+                  </div>
                 </div>
               );
             })}

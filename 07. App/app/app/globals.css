@@ -5810,3 +5810,66 @@ html.sin-intro .intro { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .vistazo, .nav-lateral, .nav-caps { animation: none !important; transition: none !important; }
 }
+
+/* ── Acordeón de libros: grupos plegables y capítulos sólo del libro tocado ──
+   Abrir y cerrar anima la altura con grid-template-rows 0fr → 1fr (sin saltos). */
+@media (min-width: 1280px) {
+  .nav-grupo-t {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-family: var(--sans);
+    transition: color 0.22s ease, background 0.22s ease;
+  }
+  .nav-grupo-t:hover { color: var(--ink); background: var(--hover); }
+  .nav-flecha { display: inline-block; font-size: 9px; transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+  .nav-grupo.cerrado .nav-flecha { transform: rotate(-90deg); }
+  .nav-grupo-libros {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.36s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
+  }
+  .nav-grupo.cerrado .nav-grupo-libros { grid-template-rows: 0fr; opacity: 0; }
+  .nav-grupo-int { overflow: hidden; min-height: 0; }
+  .nav-libro { display: flex; align-items: center; }
+  .nav-libro-caps {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .nav-libro:hover .nav-libro-caps, .nav-libro.abierto .nav-libro-caps { opacity: 1; }
+  .nav-libro.abierto { background: var(--hover); }
+  .nav-caps-caja {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .nav-caps-caja.abierta { grid-template-rows: 1fr; }
+  .nav-caps-caja > .nav-caps { overflow: hidden; min-height: 0; animation: none; }
+  .nav-caps-caja:not(.abierta) > .nav-caps { padding-top: 0; padding-bottom: 0; }
+}
+
+/* ── Cabecera en UNA sola línea en pantallas muy anchas (≥ 1400 px) ──
+   logo · versiones · libro · capítulo · capa del original · acciones · comentario · info/tema.
+   Se gana altura para la mesa de trabajo y desaparecen las filas centradas con márgenes vacíos. */
+@media (min-width: 1400px) {
+  .cabecera { display: flex; align-items: center; gap: 14px; padding-inline: 14px; }
+  .cabecera-inner { display: contents; }
+  .cabecera .marca { flex: none; order: 0; }
+  .cabecera-sub { order: 1; flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px; border-top: 0; }
+  .cabecera .lector-acciones { order: 2; margin-left: 0; flex: none; }
+  .cabecera-sub-inner { max-width: none; margin: 0; padding: 7px 0; flex-wrap: nowrap; flex: 0 1 auto; min-width: 0; }
+  .cabecera-sub-inner > select.sel { width: 170px; flex: none; }
+  .cabecera-sub .nav-fila { flex: 0 1 auto; }
+  .cabecera-sub .rec-original-nav { flex: 0 1 190px; }
+  .com-strip-fila { border-top: 0; flex: 0 1 380px; min-width: 250px; }
+  .com-strip-fila .rec-barra { max-width: none; margin: 0; padding: 5px 8px; border-radius: 10px; }
+}
