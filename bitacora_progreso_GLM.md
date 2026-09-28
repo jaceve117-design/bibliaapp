@@ -1225,3 +1225,12 @@ El móvil NO cambia; todo se añade por ancho (`07. App/app/lib/pantalla.ts`):
 - Transiciones: deslizamientos y fundidos de 0,22–0,45 s con `cubic-bezier(0.32,0.72,0,1)`; todo se desactiva con prefers-reduced-motion.
 - **Aviso técnico:** `app/globals.css` contiene bloques enteros repetidos 3 veces (≈5.500 líneas; las copias posteriores traen ajustes y ganan por cascada). Conviene deduplicarlo con cuidado (dejar la última versión de cada regla) y probar móvil antes/después.
 - Build: `out` y `salida` suelen estar bloqueadas por otra sesión; usar una carpeta nueva por build (`DIST_DIR=salida-$(date +%s)`, ignoradas por git) y borrar las viejas cuando no estén en uso.
+
+## 2026-09-28 — Mesa de trabajo en pantallas grandes (Claude)
+Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros movibles.
+- **Libros en acordeón** (≥1280): grupos del canon plegables y capítulos sólo del libro tocado (animación 0fr→1fr). **Cabecera en una línea** (≥1400).
+- **Zonas** (`lib/mesa.ts`, ≥1280): derecha arriba, derecha abajo y abajo (bajo la Biblia). Cada cuadro (comentario, 2.º comentario, versículo, citas, léxico, diccionario, notas, búsqueda…) vive en una zona; **se arrastra por su pestaña** (pointer events: ratón y dedo) y la disposición se guarda (`mesa-zonas`). Bordes ajustables (ancho derecho, reparto arriba/abajo, alto de abajo; doble clic = por defecto). Entre 680 y 1279 px todo va a una columna con pestañas.
+- **Cuadro de Citas**: la cita tocada en cualquier recurso sale abajo a la derecha, con lista de recientes (16).
+- **Segundo comentario** («+ Comentario» en el cuadro principal): su propio cuadro con selector (Henry, JFB, Barnes, Easton, Valdés; ES si existe).
+- **Biblias en paralelo** al lado o apiladas (hasta 3). **Notas** nacen en la zona de abajo.
+- Zonas/cuadros/panel usan geometría calculada (`calcZonas`) con transición de left/top/width/height; `html.mesa-arrastrando` la desactiva durante un arrastre.
