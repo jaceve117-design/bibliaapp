@@ -1273,3 +1273,9 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 - La primera heurística de titulares (`scripts/limpia-rand.mjs`) produce 1.784 entradas PERO con ruido: falsas entradas de líneas de atribución («Society», «D. D.» de la portada) y errores del OCR de 1859 («Aarox» por Aaron). El borrador de entradas.json se descarta; el script queda para iterar.
 - SIGUIENTE (turno dedicado): exigir MAYÚSCULAS en todo el nombre detectado, descartar la portada por completo (hasta «ENTERED according»), validar 50 entradas contra el escaneo, y recién entonces crear la obra `rand` (modelo easton) + muestra del motor + corrida (~$2).
 - 1.3 sigue bloqueada por fuente (documentado arriba). Gasto: $48,61 de $75.
+
+## 2026-09-28 — Cabecera en dos líneas + Ajustes (Claude)
+- **Línea 1**: marca a la izquierda · ⚙ Ajustes a la derecha. **Ajustes** = panel lateral (velo + deslizamiento) con: tema claro/oscuro, letra de la Biblia −2…+3 (`tam`), y vistas con ← atrás / ✕: Información, Fuentes del corpus (incl. reportar error), Derechos de las traducciones (CC BY 4.0, «sin revisar», no entrenamiento IA), Apoyar (próximamente). Los antiguos paneles «info» y «fuentes» de la mesa ya no existen: su contenido vive aquí. `Esc` vuelve/cierra.
+- **Línea 2**: Biblia ▾ (select) · ⫴ paralelo · Libro ▾ · Cap ▾ · **Capas ▾** (casillas: Diccionario en el texto, Interlineal, Griego SBLGNT, Mis notas; interlineal y griego se excluyen) · ⌕ ← → ····· Comentarista ▾. En móvil 3 filas (⌕←→ comparten fila con el comentarista).
+- Fix: el menú «Aa» del cuadro se pinta `position: fixed` por encima del contenido (antes quedaba debajo de la tarjeta). Los menús flotantes se cierran al tocar fuera.
+- Validado a 390 / 950 / 1920 / 2560 px: cabecera, Ajustes (4 vistas, letra, tema, Esc), capas (4), Aa (color+letra), paralelo, acordeón, teclado, «＋», arrastre a 4 zonas, citas, sincronización del comentario, sin desbordes.
