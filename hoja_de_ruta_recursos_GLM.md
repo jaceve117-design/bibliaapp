@@ -158,8 +158,13 @@ parar y dejar el informe para el usuario.
   cita este versículo». Etiqueta: «Tradición: reformada».
 - **Costo: 0.**
 
-### [~] 1.4 Diccionario de W. W. Rand (*A Dictionary of the Holy Bible*)
-- **EN CURSO (2026-09-28/29, GLM)**: OCR descargado (`05. Datos/corpus_crudo/rand/rand-djvu.txt`,
+### [x] 1.4 Diccionario de W. W. Rand (*A Dictionary of the Holy Bible*) — COMPLETA (ES desplegado)
+- **[x] COMPLETA (2026-09-29, GLM)**: limpieza v2 (detector por línea-encabezado MAYÚSCULAS+coma,
+  arranque tras la portada, filtro de ruido) → 1.772 entradas → motor (1.281 unidades gratis por
+  memoria con Easton; 2.263 traducidas, $0,87) → rand-es/rand-es.json (1.772 entradas ES, 100%,
+  desplegadas y verificadas en producción: «Aarón» abre su entrada en español). Integrado en el
+  panel del diccionario junto a Easton (P.2 punto 3). Rescate manual: Aarón y Abel (cuyas cabeceras
+  de OCR 1859 venían dañadas). OCR descargado (`05. Datos/corpus_crudo/rand/rand-djvu.txt`,
   2,4 MB). Script de limpieza primera versión en `scripts/limpia-rand.mjs` — produce 1.784 entradas
   PERO con ruido: falsas entradas de líneas de atribución («Society», «D. D.») y errores del propio
   OCR de 1859 («Aarox» por Aaron). SIGUIENTE: afinar el filtro de titulares (requerir MAYÚSCULAS del

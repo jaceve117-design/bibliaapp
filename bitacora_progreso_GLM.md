@@ -1298,3 +1298,12 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 - **Arrastre**: soltar un cuadro en la mitad libre de su PROPIA columna (que ocupaba todo el alto/ancho) la parte en dos; los demás pasan a la otra mitad. Antes no cambiaba nada y parecía «pegarse».
 - **Ritmo**: todas las transiciones/animaciones CSS ×1,15 (más pausadas, a pedido del usuario), salvo la intro (sincronizada con su sonido). Círculo del tema 750 ms.
 - **Móvil**: ⫴ también en pantallas estrechas, siempre apilado, hasta 3 Biblias; barra del comentarista sin ✎ y con «sin rev.» compacto (antes desbordaba la casilla).
+
+### 2026-09-29 · GLM (vigilante) — FASE 1.4 COMPLETA: Rand ES desplegado (1.772 entradas) · la biblioteca gana su segundo diccionario en español
+
+- **Rand → ES**: corrida completa del motor — 2.257/2.463 unidades del lote final, solo 6 fallos (0,27%), **+$0,87** (gasto total **$49,48 de $75**). 1.281 unidades salieron gratis por memoria de traducción compartida con Easton.
+- **rand-es/rand-es.json desplegado** (2 MB, 1.772 entradas ES) + integrado en el panel del diccionario junto a Easton: buscar «Aarón» → entrada en español. Verificado en producción (deploy `ef0d8f28`).
+- **Rescate manual**: Aarón y Abel (cabeceras dañadas del OCR 1859) reconstruidas del OCR con traducción fiel — script `scripts/rescata-rand-faltantes.mjs`. «Aarox» del OCR fuente queda documentado como error de origen.
+- **FASE 1 COMPLETA**: Oso 1569 ✓ · Valdés ROM+1CO ✓ · Calvino-Valera ⚠ bloqueada por licencia (documentada, requiere decisión del usuario: permiso del editor de la revisión 1967 u OCR propio del escaneo 1597) · Rand ✓.
+- **SIGUIENTE: FASE 2** (≈0-1 USD): 2.1 Theographic (CC BY-SA), 2.2 OpenBible geo+refs (CC BY), 2.3 MACULA (CC BY 4.0) → ⛔PUERTA A.
+- Gasto: **$49,48 de $75**.
