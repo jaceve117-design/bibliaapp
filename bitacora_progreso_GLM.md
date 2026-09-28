@@ -1102,3 +1102,16 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 5. **Deudas registradas para la póliza del lector** (no bloquean): (a) abreviaturas españolas de libros sin alias en `lib/referencias.ts` (Ag, Mi, Jr, Núm… el ensamblador lista ~30) — las citas del motor enlazan parcialmente; (b) 235+46+43 párrafos caídos al EN por fallo de validador — revisar en la consola de revisión; (c) auditoría censal Jev pendiente (opcional, ~$2) para ordenar la cola de revisión humana.
 
 **La Biblia de Estudio AION queda con: RV1909 · WEB · VBL · interlineal/griego con glosas ES · Matthew Henry ES completo · JFB ES · Barnes ES · Easton ES · Nave's ES · TSK · Easton EN.** Todo embebido, todo offline, todo «sin revisar» hasta la revisión humana (Política v1.0).
+
+### 2026-09-27 · GLM — Referencias comprimidas por versículo + selector de versión en las tarjetas (petición del usuario)
+
+1. **Grupos comprimidos multi-verso/multi-capítulo**: «1 Co 2:3, 6, 10, 4:4» ahora muestra TODOS los versos del grupo — antes `abrirCita` filtraba `r.c === primero.c` y DESCARTABA los capítulos posteriores (4:4 se perdía). Cada verso lleva su **chip de referencia (cap:v)** y los saltos de capítulo muestran encabezado («Juan 19» / «Juan 12»). Tope de 40 versos por grupo con aviso.
+2. **Selector de versión de Biblia en las tarjetas** (D24/D25, UX del hilo): el panel de cita Y la tarjeta de pasaje dividida llevan un desplegable RV1909/VBL/WEB — cambia SOLO la versión de la tarjeta (estado `obraCita`, null = sigue la principal; cache por versión), **la lectura principal no se mueve**. La carga del panel de cita se refactorizó a un efecto reactivo a `[obraVer, panelCita.id]` — cambia la versión y el panel re-fetchea solo.
+3. Verificado en navegador con vista móvil: grupo «Jn 19:38, 39; 12:42» de JFB → panel con JUAN 19/JUAN 12, chips 19:38/19:39/12:42, cambio a VBL recarga «Después de esto, José de Arimatea le preguntó a Pilato…» (VBL) con la lectura principal en Juan 3 RV1909 intacta. Deploy `137c88e4`.
+
+## 2026-09-28 — Buscador de pasajes, paso 1 (Claude)
+- Búsqueda local en el dispositivo, sin servidor ni coste: índices `public/data/busqueda/{rv1909,vbl}.json` (≈1,3 MB gzip c/u, se descargan al primer uso), generados con `scripts/genera-busqueda.mjs`; lógica en `lib/busqueda.ts`.
+- Criterios: frase exacta > palabras completas > prefijos > proximidad/orden; normalización sin tildes (RV1909 «á», «fué»); equivalencia Señor↔Jehová; fusiona RV1909+VBL.
+- UI: botón ⌕ → panel Buscar con pestañas Pasajes | Diccionario; resaltado de coincidencias; tocar un resultado abre la tarjeta de cita. Verificado a 390 px: «la mujer estaba vestida de escarlata» → Ap 17:4 primero, sin desborde horizontal.
+- Desplegado: https://3eaacc0e.bibliaapp.pages.dev (build con `DIST_DIR=salida` por el bloqueo EBUSY de `out`).
+- Pendiente: paso 2 (Jev reordena candidatos vía Pages Function con la clave en el servidor y límite de uso); búsqueda en comentarios; ensamblar y desplegar definiciones del léxico en español cuando termine la corrida (`node bin/ensamblar.mjs --obra lexdef`).
