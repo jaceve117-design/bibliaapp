@@ -90,7 +90,7 @@ const GRUPOS_LIBROS = [
 /** Nombre de cada panel como pestaña de la mesa de estudio (pantallas anchas). */
 const ETIQUETA_PANEL: Record<string, string> = {
   dic: "Diccionario", busqueda: "Buscar", griego: "Griego", lex: "Léxico", refs: "Versículo",
-  cita: "Cita", termino: "Término", fuentes: "Fuentes", notas: "Notas", info: "Info",
+  cita: "Citas", termino: "Término", fuentes: "Fuentes", notas: "Notas", info: "Info",
 };
 const CAP_INICIAL = 1;
 const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
@@ -182,6 +182,10 @@ export default function Lector() {
   const [activo, setActivo] = useState<Partial<Record<Zona, string>>>({});
   const [splitDer, setSplitDer] = useGuardado("mesa-split", 0.55);
   const [altoAbajo, setAltoAbajo] = useGuardado("mesa-abajo", 300);
+  const [com2, setCom2] = useGuardado<ComFuente | null>("mesa-com2", null);
+  const [com2Data, setCom2Data] = useState<{ fuente: string; osis: string; es: boolean; json: JfbJson } | null>(null);
+  const [parDisp, setParDisp] = useGuardado<"lado" | "apilado">("paralelo-disp", "lado");
+  const [citasRecientes, setCitasRecientes] = useState<NonNullable<ReturnType<typeof parseCita>>[]>([]);
   const [arrastreTab, setArrastreTab] = useState<{ id: string; x: number; y: number; sobre: Zona | null } | null>(null);
   const [versoActual, setVersoActual] = useState(1);
   const estudioRef = useRef<HTMLElement>(null);
@@ -1078,8 +1082,28 @@ export default function Lector() {
   }, []);
 
   const comEnTexto = comentario && !ancho;
+  const com2Activo = trabajo && comentario && com2 !== null && com2 !== comFuente;
+  useEffect(() => {
+    if (!com2Activo || !com2 || com2 === "henry") return;
+    const ruta = RUTA_COMENTARIO[com2];
+    if (!ruta) return;
+    let vivo = true;
+    const cargar = (url: string) => fetch(url).then((r) => (r.ok ? (r.json() as Promise<JfbJson>) : null)).catch(() => null);
+    (async () => {
+      const es = await cargar(`/data/${ruta}-es/${osis}.json`);
+      const json = es ?? (await cargar(`/data/${ruta}/${osis}.json`));
+      if (vivo && json) setCom2Data({ fuente: com2, osis, es: !!es, json });
+    })();
+    return () => { vivo = false; };
+  }, [com2Activo, com2, osis]);
+  const com2Sel = COMENTARIOS.find((c) => c.id === com2);
+  const parrafosCom2 =
+    com2Data && com2Data.fuente === com2 && com2Data.osis === osis
+      ? (com2Data.json.c[String(cap)] ?? []).flatMap((a) => a.p.filter(Boolean).map((x) => (a.v > 0 ? `${a.v}. ${x}` : x)))
+      : [];
+
   const zonaEf = (id: string): Zona => (trabajo ? zonaDe[id] ?? ZONA_POR_DEFECTO[id] ?? "der-arriba" : "der-arriba");
-  const abiertas = [...(comentario ? ["com"] : []), ...pila];
+  const abiertas = [...(comentario ? ["com"] : []), ...(com2Activo ? ["com2"] : []), ...pila];
   const porZona: Record<Zona, string[]> = { "der-arriba": [], "der-abajo": [], abajo: [] };
   for (const id of abiertas) porZona[zonaEf(id)].push(id);
   const activoEn = (z: Zona) => {
@@ -1354,6 +1378,10 @@ export default function Lector() {
   // D22: cita clicable → pop-up con el texto del verso en la obra activa
   const abrirCita = (cita: NonNullable<ReturnType<typeof parseCita>>) => {
     const primero = cita.refs[0];
+    // las citas se van guardando: en el cuadro de Citas quedan a mano para volver a ellas
+    setCitasRecientes((prev) => [cita, ...prev.filter((c) => c.etiqueta !== cita.etiqueta)].slice(0, 16));
+    // si el cuadro ya estaba abierto detrás de otro, pasa al frente de su zona
+    if (ancho) setActivo((a) => ({ ...a, [zonaEf("cita")]: "cita" }));
     // TODOS los versos del grupo, capítulos incluidos («1 Co 2:3, 6, 10, 4:4» = 4 versos
     // de DOS capítulos del mismo libro): cada uno se muestra con su referencia (petición 2026-09-27)
     const visibles = cita.refs.slice(0, 40);
@@ -1704,6 +1732,14 @@ export default function Lector() {
 
           {paraleloActivo && !cargando && !griego && !interlineal && (
             <div className="par-elige" role="group" aria-label="Versiones en paralelo">
+              <span className="par-disp" role="group" aria-label="Disposición">
+                <button className={parDisp === "lado" ? "activa" : ""} onClick={() => setParDisp("lado")} aria-pressed={parDisp === "lado"} title="Una junto a otra">
+                  ▥ Al lado
+                </button>
+                <button className={parDisp === "apilado" ? "activa" : ""} onClick={() => setParDisp("apilado")} aria-pressed={parDisp === "apilado"} title="Una debajo de otra">
+                  ☰ Apiladas
+                </button>
+              </span>
               {OPCIONES_PAR.map((o) => {
                 const on = extrasPar.includes(o.id);
                 return (
@@ -1727,7 +1763,7 @@ export default function Lector() {
             /* Versiones en paralelo: una fila por versículo, alineadas; la
                primera columna es la versión principal y sigue siendo tocable
                (notas, referencias, comentario lateral) como en la vista normal. */
-            <div className="paralelo" style={{ "--cols": extrasPar.length + 1 } as React.CSSProperties}>
+            <div className={`paralelo${parDisp === "apilado" ? " apilado" : ""}`} style={{ "--cols": extrasPar.length + 1 } as React.CSSProperties}>
               <div className="par-fila par-cabeza">
                 <span>{nombreObra(obra)}</span>
                 {extrasPar.map((o) => (
@@ -1757,7 +1793,7 @@ export default function Lector() {
                     </span>
                     {extrasPar.map((o) => (
                       <span key={o} className="par-otra" lang={o === "sblgnt" ? "el" : o === "web" ? "en" : "es"}>
-                        <sup className="num">{v.v}</sup>
+                        {parDisp === "apilado" ? <b className="par-sigla">{nombreObra(o)}</b> : <sup className="num">{v.v}</sup>}
                         {textosPar[o]?.[`${v.c}.${v.v}`] ?? <span className="par-falta">—</span>}
                       </span>
                     ))}
@@ -2053,7 +2089,7 @@ export default function Lector() {
                       title={trabajo ? "Toca para ver · arrastra para mover el cuadro" : undefined}
                     >
                       {trabajo && <span className="pestana-asidero" aria-hidden="true">⠿</span>}
-                      {id === "com" ? comSel.etiqueta : ETIQUETA_PANEL[id] ?? id}
+                      {id === "com" ? comSel.etiqueta : id === "com2" ? com2Sel?.etiqueta ?? "Comentario 2" : ETIQUETA_PANEL[id] ?? id}
                     </button>
                   ))}
                 </div>
@@ -2072,6 +2108,15 @@ export default function Lector() {
               <div className="estudio-com visible">
               <div className="estudio-autor">
                 {comSel.etiqueta} · {comSel.anio}
+                {trabajo && com2 === null && (
+                  <button
+                    className="com-anadir"
+                    onClick={() => setCom2((COMENTARIOS.find((c) => c.id !== comFuente)?.id ?? "jfb") as ComFuente)}
+                    title="Abrir un segundo comentario en otro cuadro"
+                  >
+                    + Comentario
+                  </button>
+                )}
                 {recursoTraducido && (comFuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : usarEsCom) && (
                   <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
                 )}
@@ -2104,6 +2149,62 @@ export default function Lector() {
                 <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
               )}
             </div>
+            </section>
+          )}
+          {com2Activo && com2 && rectsZona[zonaEf("com2")] && (
+            <section
+              className={`tarjeta-com${activoEn(zonaEf("com2")) === "com2" ? " visible" : ""}`}
+              style={contenidoDe(rectsZona[zonaEf("com2")]!)}
+              aria-label={com2Sel?.etiqueta}
+            >
+              <div className="estudio-com visible">
+                <div className="estudio-autor">
+                  <select
+                    className="sel sel-mini"
+                    aria-label="Segundo comentario"
+                    value={com2}
+                    onChange={(e) => setCom2(e.target.value as ComFuente)}
+                  >
+                    {COMENTARIOS.filter((c) => c.id !== comFuente).map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.etiqueta} · {c.anio}
+                      </option>
+                    ))}
+                  </select>
+                  {(com2 === "henry" ? idiomaEfectivo === "es" && esCapDisp : com2Data?.es) && (
+                    <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
+                  )}
+                  <button className="icono-btn cerrar com2-cerrar" onClick={() => setCom2(null)} aria-label="Cerrar el segundo comentario">
+                    ✕
+                  </button>
+                </div>
+                {com2 === "henry" ? (
+                  <>
+                    {rCom && (
+                      <div className="com-resumen">
+                        <div className="com-titulo">{tr.resumenCapitulo}</div>
+                        {renderMarcado(rCom)}
+                      </div>
+                    )}
+                    {seccionesCom.map((sec, i) => (
+                      <div key={`c2-${osis}.${cap}-${i}`} className="estudio-seccion">
+                        <ComentarioBloque abiertoInicial seccion={sec} tr={tr} renderFn={renderMarcado} />
+                      </div>
+                    ))}
+                  </>
+                ) : parrafosCom2.length ? (
+                  <ComentarioBloque
+                    key={`${com2}-${osis}-${cap}`}
+                    abiertoInicial
+                    autor={`${com2Sel?.etiqueta} · ${com2Sel?.anio}`}
+                    seccion={{ t: `${tr.capitulo} ${cap}`, v: null, p: parrafosCom2, sinTraducir: false }}
+                    tr={tr}
+                    renderFn={renderMarcado}
+                  />
+                ) : (
+                  <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
+                )}
+              </div>
             </section>
           )}
           {mesa.mr > 0 && (
@@ -2151,7 +2252,7 @@ export default function Lector() {
             ) : null;
           })}
           <div className="fantasma" style={{ left: arrastreTab.x + 14, top: arrastreTab.y + 10 }}>
-            {arrastreTab.id === "com" ? comSel.etiqueta : ETIQUETA_PANEL[arrastreTab.id] ?? arrastreTab.id}
+            {arrastreTab.id === "com" ? comSel.etiqueta : arrastreTab.id === "com2" ? com2Sel?.etiqueta : ETIQUETA_PANEL[arrastreTab.id] ?? arrastreTab.id}
           </div>
         </>
       )}
@@ -2595,6 +2696,19 @@ export default function Lector() {
                 </button>
               </span>
             </div>
+            {citasRecientes.length > 1 && (
+              <div className="citas-recientes" aria-label="Citas recientes">
+                {citasRecientes.map((c) => (
+                  <button
+                    key={c.etiqueta}
+                    className={`cita-chip${c.etiqueta === panelCita.etiqueta ? " activa" : ""}`}
+                    onClick={() => abrirCita(c)}
+                  >
+                    {c.etiqueta}
+                  </button>
+                ))}
+              </div>
+            )}
             {panelCita.cargando ? (
               <div className="lex-meta">…</div>
             ) : panelCita.versos.length ? (

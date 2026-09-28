@@ -5970,3 +5970,84 @@ html.sin-intro .intro { display: none; }
   border: 1px solid var(--accent);
   box-shadow: var(--shadow);
 }
+
+/* ── Cuadro de Citas: las últimas citas tocadas, para ir y volver ── */
+.citas-recientes {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0 10px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  mask-image: linear-gradient(90deg, #000 88%, transparent);
+}
+.cita-chip {
+  flex: none;
+  font-family: var(--sans);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  animation: pestana-entra 0.3s ease;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+.cita-chip:hover { color: var(--ink); border-color: var(--accent); }
+.cita-chip.activa {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* ── Segundo comentario y Biblias apiladas ── */
+.com-anadir {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px dashed var(--line);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+.com-anadir:hover { color: var(--ink); border-color: var(--accent); }
+.com2-cerrar { margin-left: auto; }
+.par-disp { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; margin-right: 6px; }
+.par-disp button {
+  font-family: var(--sans);
+  font-size: 12px;
+  padding: 5px 11px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.par-disp button.activa { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--ink); }
+@media (min-width: 1000px) {
+  .paralelo.apilado .par-fila { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .paralelo.apilado .par-cabeza { display: none; }
+  .paralelo.apilado .lector-columna, .lector-columna.ancha:has(.paralelo.apilado) { max-width: 820px; }
+  .paralelo.apilado .par-otra {
+    font-size: 0.92em;
+    padding-left: 14px;
+    border-left: 2px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-radius: 0;
+  }
+  .par-sigla {
+    font-family: var(--sans);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 8px;
+  }
+}

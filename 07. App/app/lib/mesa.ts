@@ -26,7 +26,7 @@ export const NOMBRE_ZONA: Record<Zona, string> = {
 /** Dónde nace cada cuadro si el lector no lo ha movido nunca. */
 export const ZONA_POR_DEFECTO: Record<string, Zona> = {
   com: "der-arriba",
-  com2: "der-arriba",
+  com2: "der-abajo",
   lex: "der-arriba",
   griego: "der-arriba",
   termino: "der-arriba",
