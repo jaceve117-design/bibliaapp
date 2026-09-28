@@ -117,7 +117,9 @@ parar y dejar el informe para el usuario.
   (`scripts/genera-busqueda.mjs`) como tercera obra, con carga perezosa.
 - **Traducción:** ninguna. **Costo: 0.**
 
-### [ ] 1.2 Juan de Valdés — comentarios a Romanos (1556) y 1 Corintios (1557)
+### [~] 1.2 Juan de Valdés — comentarios a Romanos (1556) y 1 Corintios (1557)
+- **1CO HECHO 2026-09-28 (GLM)**: fuente = archive.org `commentariodecl00valdgoog` (Usoz 1895, djvu.txt 570 KB, OCR limpiado); 16 capítulos con fronteras verificadas por contenido (marcas OCR: 0→9, 18→13, 16→15; 5/7/11/15/16 localizados por palabras de su apertura); 537 párrafos; integrado como comentarista con insignia ES fija (obra nativa). Pulido de artefactos OCR («volun-tad», «eLhermano») pendiente del pase de revisión.
+- **ROMANS PENDIENTE**: archive.org solo tiene la traducción inglesa 1883 (no sirve); buscar la edición española de Usoz en Google Books/HathiTrust/Cervantes.
 - Escritos **en español** por un reformador español. Dominio público.
 - **Fuente:** buscar transcripción en la serie «Reformistas Antiguos Españoles» (Usoz, s. XIX),
   disponible en archive.org / Google Books / Biblioteca Virtual Cervantes. Preferir texto
