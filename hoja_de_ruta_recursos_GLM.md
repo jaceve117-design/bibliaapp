@@ -199,6 +199,8 @@ ingerir ninguna versión con derechos** hasta que haya un permiso escrito archiv
       sección «ENCARGO PARA GLM — Buscador paso 3»). Cada obra nueva de esta hoja de ruta debe
       entrar también en ese buscador.
 - [x] Reintentar unidades fallidas: Henry 307, Barnes 46, JFB 43, Easton 17. (2026-09-28: cadenas corridas; re-ensamblados henry/barnes/jfb/easton-es con las recuperadas — Barnes +12, JFB +7)
-- [ ] Ensamblar y desplegar las definiciones del léxico en español (`node bin/ensamblar.mjs --obra lexdef`)
-      si la corrida ya terminó.
+- [x] Ensamblar y desplegar las definiciones del léxico en español (`node bin/ensamblar.mjs --obra lexdef`)
+      si la corrida ya terminó. (2026-09-28: 20.331/22.716 = 90 % desplegado — 11.680 H + 8.651 G; el freno
+      de emergencia detuvo el reintento de las 2.385 difíciles al 36 % de rechazo: definiciones largas donde
+      el modelo no conserva las máscaras ⟦n⟧ — requieren ajuste de prompt, no gasto ciego)
 - [ ] Auditoría Jev del corpus traducido (~2 USD).

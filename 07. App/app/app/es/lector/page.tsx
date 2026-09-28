@@ -7,6 +7,7 @@ import { t } from "@/lib/i18n";
 import { parejaDe } from "@/lib/alinea-gr";
 import { morfGntEs } from "@/lib/morfgnt";
 import { buscaEnVarias, cargaIndice, ordenaConIA, tramosResaltados, type Resultado } from "@/lib/busqueda";
+import { cargaComentarios, buscaComentarios, contexto } from "@/lib/busqueda";
 import { parseCita, segmentarPorCitas } from "@/lib/referencias";
 
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
@@ -634,6 +635,12 @@ export default function Lector() {
   // diccionario Easton: índice + definiciones por letra, todo con caché
   // ── Buscador de pasajes (paso 1: en el dispositivo, sin coste) ──────────────
   const [busPanel, setBusPanel] = useState(false);
+  // Buscador paso 3: pestaña «Comentarios» — busca en las obras traducidas
+  const [busTab, setBusTab] = useState<"pasajes" | "comentarios">("pasajes");
+  const [busComObra, setBusComObra] = useState("henry-es");
+  const [busComRes, setBusComRes] = useState<Array<Resultado & { obra: string }> | null>(null);
+  const busComIndice = useRef<Awaited<ReturnType<typeof cargaComentarios>> | null>(null);
+  const busComObraObra = useRef<string | null>(null);
   const [busQ, setBusQ] = useState("");
   const [busRes, setBusRes] = useState<Array<Resultado & { ia?: number }> | null>(null);
   const [busIa, setBusIa] = useState<"" | "pensando" | "hecho" | string>("");
@@ -667,6 +674,29 @@ export default function Lector() {
     return () => { vivo = false; clearTimeout(t); };
   }, [busQ, busPanel, obra]);
 
+  // búsqueda en comentarios: carga perezosa del índice de la obra elegida
+  useEffect(() => {
+    if (!busPanel || busTab !== "comentarios") return;
+    const q = busQ.trim();
+    if (q.length < 3) { setBusComRes(null); return; }
+    let vivo = true;
+    const t = setTimeout(async () => {
+      try {
+        if (busComIndice.current === null || busComObraObra.current !== busComObra) {
+          setBusEstado("cargando");
+          busComIndice.current = await cargaComentarios(busComObra);
+          busComObraObra.current = busComObra;
+        }
+        const r = buscaComentarios(busComIndice.current, q, 30);
+        if (vivo) { setBusComRes(r); setBusEstado(""); }
+      } catch {
+        if (vivo) setBusEstado("error");
+      }
+    }, 280);
+    return () => { vivo = false; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busQ, busPanel, busTab, busComObra]);
+
   const ordenarPorSentido = async () => {
     if (!busRes?.length) return;
     setBusIa("pensando");
@@ -682,6 +712,13 @@ export default function Lector() {
 
   const abrirBusqueda = () => {
     setDicPanel(false);
+    setBusTab("pasajes");
+    setBusPanel(true);
+  };
+
+  const abrirComentarios = () => {
+    setDicPanel(false);
+    setBusTab("comentarios");
     setBusPanel(true);
   };
 
@@ -1531,7 +1568,8 @@ export default function Lector() {
               </button>
             </div>
             <div className="bus-pestanas" role="tablist">
-              <button role="tab" aria-selected className="bus-pestana activa">Pasajes</button>
+              <button role="tab" aria-selected={busTab === "pasajes"} className={`bus-pestana${busTab === "pasajes" ? " activa" : ""}`} onClick={() => setBusTab("pasajes")}>Pasajes</button>
+              <button role="tab" aria-selected={busTab === "comentarios"} className={`bus-pestana${busTab === "comentarios" ? " activa" : ""}`} onClick={() => setBusTab("comentarios")}>Comentarios</button>
               <button role="tab" aria-selected={false} className="bus-pestana" onClick={abrirDic}>Diccionario</button>
             </div>
             <input
@@ -1540,16 +1578,29 @@ export default function Lector() {
               autoFocus
               value={busQ}
               onChange={(e) => setBusQ(e.target.value)}
-              placeholder="Escribe lo que recuerdes del versículo…"
-              aria-label="Buscar un pasaje por sus palabras"
+              placeholder={busTab === "comentarios" ? "Busca en Henry, JFB, Barnes y Easton (ES)…" : "Escribe lo que recuerdes del versículo…"}
+              aria-label={busTab === "comentarios" ? "Buscar en los comentarios" : "Buscar un pasaje por sus palabras"}
             />
+            {busTab === "comentarios" && (
+              <select
+                className="sel"
+                aria-label="Comentarista a buscar"
+                value={busComObra}
+                onChange={(e) => setBusComObra(e.target.value)}
+              >
+                <option value="henry-es">Matthew Henry (ES, sin revisar)</option>
+                <option value="barnes-es">Albert Barnes (ES, sin revisar)</option>
+                <option value="jfb-es">Jamieson, Fausset y Brown (ES, sin revisar)</option>
+                <option value="easton-es">Easton (ES, sin revisar)</option>
+              </select>
+            )}
             {busEstado === "cargando" && <div className="lex-meta">Preparando la búsqueda (solo la primera vez)…</div>}
             {busEstado === "error" && <div className="lex-meta">No se pudo cargar el índice de búsqueda.</div>}
             {busQ.trim().length > 0 && busQ.trim().length < 3 && <div className="lex-meta">Escribe al menos tres letras.</div>}
             {busRes && busRes.length === 0 && busEstado === "" && (
               <div className="lex-meta">Sin resultados. Prueba con menos palabras o con otras que recuerdes.</div>
             )}
-            {busRes && busRes.length > 1 && (
+            {busTab === "pasajes" && busRes && busRes.length > 1 && (
               <div className="bus-ia">
                 {busIa === "hecho" ? (
                   <span className="lex-meta">✦ Ordenado por sentido (IA). Porcentaje = probabilidad de que sea el pasaje buscado.</span>
@@ -1561,7 +1612,7 @@ export default function Lector() {
                 {busIa && busIa !== "hecho" && busIa !== "pensando" && <span className="lex-meta">{busIa}</span>}
               </div>
             )}
-            {busRes && busRes.length > 0 && (
+            {busTab === "pasajes" && busRes && busRes.length > 0 && (
               <ol className="bus-resultados">
                 {busRes.map((r) => (
                   <li key={r.ref}>
@@ -1585,7 +1636,42 @@ export default function Lector() {
                 ))}
               </ol>
             )}
-            <div className="lex-fuente">Busca en RV1909 y VBL a la vez, en tu dispositivo · sin conexión tras la primera vez</div>
+            {busTab === "comentarios" && busComRes && busComRes.length === 0 && busEstado === "" && (
+              <div className="lex-meta">Sin resultados en este comentarista. Prueba con otras palabras o con otro comentarista.</div>
+            )}
+            {busTab === "comentarios" && busComRes && busComRes.length > 0 && (
+              <ol className="bus-resultados">
+                {busComRes.map((r) => (
+                  <li key={`${r.obra}-${r.ref}`}>
+                    <button
+                      className="bus-resultado"
+                      onClick={() => {
+                        if (r.obra === "easton-es") {
+                          setDicPanel(true);
+                          setDicQuery(r.texto.split(". ")[0].slice(0, 40));
+                          return;
+                        }
+                        const com = r.obra === "henry-es" ? "henry" : r.obra === "barnes-es" ? "barnes" : "jfb";
+                        setComFuente(com);
+                        setComentario(true);
+                        if (r.c > 0) abrirTarjeta(r.osis, r.c);
+                      }}
+                    >
+                      <span className="bus-ref">
+                        <b className="bus-obra">{r.obra === "henry-es" ? "Henry" : r.obra === "barnes-es" ? "Barnes" : r.obra === "jfb-es" ? "JFB" : "Easton"}</b>
+                        {r.c > 0 && <> · {nombreLibro(r.osis)} {r.c}{r.v > 0 ? `:${r.v}` : ""}</>}
+                      </span>
+                      <span className="bus-texto">
+                        {tramosResaltados(contexto(r.texto, busQ), busQ).map((tr2, i) =>
+                          tr2.marca ? <mark key={i}>{tr2.t}</mark> : <span key={i}>{tr2.t}</span>
+                        )}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <div className="lex-fuente">{busTab === "comentarios" ? "Busca dentro de los comentarios en tu dispositivo · sin conexión tras la primera vez · todo «sin revisar»" : "Busca en RV1909 y VBL a la vez, en tu dispositivo · sin conexión tras la primera vez"}</div>
           </div>
         </div>
       )}
@@ -1611,6 +1697,7 @@ export default function Lector() {
             </div>
             <div className="bus-pestanas" role="tablist">
               <button role="tab" aria-selected={false} className="bus-pestana" onClick={abrirBusqueda}>Pasajes</button>
+              <button role="tab" aria-selected={false} className="bus-pestana" onClick={abrirComentarios}>Comentarios</button>
               <button role="tab" aria-selected className="bus-pestana activa">Diccionario</button>
             </div>
             {dicEntrada ? (

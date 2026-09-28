@@ -1149,3 +1149,9 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 - **Re-ensamblados** con las unidades recuperadas por los reintentos: barnes-es (58.444, +12), jfb-es (43.220, +7), easton-es, henry-es completo. Reintentos marcados [x] en la hoja.
 - **Pendiente en turno siguiente**: al terminar lexdef → ensamblar → deploy (las ~22.700 definiciones) → marcar la previa [x]; lanzar auditoría Jev (`bin/auditar.mjs`, solo Henry, ~2 USD, horas) SECUENCIAL tras lexdef para no pelear el gateway; y la tarea de código grande: Buscador paso 3 (especificación en la sección ENCARGO de esta bitácora).
 - Gasto: **$45,43 de $75** al iniciar la corrida de lexdef.
+
+### 2026-09-28 · GLM (vigilante) — lexdef al 90% DESPLEGADO: 20.331 definiciones ES en la ficha léxica
+
+- La corrida completa de lexdef YA estaba en el estado (la de la hoja); el ensamblado con el estado completo arrojó **20.331/22.716 (90%)**: 11.680 H + 8.651 G. Deploy `b0a44b17` — producción verificada por hash (el alias tardó en propagar: `-h` 2,87 MB). La ficha del lector muestra ES con caída al EN.
+- **El freno de emergencia hizo su trabajo**: el reintento de las ~2.385 fallidas se detuvo al 36% de rechazo (umbral 25%) — son definiciones largas donde el modelo no conserva las máscaras ⟦n⟧ del hebreo/griego. **No quemar más gasto**: esas requieren ajuste de prompt/validador del motor (revisar `validaUnidad` sobre fichas ⟦n⟧ largas) antes de reintentar. Coste de la corrida fallida: ~$0,22.
+- **Pendiente del turno siguiente**: Buscador paso 3 (especificación en la sección ENCARGO) y luego Fase 1. Gasto: $45,65 de $75.

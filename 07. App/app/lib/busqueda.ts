@@ -109,6 +109,59 @@ export function busca(versos: Verso[], consulta: string, max = 40): Resultado[] 
   return salida.slice(0, max);
 }
 
+/* — Paso 3 del buscador: comentarios y recursos —
+   Índices `public/data/busqueda/com-{obra}.json` con líneas «ref|obra|texto»,
+   generados por `scripts/genera-busqueda.mjs`. Carga perezosa por obra y
+   búsqueda con el mismo motor de pasajes (normalización sin tildes, prefijos,
+   proximidad). Los nombres de obra en el índice llevan sufijo -es: es la obra
+   traducida la que se busca. */
+
+export type VersoCom = Verso & { obra: string };
+
+export async function cargaComentarios(obra: string): Promise<VersoCom[]> {
+  const enCache = cacheIndices.get("com:" + obra);
+  if (enCache) return enCache as VersoCom[];
+  const mf = await (await fetch(`/data/busqueda/com-${obra}.json`)).json() as { trozos: number };
+  const versos: VersoCom[] = [];
+  for (let i = 1; i <= mf.trozos; i++) {
+    const rr = await fetch(`/data/busqueda/com-${obra}-${String(i).padStart(2, "0")}.json`);
+    if (!rr.ok) throw new Error(`trozo de comentarios no disponible: ${obra} ${i}`);
+    const j = (await rr.json()) as { v: string[] };
+    for (const linea of j.v) {
+    const p1 = linea.indexOf("|");
+    const p2 = linea.indexOf("|", p1 + 1);
+    const ref = linea.slice(0, p1);
+    const obraId = linea.slice(p1 + 1, p2);
+    const texto = linea.slice(p2 + 1);
+    const [osis, c, v] = ref.split(".");
+      const norm = normaliza(texto);
+      versos.push({ ref, osis, c: Number(c), v: Number(v), texto, norm, palabras: norm.split(" "), obra: obraId });
+    }
+  }
+  cacheIndices.set("com:" + obra, versos as Verso[]);
+  return versos;
+}
+
+export function buscaComentarios(versos: VersoCom[], consulta: string, max = 30): Array<Resultado & { obra: string }> {
+  const mapa = new Map(versos.map((v) => [v.ref, v.obra]));
+  return busca(versos, consulta, max).map((r) => ({ ...r, obra: mapa.get(r.ref) ?? "" }));
+}
+
+/** Fragmento con contexto alrededor de la primera coincidencia (el índice trae el párrafo entero). */
+export function contexto(texto: string, consulta: string, radio = 110): string {
+  const q = normaliza(consulta).split(" ").filter((t) => t.length >= 3);
+  const norm = normaliza(texto);
+  let pos = -1;
+  for (const t of q) {
+    pos = norm.indexOf(t);
+    if (pos !== -1) break;
+  }
+  if (pos === -1) return texto.slice(0, radio * 2) + (texto.length > radio * 2 ? "…" : "");
+  const desde = Math.max(0, pos - radio);
+  const hasta = Math.min(texto.length, pos + radio);
+  return (desde > 0 ? "… " : "") + texto.slice(desde, hasta).trim() + (hasta < texto.length ? " …" : "");
+}
+
 /** Tramos del texto a resaltar: las palabras (o prefijos) de la consulta. */
 export function tramosResaltados(texto: string, consulta: string): Array<{ t: string; marca: boolean }> {
   const terminos = normaliza(consulta).split(" ").filter((t) => t && !VACIAS.has(t));
