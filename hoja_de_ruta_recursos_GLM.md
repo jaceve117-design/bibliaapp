@@ -139,7 +139,17 @@ parar y dejar el informe para el usuario.
   Añadir como comentario seleccionable. Nota de fuente: «Texto original en castellano del s. XVI».
 - **Costo: 0.**
 
-### [ ] 1.3 Calvino, *Institución de la religión cristiana* — trad. de Cipriano de Valera (1597)
+### [~] 1.3 Calvino, *Institución de la religión cristiana* — trad. de Cipriano de Valera (1597)
+- **BLOQUEADA POR FUENTE (2026-09-28, GLM)**: la única transcripción española en archive.org es la
+  **edición revisada de 1967/1999** (`calvino-institucion-de-la-religion-cristiana-tomo-1/2`, djvu.txt
+  2 MB c/u) — portada: «traducida y publicada por Cipriano de Valera en 1597, reeditada por Luis de
+  Usoz y Río en 1858, NUEVA EDICIÓN REVISADA EN 1967… QUINTA EDICIÓN INALTERADA 1999». La regla de la
+  hoja («sólo sirven traducciones antiguas; las revisiones modernas pueden tener derechos propios»)
+  impide ingerir la revisión de 1967 sin permiso. El escaneo del ORIGINAL 1597
+  (`Institucion-de-la-religion-christiana-juan-calvino`) es solo imágenes/MP4 sin OCR.
+- **Vías abiertas**: (a) pedir permiso al editor de la revisión 1967 (decisión del usuario, como SBU);
+  (b) OCR propio del escaneo 1597/Usoz 1858 (Google Books tiene la Usoz) — costoso pero fiel;
+  (c) buscar transcripción en Biblioteca Virtual Cervantes.
 - Traducción española de dominio público (mismo Valera de la Reina-Valera 1602).
 - **Fuente:** edición de Usoz (1858, «Reformistas Antiguos Españoles») en archive.org / Google Books.
 - **Salida:** nueva sección «Teología» (obra no versicular). Estructura por libro → capítulo →
@@ -148,7 +158,12 @@ parar y dejar el informe para el usuario.
   cita este versículo». Etiqueta: «Tradición: reformada».
 - **Costo: 0.**
 
-### [ ] 1.4 Diccionario de W. W. Rand (*A Dictionary of the Holy Bible*)
+### [~] 1.4 Diccionario de W. W. Rand (*A Dictionary of the Holy Bible*)
+- **EN CURSO (2026-09-28, GLM)**: OCR descargado (`05. Datos/corpus_crudo/rand/rand-djvu.txt`, 2,4 MB,
+  edición "For General Use" American Tract Society). Formato identificado: entradas en Title Case con
+  OCR de espacios dobles y cortes ruidosos («A' BEL,» = ABEL; «A, the first letter»). Falta: el script
+  de limpieza (unir guiones/palabras, detectar titulares con tolerancia a espacios dobles) + la
+  ingesta + la traducción motor (~1,5-2 USD). Turno dedicado.
 - Dominio público («NOT_IN_COPYRIGHT» en Internet Archive).
 - **Fuente:** https://archive.org/details/dictionholybible00randrich (texto completo djvu.txt, 2,3 MB)
   y edición de 1886 https://archive.org/details/dictionaryofholy02rand (preferir la más completa;

@@ -6,7 +6,7 @@
  *
  *   ┌ libros ┬──────── Biblia ────────┬─ der-arriba ─┐
  *   │        │                        ├─ der-abajo ──┤
- *   │        ├──────── abajo ─────────┤              │
+ *   │        ├─ abajo ───┬─ abajo-der ┤              │
  *
  * Entre 680 y 1279 px (tablet, plegable) hay dos zonas: la columna derecha y la
  * de abajo, bajo el texto; también se arrastran con el dedo.
@@ -15,12 +15,13 @@
  */
 import { useEffect, useState } from "react";
 
-export type Zona = "der-arriba" | "der-abajo" | "abajo";
-export const ZONAS: Zona[] = ["der-arriba", "der-abajo", "abajo"];
+export type Zona = "der-arriba" | "der-abajo" | "abajo" | "abajo-der";
+export const ZONAS: Zona[] = ["der-arriba", "der-abajo", "abajo", "abajo-der"];
 export const NOMBRE_ZONA: Record<Zona, string> = {
   "der-arriba": "Derecha arriba",
   "der-abajo": "Derecha abajo",
-  abajo: "Abajo",
+  abajo: "Abajo izquierda",
+  "abajo-der": "Abajo derecha",
 };
 
 /** Dónde nace cada cuadro si el lector no lo ha movido nunca. */
@@ -36,7 +37,7 @@ export const ZONA_POR_DEFECTO: Record<string, Zona> = {
   refs: "abajo",
   cita: "der-abajo",
   citas: "der-abajo",
-  dic: "abajo",
+  dic: "abajo-der",
   notas: "abajo",
 };
 
@@ -59,17 +60,18 @@ export function calcZonas(o: {
   R: number; // ancho de la columna derecha
   B: number; // alto de la zona de abajo
   split: number; // fracción de la columna derecha para der-arriba (0,2–0,8)
+  splitAbajo: number; // fracción del ancho de abajo para la zona izquierda (0,2–0,8)
   ocupadas: Record<Zona, boolean>;
   trabajo: boolean; // ≥ 1280 px: tres zonas; si no, una sola columna
 }): { mr: number; pb: number; zonas: Partial<Record<Zona, Rect>> } {
-  const { W, H, T, navW, R, B, split, ocupadas, trabajo } = o;
+  const { W, H, T, navW, R, B, split, splitAbajo, ocupadas, trabajo } = o;
   const zonas: Partial<Record<Zona, Rect>> = {};
   const hDer = Math.max(0, H - T);
   if (!trabajo) {
     // tablet / plegable: la columna derecha (der-arriba + der-abajo juntas) y la zona de abajo
     const der = ocupadas["der-arriba"] || ocupadas["der-abajo"];
     const Rc = der ? R : 0;
-    const Bc = ocupadas.abajo ? Math.min(B, Math.round(hDer * 0.45)) : 0;
+    const Bc = ocupadas.abajo || ocupadas["abajo-der"] ? Math.min(B, Math.round(hDer * 0.45)) : 0;
     if (der) zonas["der-arriba"] = { left: W - Rc, top: T, width: Rc, height: hDer };
     if (Bc) zonas.abajo = { left: 0, top: H - Bc, width: W - Rc, height: Bc };
     return { mr: Rc, pb: Bc, zonas };
@@ -77,14 +79,22 @@ export function calcZonas(o: {
   const derA = ocupadas["der-arriba"];
   const derB = ocupadas["der-abajo"];
   const Rr = derA || derB ? R : 0;
-  const Bb = ocupadas.abajo ? B : 0;
+  const abI = ocupadas.abajo;
+  const abD = ocupadas["abajo-der"];
+  const Bb = abI || abD ? B : 0;
   if (derA && derB) {
     const hA = Math.round(hDer * split);
     zonas["der-arriba"] = { left: W - Rr, top: T, width: Rr, height: hA };
     zonas["der-abajo"] = { left: W - Rr, top: T + hA, width: Rr, height: hDer - hA };
   } else if (derA) zonas["der-arriba"] = { left: W - Rr, top: T, width: Rr, height: hDer };
   else if (derB) zonas["der-abajo"] = { left: W - Rr, top: T, width: Rr, height: hDer };
-  if (Bb) zonas.abajo = { left: navW, top: H - Bb, width: Math.max(0, W - Rr - navW), height: Bb };
+  const Wab = Math.max(0, W - Rr - navW);
+  if (abI && abD) {
+    const wI = Math.round(Wab * splitAbajo);
+    zonas.abajo = { left: navW, top: H - Bb, width: wI, height: Bb };
+    zonas["abajo-der"] = { left: navW + wI, top: H - Bb, width: Wab - wI, height: Bb };
+  } else if (abI) zonas.abajo = { left: navW, top: H - Bb, width: Wab, height: Bb };
+  else if (abD) zonas["abajo-der"] = { left: navW, top: H - Bb, width: Wab, height: Bb };
   return { mr: Rr, pb: Bb, zonas };
 }
 

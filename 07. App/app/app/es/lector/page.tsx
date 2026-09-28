@@ -184,8 +184,13 @@ export default function Lector() {
   const [activo, setActivo] = useState<Partial<Record<Zona, string>>>({});
   const [splitDer, setSplitDer] = useGuardado("mesa-split", 0.55);
   const [altoAbajo, setAltoAbajo] = useGuardado("mesa-abajo", 300);
-  const [com2, setCom2] = useGuardado<ComFuente | null>("mesa-com2", null);
-  const [com2Data, setCom2Data] = useState<{ fuente: string; osis: string; es: boolean; json: JfbJson } | null>(null);
+  // comentarios EXTRA de la mesa (además del principal): hasta 3 por zona, cada uno con su recurso
+  const [comsExtra, setComsExtra] = useGuardado<{ id: string; fuente: ComFuente }[]>("mesa-coms", []);
+  const [datosCom, setDatosCom] = useState<Record<string, { osis: string; es: boolean; json: JfbJson }>>({});
+  const [splitAbajo, setSplitAbajo] = useGuardado("mesa-split-abajo", 0.5);
+  // color (0 = ninguno, 1-5) y tamaño de letra (-2…+3) de cada cuadro de la mesa
+  const [estiloZona, setEstiloZona] = useGuardado<Partial<Record<Zona, { c: number; t: number }>>>("mesa-estilos", {});
+  const [estiloAbierto, setEstiloAbierto] = useState<Zona | null>(null);
   const [parDisp, setParDisp] = useGuardado<"lado" | "apilado">("paralelo-disp", "lado");
   const [citasRecientes, setCitasRecientes] = useState<NonNullable<ReturnType<typeof parseCita>>[]>([]);
   const [arrastreTab, setArrastreTab] = useState<{ id: string; x: number; y: number; sobre: Zona | null } | null>(null);
@@ -1025,9 +1030,10 @@ export default function Lector() {
       const z = zonaEf(id);
       const r = rectsZona[z];
       const alFrente = activoEn(z) === id;
+      const est = estiloDe(z);
       return {
-        className: `lex-panel lateral${alFrente ? " frente" : " detras"}`,
-        style: r ? { zIndex: 60, ...contenidoDe(r) } : { zIndex: 60, display: "none" },
+        className: `lex-panel lateral${alFrente ? " frente" : " detras"}${est.clase}`,
+        style: r ? { zIndex: 60, ...contenidoDe(r), ...est.vars } : { zIndex: 60, display: "none" },
         onPointerDown: undefined,
       };
     }
@@ -1153,33 +1159,51 @@ export default function Lector() {
   }, []);
 
   const comEnTexto = comentario && !ancho;
-  const com2Activo = trabajo && comentario && com2 !== null && com2 !== comFuente;
+  const extrasVisibles = ancho && comentario ? comsExtra : [];
+  const fuentesExtra = [...new Set(extrasVisibles.map((e) => e.fuente))].filter((f) => f !== "henry").join(",");
   useEffect(() => {
-    if (!com2Activo || !com2 || com2 === "henry") return;
-    const ruta = RUTA_COMENTARIO[com2];
-    if (!ruta) return;
+    if (!fuentesExtra) return;
     let vivo = true;
     const cargar = (url: string) => fetch(url).then((r) => (r.ok ? (r.json() as Promise<JfbJson>) : null)).catch(() => null);
-    (async () => {
-      const es = await cargar(`/data/${ruta}-es/${osis}.json`);
-      const json = es ?? (await cargar(`/data/${ruta}/${osis}.json`));
-      if (vivo && json) setCom2Data({ fuente: com2, osis, es: !!es, json });
-    })();
+    for (const f of fuentesExtra.split(",") as ComFuente[]) {
+      const ruta = RUTA_COMENTARIO[f];
+      if (!ruta) continue;
+      (async () => {
+        const es = await cargar(`/data/${ruta}-es/${osis}.json`);
+        const json = es ?? (await cargar(`/data/${ruta}/${osis}.json`));
+        if (vivo && json) setDatosCom((d) => ({ ...d, [f]: { osis, es: !!es, json } }));
+      })();
+    }
     return () => { vivo = false; };
-  }, [com2Activo, com2, osis]);
-  const com2Sel = COMENTARIOS.find((c) => c.id === com2);
-  const parrafosCom2 =
-    com2Data && com2Data.fuente === com2 && com2Data.osis === osis
-      ? (com2Data.json.c[String(cap)] ?? []).flatMap((a) => a.p.filter(Boolean).map((x) => (a.v > 0 ? `${a.v}. ${x}` : x)))
-      : [];
+  }, [fuentesExtra, osis]);
+  const parrafosDe = (f: ComFuente) => {
+    const d = datosCom[f];
+    if (!d || d.osis !== osis) return [];
+    return (d.json.c[String(cap)] ?? []).flatMap((a) => a.p.filter(Boolean).map((x) => (a.v > 0 ? `${a.v}. ${x}` : x)));
+  };
+  const esCom = (id: string) => id === "com" || comsExtra.some((e) => e.id === id);
+  const fuenteDe = (id: string): ComFuente | undefined => (id === "com" ? comFuente : comsExtra.find((e) => e.id === id)?.fuente);
+  /** Clase y variables de estilo del cuadro según su zona (color de fondo y escala de letra). */
+  const ZOOM = { "-2": 0.8, "-1": 0.9, "0": 1, "1": 1.12, "2": 1.25, "3": 1.4 } as Record<string, number>;
+  const estiloDe = (z: Zona) => {
+    const e = estiloZona[z] ?? { c: 0, t: 0 };
+    return { clase: e.c ? ` tinte-${e.c}` : "", vars: { "--zoom-panel": ZOOM[String(e.t)] ?? 1 } as React.CSSProperties, e };
+  };
+  const fijaEstilo = (z: Zona, cambio: Partial<{ c: number; t: number }>) =>
+    setEstiloZona((prev) => ({ ...prev, [z]: { c: 0, t: 0, ...prev[z], ...cambio } }));
+
+  const etiquetaDe = (id: string) => {
+    const f = fuenteDe(id);
+    return f ? COMENTARIOS.find((c) => c.id === f)?.etiqueta ?? f : ETIQUETA_PANEL[id] ?? id;
+  };
 
   const zonaEf = (id: string): Zona => {
     const z = zonaDe[id] ?? ZONA_POR_DEFECTO[id] ?? "der-arriba";
     // entre 680 y 1279 px hay dos zonas: la columna derecha y la de abajo
-    return trabajo ? z : z === "abajo" ? "abajo" : "der-arriba";
+    return trabajo ? z : z === "abajo" || z === "abajo-der" ? "abajo" : "der-arriba";
   };
-  const abiertas = [...(comentario ? ["com"] : []), ...(com2Activo ? ["com2"] : []), ...pila];
-  const porZona: Record<Zona, string[]> = { "der-arriba": [], "der-abajo": [], abajo: [] };
+  const abiertas = [...(comentario ? ["com"] : []), ...extrasVisibles.map((e) => e.id), ...pila];
+  const porZona: Record<Zona, string[]> = { "der-arriba": [], "der-abajo": [], abajo: [], "abajo-der": [] };
   for (const id of abiertas) porZona[zonaEf(id)].push(id);
   const activoEn = (z: Zona) => {
     const ids = porZona[z];
@@ -1191,11 +1215,17 @@ export default function Lector() {
   const mesa = calcZonas({
     ...baseMesa,
     split: splitDer,
-    ocupadas: { "der-arriba": porZona["der-arriba"].length > 0, "der-abajo": porZona["der-abajo"].length > 0, abajo: porZona.abajo.length > 0 },
+    splitAbajo,
+    ocupadas: {
+      "der-arriba": porZona["der-arriba"].length > 0,
+      "der-abajo": porZona["der-abajo"].length > 0,
+      abajo: porZona.abajo.length > 0,
+      "abajo-der": porZona["abajo-der"].length > 0,
+    },
   });
   const rectsZona = mesa.zonas;
   // dónde se puede soltar un cuadro: las tres zonas, estén ocupadas o no
-  const destinos = ancho ? calcZonas({ ...baseMesa, split: 0.5, ocupadas: { "der-arriba": true, "der-abajo": true, abajo: true } }).zonas : {};
+  const destinos = ancho ? calcZonas({ ...baseMesa, split: 0.5, splitAbajo: 0.5, ocupadas: { "der-arriba": true, "der-abajo": true, abajo: true, "abajo-der": true } }).zonas : {};
   const estudioVisible = ancho && abiertas.length > 0;
   // cuántas Biblias caben lado a lado en el hueco que deja la mesa (mín. 2 extra, máx. 4)
   const maxPar = Math.max(2, Math.min(4, Math.floor((ventW - navW - (ancho ? mesa.mr : 0) - 64) / 300) - 1));
@@ -1287,12 +1317,44 @@ export default function Lector() {
     document.documentElement.classList.toggle("mesa-arrastrando", arrastrando || !!arrastreTab);
   }, [arrastrando, arrastreTab]);
 
+  /** «+» de cada zona: un comentario más (máx. 3 por zona) o una herramienta, directo a esa zona. */
+  const anadirEn = (z: Zona, v: string) => {
+    if (!v) return;
+    if (v.startsWith("p:")) {
+      const id = v.slice(2);
+      setZonaDe((prev) => ({ ...prev, [id]: z }));
+      setActivo((a) => ({ ...a, [z]: id }));
+      if (id === "notas") setPanelNotas(true);
+      else if (id === "dic") abrirDic();
+      else if (id === "busqueda") abrirBusqueda();
+      return;
+    }
+    const f = v as ComFuente;
+    if (!comentario) {
+      setComFuente(f);
+      setComentario(true);
+      setZonaDe((prev) => ({ ...prev, com: z }));
+      return;
+    }
+    if (porZona[z].filter(esCom).length >= 3) return;
+    const id = `c${Date.now().toString(36)}`;
+    setComsExtra((prev) => [...prev, { id, fuente: f }]);
+    setZonaDe((prev) => ({ ...prev, [id]: z }));
+    setActivo((a) => ({ ...a, [z]: id }));
+  };
+  const cambiarFuente = (id: string, f: ComFuente) => {
+    if (id === "com") setComFuente(f);
+    else setComsExtra((prev) => prev.map((e) => (e.id === id ? { ...e, fuente: f } : e)));
+  };
+  const quitarExtra = (id: string) => setComsExtra((prev) => prev.filter((e) => e.id !== id));
+
   /** Bordes entre zonas: v = ancho de la derecha · h = reparto arriba/abajo · b = alto de abajo. */
-  const arrastrarBorde = (tipo: "v" | "h" | "b") => (e: React.PointerEvent) => {
+  const arrastrarBorde = (tipo: "v" | "h" | "b" | "a") => (e: React.PointerEvent) => {
     e.preventDefault();
     setArrastrando(true);
     const mover = (ev: PointerEvent) => {
       if (tipo === "v") setAnchoEstudio(ventW - ev.clientX);
+      else if (tipo === "a") setSplitAbajo(Math.min(0.8, Math.max(0.2, (ev.clientX - navW) / Math.max(1, ventW - mesa.mr - navW))));
       else if (tipo === "h") setSplitDer(Math.min(0.8, Math.max(0.2, (ev.clientY - altoCab) / Math.max(1, ventH - altoCab))));
       else setAltoAbajo(Math.round(Math.min((ventH - altoCab) * 0.7, Math.max(140, ventH - ev.clientY))));
     };
@@ -1804,7 +1866,7 @@ export default function Lector() {
 
       <main
         className={[estudioVisible && "con-estudio", arrastrando && "arrastrando", navVisible && "con-nav"].filter(Boolean).join(" ") || undefined}
-        style={{ "--estudio-w": `${anchoEstudio}px`, ...(ancho ? { marginRight: mesa.mr, paddingBottom: mesa.pb } : {}) } as React.CSSProperties}
+        style={{ "--estudio-w": `${anchoEstudio}px`, ...(ancho ? { marginRight: mesa.mr, paddingBottom: mesa.pb } : {}), ...(anchoNav ? { marginLeft: navW } : {}) } as React.CSSProperties}
       >
         <div
           className={`lector-columna${pila.length && !ancho ? ` con-panel pila-${Math.min(pila.length, 2)}` : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
@@ -2164,64 +2226,144 @@ export default function Lector() {
             if (!r) return null;
             const act = activoEn(z);
             return (
-              <div key={z} className={`zona zona-${z}`} style={r} data-zona={z}>
+              <div key={z} className={`zona zona-${z}${estiloDe(z).clase}`} style={r} data-zona={z}>
                 <div className="estudio-pestanas" role="tablist" aria-label={NOMBRE_ZONA[z]}>
-                  {porZona[z].map((id) => (
-                    <button
-                      key={id}
-                      role="tab"
-                      aria-selected={act === id}
-                      className={`estudio-pestana${act === id ? " activa" : ""}${arrastreTab?.id === id ? " arrastrada" : ""}`}
-                      onPointerDown={(e) => iniciarTab(id, e)}
-                      onClick={(e) => {
-                        if (e.detail === 0) traerAlFrente(id); // teclado
-                      }}
-                      title="Toca para ver · arrastra para mover el cuadro"
+                  {porZona[z].map((id) => {
+                    const f = fuenteDe(id);
+                    const clase = `estudio-pestana${act === id ? " activa" : ""}${arrastreTab?.id === id ? " arrastrada" : ""}`;
+                    if (f)
+                      return (
+                        <div
+                          key={id}
+                          role="tab"
+                          tabIndex={0}
+                          aria-selected={act === id}
+                          className={`${clase} pestana-rec`}
+                          onPointerDown={(e) => {
+                            if ((e.target as HTMLElement).closest("select, .pestana-x")) return traerAlFrente(id);
+                            iniciarTab(id, e);
+                          }}
+                          onKeyDown={(e) => e.key === "Enter" && traerAlFrente(id)}
+                          title="Arrastra para mover · elige el recurso en el desplegable"
+                        >
+                          {ancho && <span className="pestana-asidero" aria-hidden="true">⠿</span>}
+                          <select
+                            className="pestana-sel"
+                            aria-label="Recurso de este cuadro"
+                            value={f}
+                            onChange={(e) => cambiarFuente(id, e.target.value as ComFuente)}
+                          >
+                            {COMENTARIOS.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.etiqueta} · {c.anio}
+                              </option>
+                            ))}
+                          </select>
+                          {id !== "com" && (
+                            <button className="pestana-x" onClick={() => quitarExtra(id)} aria-label="Cerrar este comentario">
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      );
+                    return (
+                      <button
+                        key={id}
+                        role="tab"
+                        aria-selected={act === id}
+                        className={clase}
+                        onPointerDown={(e) => iniciarTab(id, e)}
+                        onClick={(e) => {
+                          if (e.detail === 0) traerAlFrente(id); // teclado
+                        }}
+                        title="Toca para ver · arrastra para mover el cuadro"
+                      >
+                        {ancho && <span className="pestana-asidero" aria-hidden="true">⠿</span>}
+                        {etiquetaDe(id)}
+                      </button>
+                    );
+                  })}
+                  {ancho && (
+                    <select
+                      className="pestana-mas"
+                      aria-label="Añadir un recurso a este cuadro"
+                      title="Añadir un recurso a este cuadro"
+                      value=""
+                      onChange={(e) => anadirEn(z, e.target.value)}
                     >
-                      {ancho && <span className="pestana-asidero" aria-hidden="true">⠿</span>}
-                      {id === "com" ? comSel.etiqueta : id === "com2" ? com2Sel?.etiqueta ?? "Comentario 2" : ETIQUETA_PANEL[id] ?? id}
+                      <option value="">＋</option>
+                      <optgroup label={porZona[z].filter(esCom).length >= 3 ? "Comentarios (máx. 3 por cuadro)" : "Comentarios"}>
+                        {COMENTARIOS.map((c) => (
+                          <option key={c.id} value={c.id} disabled={comentario && porZona[z].filter(esCom).length >= 3}>
+                            {c.etiqueta}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Herramientas">
+                        <option value="p:notas">Mis notas</option>
+                        <option value="p:dic">Diccionario</option>
+                        <option value="p:busqueda">Buscar</option>
+                      </optgroup>
+                    </select>
+                  )}
+                  {ancho && (
+                    <button
+                      className={`pestana-estilo${estiloAbierto === z ? " activa" : ""}`}
+                      onClick={() => setEstiloAbierto(estiloAbierto === z ? null : z)}
+                      aria-label="Color y tamaño de letra de este cuadro"
+                      aria-expanded={estiloAbierto === z}
+                      title="Color y tamaño de letra de este cuadro"
+                    >
+                      Aa
                     </button>
-                  ))}
+                  )}
                 </div>
+                {estiloAbierto === z && (
+                  <div className="estilo-popo" role="dialog" aria-label="Estilo del cuadro">
+                    <div className="estilo-fila" role="group" aria-label="Color">
+                      {[0, 1, 2, 3, 4, 5].map((c) => (
+                        <button
+                          key={c}
+                          className={`estilo-color tinte-muestra-${c}${estiloDe(z).e.c === c ? " activa" : ""}`}
+                          onClick={() => fijaEstilo(z, { c })}
+                          aria-label={c ? `Color ${c}` : "Sin color"}
+                          aria-pressed={estiloDe(z).e.c === c}
+                        />
+                      ))}
+                    </div>
+                    <div className="estilo-fila" role="group" aria-label="Tamaño de letra">
+                      {[-2, -1, 0, 1, 2, 3].map((t) => (
+                        <button
+                          key={t}
+                          className={`estilo-tam${estiloDe(z).e.t === t ? " activa" : ""}`}
+                          onClick={() => fijaEstilo(z, { t })}
+                          aria-pressed={estiloDe(z).e.t === t}
+                          style={{ fontSize: 11 + (t + 2) * 1.6 }}
+                        >
+                          {t > 0 ? `+${t}` : t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
           {comentario && rectsZona[zonaEf("com")] && (
             <section
               ref={estudioRef}
-              className={`tarjeta-com${comAlFrente ? " visible" : ""}`}
-              style={contenidoDe(rectsZona[zonaEf("com")]!)}
+              className={`tarjeta-com${comAlFrente ? " visible" : ""}${estiloDe(zonaEf("com")).clase}`}
+              style={{ ...contenidoDe(rectsZona[zonaEf("com")]!), ...estiloDe(zonaEf("com")).vars }}
               aria-label={comSel.etiqueta}
               onWheel={() => (estudioTocado.current = Date.now())}
               onPointerDown={() => (estudioTocado.current = Date.now())}
             >
-              <div className="estudio-com visible">
-              <div className="estudio-autor">
-                <select
-                  className="sel sel-mini"
-                  aria-label="Comentario de este cuadro"
-                  value={comFuente}
-                  onChange={(e) => setComFuente(e.target.value as ComFuente)}
-                >
-                  {COMENTARIOS.filter((c) => c.id === comFuente || c.id !== com2).map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.etiqueta} · {c.anio}
-                    </option>
-                  ))}
-                </select>
-                {trabajo && com2 === null && (
-                  <button
-                    className="com-anadir"
-                    onClick={() => setCom2((COMENTARIOS.find((c) => c.id !== comFuente)?.id ?? "jfb") as ComFuente)}
-                    title="Abrir un segundo comentario en otro cuadro"
-                  >
-                    + Comentario
-                  </button>
-                )}
-                {recursoTraducido && (comFuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : usarEsCom) && (
+              <div className="estudio-com visible cambio-suave" key={`${comFuente}-${osis}-${cap}`}>
+              {recursoTraducido && (comFuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : usarEsCom) && (
+                <div className="estudio-autor">
                   <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
-                )}
-              </div>
+                </div>
+              )}
               {comFuente === "henry" && rCom && (
                 <div className="com-resumen">
                   <div className="com-titulo">{tr.resumenCapitulo}</div>
@@ -2251,61 +2393,52 @@ export default function Lector() {
             </div>
             </section>
           )}
-          {com2Activo && com2 && rectsZona[zonaEf("com2")] && (
-            <section
-              className={`tarjeta-com${activoEn(zonaEf("com2")) === "com2" ? " visible" : ""}`}
-              style={contenidoDe(rectsZona[zonaEf("com2")]!)}
-              aria-label={com2Sel?.etiqueta}
-            >
-              <div className="estudio-com visible">
-                <div className="estudio-autor">
-                  <select
-                    className="sel sel-mini"
-                    aria-label="Segundo comentario"
-                    value={com2}
-                    onChange={(e) => setCom2(e.target.value as ComFuente)}
-                  >
-                    {COMENTARIOS.filter((c) => c.id !== comFuente).map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.etiqueta} · {c.anio}
-                      </option>
-                    ))}
-                  </select>
-                  {(com2 === "henry" ? idiomaEfectivo === "es" && esCapDisp : com2Data?.es) && (
-                    <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
+          {extrasVisibles.map((e) => {
+            const r = rectsZona[zonaEf(e.id)];
+            if (!r) return null;
+            const par = e.fuente === "henry" ? [] : parrafosDe(e.fuente);
+            const sel = COMENTARIOS.find((c) => c.id === e.fuente);
+            return (
+              <section
+                key={e.id}
+                className={`tarjeta-com${activoEn(zonaEf(e.id)) === e.id ? " visible" : ""}${estiloDe(zonaEf(e.id)).clase}`}
+                style={{ ...contenidoDe(r), ...estiloDe(zonaEf(e.id)).vars }}
+                aria-label={sel?.etiqueta}
+              >
+                <div className="estudio-com visible cambio-suave" key={`${e.fuente}-${osis}-${cap}`}>
+                  {(e.fuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : datosCom[e.fuente]?.es) && (
+                    <div className="estudio-autor">
+                      <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
+                    </div>
                   )}
-                  <button className="icono-btn cerrar com2-cerrar" onClick={() => setCom2(null)} aria-label="Cerrar el segundo comentario">
-                    ✕
-                  </button>
+                  {e.fuente === "henry" ? (
+                    <>
+                      {rCom && (
+                        <div className="com-resumen">
+                          <div className="com-titulo">{tr.resumenCapitulo}</div>
+                          {renderMarcado(rCom)}
+                        </div>
+                      )}
+                      {seccionesCom.map((sec, i) => (
+                        <div key={`${e.id}-${osis}.${cap}-${i}`} className="estudio-seccion">
+                          <ComentarioBloque seccion={sec} tr={tr} renderFn={renderMarcado} />
+                        </div>
+                      ))}
+                    </>
+                  ) : par.length ? (
+                    <ComentarioBloque
+                      autor={`${sel?.etiqueta} · ${sel?.anio}`}
+                      seccion={{ t: e.fuente === "easton" ? tr.eastonTemasTitulo : `${tr.capitulo} ${cap}`, v: null, p: par, sinTraducir: false }}
+                      tr={tr}
+                      renderFn={e.fuente === "easton" ? renderEaston : renderMarcado}
+                    />
+                  ) : (
+                    <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
+                  )}
                 </div>
-                {com2 === "henry" ? (
-                  <>
-                    {rCom && (
-                      <div className="com-resumen">
-                        <div className="com-titulo">{tr.resumenCapitulo}</div>
-                        {renderMarcado(rCom)}
-                      </div>
-                    )}
-                    {seccionesCom.map((sec, i) => (
-                      <div key={`c2-${osis}.${cap}-${i}`} className="estudio-seccion">
-                        <ComentarioBloque seccion={sec} tr={tr} renderFn={renderMarcado} />
-                      </div>
-                    ))}
-                  </>
-                ) : parrafosCom2.length ? (
-                  <ComentarioBloque
-                    key={`${com2}-${osis}-${cap}`}
-                    autor={`${com2Sel?.etiqueta} · ${com2Sel?.anio}`}
-                    seccion={{ t: `${tr.capitulo} ${cap}`, v: null, p: parrafosCom2, sinTraducir: false }}
-                    tr={tr}
-                    renderFn={renderMarcado}
-                  />
-                ) : (
-                  <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
-                )}
-              </div>
-            </section>
-          )}
+              </section>
+            );
+          })}
           {mesa.mr > 0 && (
             <div
               className={`asa asa-v${arrastrando ? " activa" : ""}`}
@@ -2327,10 +2460,21 @@ export default function Lector() {
               onDoubleClick={() => setSplitDer(0.55)}
             />
           )}
-          {rectsZona.abajo && (
+          {rectsZona.abajo && rectsZona["abajo-der"] && (
+            <div
+              className="asa asa-v"
+              style={{ left: rectsZona["abajo-der"].left - 5, top: rectsZona["abajo-der"].top, height: rectsZona["abajo-der"].height }}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Repartir la zona de abajo"
+              onPointerDown={arrastrarBorde("a")}
+              onDoubleClick={() => setSplitAbajo(0.5)}
+            />
+          )}
+          {(rectsZona.abajo || rectsZona["abajo-der"]) && (
             <div
               className="asa asa-h"
-              style={{ left: rectsZona.abajo.left, width: rectsZona.abajo.width, top: rectsZona.abajo.top - 5 }}
+              style={{ left: navW, width: ventW - mesa.mr - navW, top: ventH - mesa.pb - 5 }}
               role="separator"
               aria-label="Ajustar el alto de la zona de abajo"
               onPointerDown={arrastrarBorde("b")}
@@ -2346,12 +2490,12 @@ export default function Lector() {
             const r = destinos[z];
             return r ? (
               <div key={z} className={`destino${arrastreTab.sobre === z ? " sobre" : ""}`} style={r}>
-                <span>{!trabajo && z === "der-arriba" ? "Derecha" : NOMBRE_ZONA[z]}</span>
+                <span>{!trabajo ? (z === "der-arriba" ? "Derecha" : "Abajo") : NOMBRE_ZONA[z]}</span>
               </div>
             ) : null;
           })}
           <div className="fantasma" style={{ left: arrastreTab.x + 14, top: arrastreTab.y + 10 }}>
-            {arrastreTab.id === "com" ? comSel.etiqueta : arrastreTab.id === "com2" ? com2Sel?.etiqueta : ETIQUETA_PANEL[arrastreTab.id] ?? arrastreTab.id}
+            {etiquetaDe(arrastreTab.id)}
           </div>
         </>
       )}

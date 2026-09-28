@@ -1251,3 +1251,10 @@ Pedido del usuario (pantalla de 32″): aprovechar todo el espacio con cuadros m
 3. **Verificado en navegador**: tap en «Dios» (Gen 1) abre la ficha del diccionario con la entrada y la insignia «sin revisar». Deploy `71fbd82b` (el toggle recarga el índice _indice.json al activarse — fix del ciclo de carga).
 4. **Lección de depuración**: los tests con element.click() en una página con muchos clicks acumulados daban resultados falsos negativos (estado sucio del IAB) — la recarga limpia del despliegue correcto funcionó a la primera. Verificar SIEMPRE la URL del despliegue antes de culpar al código.
 - Gasto: $48,61 (P.2 = $0).
+
+### 2026-09-29 · GLM (vigilante) — Fase 1.3 BLOQUEADA por licencia · Fase 1.4 Rand descargada (limpieza pendiente) · vigilante reactivado · división de roles Claude/GLM
+
+1. **VIGILANTE REACTIVADO** a petición del usuario (`automation-5222f406`, cron `41 * * * *`, sin límite de fase hasta ⛔Puerta A). **División de roles acordada por el usuario**: Claude → interfaz y videos/publicidad; GLM → traducción e ingesta. Respetar los commits del otro.
+2. **FASE 1.3 (Calvino, Institución) BLOQUEADA POR FUENTE**: la única transcripción ES en archive.org es la **edición revisada 1967/1999** — la regla de la hoja («sólo traducciones antiguas; las revisiones modernas pueden tener derechos») impide ingerirla sin permiso. El escaneo del original 1597 es solo imágenes. Vías abiertas documentadas en la hoja (permiso del editor / OCR propio del 1597 / Cervantes). **Decisión para el usuario si quiere desbloquearla por la vía del permiso.**
+3. **FASE 1.4 (Rand) EN CURSO**: OCR descargado (2,4 MB, American Tract Society "For General Use"). Formato: entradas Title Case, OCR con espacios dobles y titulares ruidosos («A' BEL,»). Falta el turno de limpieza + ingesta + traducción motor (~$2). Marcada [~].
+4. **Gasto: $48,61 de $75.** Comprometido el registro de 1.1/1.2/P.1/P.2 en la hoja y la BP.
