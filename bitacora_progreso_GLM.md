@@ -1201,3 +1201,10 @@ Arriba de `hoja_de_ruta_recursos_GLM.md` hay dos tareas **⚑ PRIORIDAD** que va
 - **Detalle bueno**: las citas latinas/griegas del propio Valdés («Paulis servus lesu Christi», «Commendo autem vobis») quedan conservadas en el texto — valen como en 1.3.
 - Deploy `f8142135`: valdes/ROM.json 200 (504 KB) — el comentario de Valdés cubre ahora **Romanos y 1 Corintios** en el desplegable.
 - Gasto: $48,61 (1.2 = $0: obra en castellano original).
+
+### 2026-09-28 · GLM (vigilante) — P.1 PASO 1: auditoría de citas completada (medición en las 9 obras)
+
+- `scripts/audita-citas.mjs`: recorre henry/henry-es/jfb/jfb-es/barnes/barnes-es/easton/easton-es/valdes; marca lo que RE_CITA captura y clasifica los candidatos fuera por forma. Informe: `05. Datos/auditoria-citas.md` (1.102 formas distintas).
+- **Top confirmado con pruebas directas de RE_CITA** (no solo candidatos): (1) **elípticas heredadas** «(Ex 6:20) … (2:1, 4; 7:7)» ×78.364 — la más grande por lejos; (2) abreviaturas ausentes del MAPA: «Lu» ×4.401, «Ac» ×3.781, «Ge» ×3.314, «Re» ×2.879, «Nu» ×1.869, «Chr» ×1.575; (3) **número+espacio+abreviatura** «1 Co 9:1» / «2 Co 10:10» / «1 Ts 2:5» / «2 Sam 7:12» — fallan TODAS (el prefijo `[1-3]\s?` del regex no alcanza: «Co» no es clave del MAPA sin número) y es la forma que usa nuestro propio motor de traducción (~4.000+ en henry-es); (4) nombres completos ES: «Isaías» ×3.212, «Salmo» ×3.054.
+- **Paso 2 (siguiente turno)**: añadir claves al MAPA + claves espaciadas + lógica de herencia de libro (portar `refsDe` del generador de Easton al lector) + rangos que cruzan capítulo; luego paso 4 (casos-citas.json + ≥98%).
+- Gasto: $48,61 (P.1 paso 1 = $0).

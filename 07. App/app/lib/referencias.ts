@@ -33,6 +33,29 @@ const MAPA: Record<string, string> = {
   '1Jn': '1JN', '1John': '1JN', '1Jo': '1JN', '2Jn': '2JN', '2Jo': '2JN', '2John': '2JN',
   '3Jn': '3JN', '3Jo': '3JN', '3John': '3JN', Jud: 'JUD', Jude: 'JUD', Jd: 'JUD',
   Rev: 'REV', Ap: 'REV', Apoc: 'REV',
+  // — P.1 (auditoria-citas.md): abreviaturas y formas que RE_CITA no capturaba —
+  // numeradas con espacio («1 Co 9:1», «2 Sam 7:12», «1 Ts 2:5»…): el motor de
+  // traducción y Usoz las escriben así. Las ambiguas van también a AMBIGUOS.
+  '1 Co': '1CO', '2 Co': '2CO', '1 Cor': '1CO', '2 Cor': '2CO',
+  '1 Sam': '1SA', '2 Sam': '2SA', '1 Chr': '1CH', '2 Chr': '2CH', '1 Chron': '1CH', '2 Chron': '2CH',
+  '1 Ts': '1TH', '2 Ts': '2TH', '1 Tes': '1TH', '2 Tes': '2TH',
+  '1 Reyes': '1KI', '2 Reyes': '2KI', '1 Ped': '1PE', '2 Ped': '2PE',
+  '1 Pe': '1PE', '2 Pe': '2PE', '1 Cr': '1CH', '2 Cr': '2CH', '1 S': '1SA', '2 S': '2SA',
+  He: 'HEB', Da: 'DAN', Tt: 'TIT', Ga: 'GAL', Mi: 'MIC', Nú: 'NUM',
+  Ne: 'NEH', Ho: 'HOS', Ec: 'ECC', Ti: '1TI', Mk: 'MRK', So: 'ZEP', Núm: 'NUM',
+  '1 Corintios': '1CO', '2 Corintios': '2CO', '1 Cor.': '1CO', '2 Cor.': '2CO',
+  '1 Tesalonicenses': '1TH', '2 Tesalonicenses': '2TH',
+  // abreviaturas sueltas ausentes
+  Lu: 'LUK', Ac: 'ACT', Ge: 'GEN', Re: 'REV', Nu: 'NUM', Chr: '1CH',
+  // nombres completos en español
+  Isaías: 'ISA', Salmo: 'PSA', Salmos: 'PSA', Génesis: 'GEN', Éxodo: 'EXO', Deuteronomio: 'DEU',
+  Levítico: 'LEV', Números: 'NUM', Josué: 'JOS', Jueces: 'JDG', Esdras: 'EZR', Nehemías: 'NEH',
+  Ester: 'EST', Proverbios: 'PRO', Eclesiastés: 'ECC', Cantares: 'SNG', Jeremías: 'JER',
+  Lamentaciones: 'LAM', Ezequiel: 'EZK', Oseas: 'HOS', Amós: 'AMO', Jonás: 'JON', Miqueas: 'MIC',
+  Nahúm: 'NAM', Habacuc: 'HAB', Sofonías: 'ZEP', Hageo: 'HAG', Zacarías: 'ZEC', Malaquías: 'MAL',
+  Mateo: 'MAT', Marcos: 'MRK', Lucas: 'LUK', Hechos: 'ACT', Romanos: 'ROM', Gálatas: 'GAL',
+  Efesios: 'EPH', Filipenses: 'PHP', Colosenses: 'COL', Tito: 'TIT', Filemón: 'PHM',
+  Hebreos: 'HEB', Santiago: 'JAS', Judas: 'JUD', Apocalipsis: 'REV',
   // — Nombres ingleses COMPLETOS —
   // Easton cita así («Genesis 25:26», «1 Chronicles 12»), y sin estas claves
   // ninguna de sus 504 formas de referencia era enlazable.
@@ -64,8 +87,8 @@ const CLAVES = Object.keys(MAPA).sort((a, b) => b.length - a.length).map((k) => 
 // cita y se perdía la verdadera (medido en Easton: «Jn 7:35; 1P 1:1»).
 /** Cita: "Jn 1:1-5", "1Co 1:6,2:1", "Mal 3:1", "Isa 40:12,28"… (con o sin punto, con o sin espacio). */
 export const RE_CITA = new RegExp(
-  '\\b([1-3]\\s?)?(' + CLAVES.join('|') + ')\\.?\\s?(\\d{1,3})(?::(\\d{1,3}))?((?:[,;]\\s?(?![1-3]\\s?[A-ZÁÉÍÓÚ])\\d{1,3}(?::\\d{1,3})?)*)(?:[-–—](\\d{1,3}))?',
-  'g'
+  '(?<![\p{L}\p{N}_])([1-3]\\s?)?(' + CLAVES.join('|') + ')\\.?\\s?(\\d{1,3})(?::(\\d{1,3}))?((?:[,;]\\s?(?![1-3]\\s?[A-ZÁÉÍÓÚ])\\d{1,3}(?::\\d{1,3})?)*)(?:[-–—](\\d{1,3}(?::\\d{1,3})?))?',
+  'gu'
 );
 
 export type Cita = { etiqueta: string; refs: RefOsis[] };
@@ -77,6 +100,7 @@ export type Cita = { etiqueta: string; refs: RefOsis[] };
 const AMBIGUOS = new Set([
   'Samuel', 'Kings', 'Chronicles', 'Corinthians', 'Thessalonians',
   'Timothy', 'Peter', 'John',
+  'Sam', 'Chr', 'Chron', 'Cor', 'Thess', 'Ts', 'Tes', 'Cor', 'Reyes', 'Ped', 'Tesalonicenses',
 ]);
 
 /** Convierte una cita detectada (cadena completa) en coordenadas OSIS. */
@@ -105,11 +129,22 @@ export function parseCita(match: RegExpMatchArray): Cita | null {
       }
     }
   }
-  // rango con guion en el último verso: "1:1-5"
+  // rango con guion en el último verso: "1:1-5" — y el que cruza capítulo: "5:18-6:2"
   if (rangoHasta && refs.length === 1) {
-    const hasta = Number(rangoHasta);
-    if (Number.isFinite(hasta) && hasta > v && hasta - v <= 12) {
-      for (let vv = v + 1; vv <= hasta; vv++) empujar(vv);
+    const cruzado = rangoHasta.split(':');
+    if (cruzado.length === 2) {
+      // «5:18-6:2»: se emite el ancla (5:18) y los versos explícitos del capítulo destino
+      // (6:1…6:2) — el largo exacto del capítulo inicial lo sabe el lector, no parseCita
+      const hC = Number(cruzado[0]);
+      const hV = Number(cruzado[1]);
+      if (hC > c && hC - c <= 3 && hV >= 1) {
+        for (let vv = 1; vv <= hV && refs.length < 40; vv++) refs.push({ osis, c: hC, v: vv });
+      }
+    } else {
+      const hasta = Number(rangoHasta);
+      if (Number.isFinite(hasta) && hasta > v && hasta - v <= 12) {
+        for (let vv = v + 1; vv <= hasta; vv++) empujar(vv);
+      }
     }
   }
   return { etiqueta, refs };
@@ -126,5 +161,43 @@ export function segmentarPorCitas(texto: string): Array<{ tipo: 'texto' | 'cita'
     ultimo = idx + m[0].length;
   }
   if (ultimo < texto.length) salida.push({ tipo: 'texto', contenido: texto.slice(ultimo) });
+
+  // — P.1: herencia elíptica — «(Ex 6:20) … (2:1, 4; 7:7)»: un grupo desnudo «c:v, v; c:v»
+  // que sigue de cerca a una cita capturada HEREDA su libro. Sólo si el segmento de texto
+  // entre ambas es casi puro separador (paréntesis, comas, espacios).
+  const RE_GRUPO_DESNUDO =
+    /^[\s;,()]*(\d{1,3}):(\d{1,3})((?:\s?[,;]\s?\d{1,3}(?::\d{1,3})?)*)[\s;,)]*$/;
+  for (let i = 1; i < salida.length; i++) {
+    const seg = salida[i];
+    if (seg.tipo !== 'texto' || seg.contenido.length > 60) continue;
+    const previa = salida[i - 1];
+    if (previa.tipo !== 'cita' || !previa.cita || !previa.cita.refs.length) continue;
+    const m = seg.contenido.match(RE_GRUPO_DESNUDO);
+    if (!m) continue;
+    const base = previa.cita.refs[previa.cita.refs.length - 1];
+    const refs: RefOsis[] = [];
+    const partes = (m[1] + ":" + m[2] + m[3]).split(/[,;]/).map((x) => x.trim()).filter(Boolean);
+    let capCorriente = base.c; // los versos desnudos del grupo heredan el capítulo EN CURSO del grupo
+    for (const parte of partes) {
+      const [cStr, vStr] = parte.split(':');
+      const c2 = vStr !== undefined ? Number(cStr) : capCorriente;
+      const v2 = vStr !== undefined ? Number(vStr) : Number(cStr);
+      if (Number.isFinite(c2) && Number.isFinite(v2) && c2 >= 1 && v2 >= 1) {
+        refs.push({ osis: base.osis, c: c2, v: v2 });
+        capCorriente = c2;
+      }
+    }
+    if (!refs.length) continue;
+    // trocear el segmento: [texto inicial][cita heredada][texto final]
+    const idx = seg.contenido.search(/\d/);
+    const pre = seg.contenido.slice(0, idx).replace(/[(\s]+$/, '');
+    const post = seg.contenido.slice(seg.contenido.search(/[),;.]\s*$|\)$/)).length ? '' : '';
+    salida.splice(i, 1,
+      { tipo: 'texto', contenido: pre },
+      { tipo: 'cita', contenido: m[0].trim(), cita: { etiqueta: m[0].trim(), refs } },
+      { tipo: 'texto', contenido: '' }
+    );
+    i += 1;
+  }
   return salida;
 }

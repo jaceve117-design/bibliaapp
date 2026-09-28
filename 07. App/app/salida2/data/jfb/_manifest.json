@@ -1,0 +1,540 @@
+{
+  "obra": "A Commentary, Critical and Explanatory, on the Whole Bible — Jamieson, Fausset y Brown (1871)",
+  "osis_obra": "JFB",
+  "licencia": "Dominio público (1871) · ThML: CCEL",
+  "fuente": "https://www.ccel.org/ccel/jamieson/jfb.xml (crudo en 05. Datos/corpus_crudo/jfb/)",
+  "fecha_ingesta": "2026-09-21",
+  "idioma": "en",
+  "total_versos_ancla": 19768,
+  "nota": "JFB comenta por anclas de versículo (grupos): los versos sin ancla quedan cubiertos por el bloque anterior, fiel a la edición impresa.",
+  "incidentes": [
+    {
+      "osis": "GEN",
+      "tipo": "anclas vs RV1909: 594 vs 1533 (dif -939) — granularidad propia de JFB"
+    },
+    {
+      "osis": "EXO",
+      "tipo": "anclas vs RV1909: 409 vs 1213 (dif -804) — granularidad propia de JFB"
+    },
+    {
+      "osis": "LEV",
+      "tipo": "anclas vs RV1909: 276 vs 859 (dif -583) — granularidad propia de JFB"
+    },
+    {
+      "osis": "NUM",
+      "tipo": "anclas vs RV1909: 424 vs 1286 (dif -862) — granularidad propia de JFB"
+    },
+    {
+      "osis": "DEU",
+      "tipo": "anclas vs RV1909: 329 vs 959 (dif -630) — granularidad propia de JFB"
+    },
+    {
+      "osis": "JOS",
+      "tipo": "anclas vs RV1909: 235 vs 658 (dif -423) — granularidad propia de JFB"
+    },
+    {
+      "osis": "JDG",
+      "tipo": "anclas vs RV1909: 269 vs 618 (dif -349) — granularidad propia de JFB"
+    },
+    {
+      "osis": "RUT",
+      "tipo": "anclas vs RV1909: 43 vs 85 (dif -42) — granularidad propia de JFB"
+    },
+    {
+      "osis": "1SA",
+      "tipo": "anclas vs RV1909: 333 vs 809 (dif -476) — granularidad propia de JFB"
+    },
+    {
+      "osis": "2SA",
+      "tipo": "anclas vs RV1909: 251 vs 694 (dif -443) — granularidad propia de JFB"
+    },
+    {
+      "osis": "1KI",
+      "tipo": "anclas vs RV1909: 278 vs 816 (dif -538) — granularidad propia de JFB"
+    },
+    {
+      "osis": "2KI",
+      "tipo": "anclas vs RV1909: 296 vs 719 (dif -423) — granularidad propia de JFB"
+    },
+    {
+      "osis": "1CH",
+      "tipo": "anclas vs RV1909: 305 vs 942 (dif -637) — granularidad propia de JFB"
+    },
+    {
+      "osis": "2CH",
+      "tipo": "anclas vs RV1909: 301 vs 821 (dif -520) — granularidad propia de JFB"
+    },
+    {
+      "osis": "EZR",
+      "tipo": "anclas vs RV1909: 85 vs 280 (dif -195) — granularidad propia de JFB"
+    },
+    {
+      "osis": "NEH",
+      "tipo": "anclas vs RV1909: 105 vs 406 (dif -301) — granularidad propia de JFB"
+    },
+    {
+      "osis": "EST",
+      "tipo": "anclas vs RV1909: 65 vs 167 (dif -102) — granularidad propia de JFB"
+    },
+    {
+      "osis": "JOB",
+      "tipo": "anclas vs RV1909: 1013 vs 1061 (dif -48) — granularidad propia de JFB"
+    },
+    {
+      "osis": "PSA",
+      "tipo": "anclas vs RV1909: 1722 vs 2461 (dif -739) — granularidad propia de JFB"
+    },
+    {
+      "osis": "PRO",
+      "tipo": "anclas vs RV1909: 812 vs 915 (dif -103) — granularidad propia de JFB"
+    },
+    {
+      "osis": "ECC",
+      "tipo": "anclas vs RV1909: 214 vs 222 (dif -8) — granularidad propia de JFB"
+    },
+    {
+      "osis": "SNG",
+      "tipo": "anclas vs RV1909: 115 vs 117 (dif -2) — granularidad propia de JFB"
+    },
+    {
+      "osis": "ISA",
+      "tipo": "anclas vs RV1909: 1269 vs 1292 (dif -23) — granularidad propia de JFB"
+    },
+    {
+      "osis": "JER",
+      "tipo": "anclas vs RV1909: 1228 vs 1364 (dif -136) — granularidad propia de JFB"
+    },
+    {
+      "osis": "LAM",
+      "tipo": "anclas vs RV1909: 153 vs 154 (dif -1) — granularidad propia de JFB"
+    },
+    {
+      "osis": "EZK",
+      "tipo": "anclas vs RV1909: 1002 vs 1273 (dif -271) — granularidad propia de JFB"
+    },
+    {
+      "osis": "DAN",
+      "tipo": "anclas vs RV1909: 317 vs 357 (dif -40) — granularidad propia de JFB"
+    },
+    {
+      "osis": "HOS",
+      "tipo": "anclas vs RV1909: 195 vs 196 (dif -1) — granularidad propia de JFB"
+    },
+    {
+      "osis": "JOL",
+      "tipo": "anclas vs RV1909: 72 vs 73 (dif -1) — granularidad propia de JFB"
+    },
+    {
+      "osis": "AMO",
+      "tipo": "anclas vs RV1909: 141 vs 146 (dif -5) — granularidad propia de JFB"
+    },
+    {
+      "osis": "JON",
+      "tipo": "anclas vs RV1909: 48 vs 47 (dif 1) — granularidad propia de JFB"
+    },
+    {
+      "osis": "MIC",
+      "tipo": "anclas vs RV1909: 104 vs 105 (dif -1) — granularidad propia de JFB"
+    },
+    {
+      "osis": "HAG",
+      "tipo": "anclas vs RV1909: 35 vs 38 (dif -3) — granularidad propia de JFB"
+    },
+    {
+      "osis": "ZEC",
+      "tipo": "anclas vs RV1909: 204 vs 211 (dif -7) — granularidad propia de JFB"
+    },
+    {
+      "osis": "MAT",
+      "tipo": "anclas vs RV1909: 625 vs 1071 (dif -446) — granularidad propia de JFB"
+    },
+    {
+      "osis": "MRK",
+      "tipo": "anclas vs RV1909: 382 vs 678 (dif -296) — granularidad propia de JFB"
+    },
+    {
+      "osis": "LUK",
+      "tipo": "anclas vs RV1909: 663 vs 1151 (dif -488) — granularidad propia de JFB"
+    },
+    {
+      "osis": "JHN",
+      "tipo": "anclas vs RV1909: 704 vs 879 (dif -175) — granularidad propia de JFB"
+    },
+    {
+      "osis": "ACT",
+      "tipo": "anclas vs RV1909: 806 vs 1006 (dif -200) — granularidad propia de JFB"
+    },
+    {
+      "osis": "ROM",
+      "tipo": "anclas vs RV1909: 402 vs 433 (dif -31) — granularidad propia de JFB"
+    },
+    {
+      "osis": "1CO",
+      "tipo": "anclas vs RV1909: 432 vs 437 (dif -5) — granularidad propia de JFB"
+    },
+    {
+      "osis": "2CO",
+      "tipo": "anclas vs RV1909: 253 vs 256 (dif -3) — granularidad propia de JFB"
+    },
+    {
+      "osis": "EPH",
+      "tipo": "anclas vs RV1909: 154 vs 155 (dif -1) — granularidad propia de JFB"
+    },
+    {
+      "osis": "PHP",
+      "tipo": "anclas vs RV1909: 102 vs 104 (dif -2) — granularidad propia de JFB"
+    },
+    {
+      "osis": "1TI",
+      "tipo": "anclas vs RV1909: 112 vs 113 (dif -1) — granularidad propia de JFB"
+    },
+    {
+      "osis": "PHM",
+      "tipo": "anclas vs RV1909: 23 vs 25 (dif -2) — granularidad propia de JFB"
+    },
+    {
+      "osis": "HEB",
+      "tipo": "anclas vs RV1909: 301 vs 303 (dif -2) — granularidad propia de JFB"
+    },
+    {
+      "osis": "1PE",
+      "tipo": "anclas vs RV1909: 104 vs 105 (dif -1) — granularidad propia de JFB"
+    },
+    {
+      "osis": "REV",
+      "tipo": "anclas vs RV1909: 396 vs 404 (dif -8) — granularidad propia de JFB"
+    }
+  ],
+  "libros": [
+    {
+      "osis": "1CH",
+      "versos_ancla": 305,
+      "dif_rv1909": -637
+    },
+    {
+      "osis": "1CO",
+      "versos_ancla": 432,
+      "dif_rv1909": -5
+    },
+    {
+      "osis": "1JN",
+      "versos_ancla": 105,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "1KI",
+      "versos_ancla": 278,
+      "dif_rv1909": -538
+    },
+    {
+      "osis": "1PE",
+      "versos_ancla": 104,
+      "dif_rv1909": -1
+    },
+    {
+      "osis": "1SA",
+      "versos_ancla": 333,
+      "dif_rv1909": -476
+    },
+    {
+      "osis": "1TH",
+      "versos_ancla": 89,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "1TI",
+      "versos_ancla": 112,
+      "dif_rv1909": -1
+    },
+    {
+      "osis": "2CH",
+      "versos_ancla": 301,
+      "dif_rv1909": -520
+    },
+    {
+      "osis": "2CO",
+      "versos_ancla": 253,
+      "dif_rv1909": -3
+    },
+    {
+      "osis": "2JN",
+      "versos_ancla": 13,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "2KI",
+      "versos_ancla": 296,
+      "dif_rv1909": -423
+    },
+    {
+      "osis": "2PE",
+      "versos_ancla": 61,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "2SA",
+      "versos_ancla": 251,
+      "dif_rv1909": -443
+    },
+    {
+      "osis": "2TH",
+      "versos_ancla": 47,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "2TI",
+      "versos_ancla": 83,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "3JN",
+      "versos_ancla": 14,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "ACT",
+      "versos_ancla": 806,
+      "dif_rv1909": -200
+    },
+    {
+      "osis": "AMO",
+      "versos_ancla": 141,
+      "dif_rv1909": -5
+    },
+    {
+      "osis": "COL",
+      "versos_ancla": 95,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "DAN",
+      "versos_ancla": 317,
+      "dif_rv1909": -40
+    },
+    {
+      "osis": "DEU",
+      "versos_ancla": 329,
+      "dif_rv1909": -630
+    },
+    {
+      "osis": "ECC",
+      "versos_ancla": 214,
+      "dif_rv1909": -8
+    },
+    {
+      "osis": "EPH",
+      "versos_ancla": 154,
+      "dif_rv1909": -1
+    },
+    {
+      "osis": "EST",
+      "versos_ancla": 65,
+      "dif_rv1909": -102
+    },
+    {
+      "osis": "EXO",
+      "versos_ancla": 409,
+      "dif_rv1909": -804
+    },
+    {
+      "osis": "EZK",
+      "versos_ancla": 1002,
+      "dif_rv1909": -271
+    },
+    {
+      "osis": "EZR",
+      "versos_ancla": 85,
+      "dif_rv1909": -195
+    },
+    {
+      "osis": "GAL",
+      "versos_ancla": 149,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "GEN",
+      "versos_ancla": 594,
+      "dif_rv1909": -939
+    },
+    {
+      "osis": "HAB",
+      "versos_ancla": 56,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "HAG",
+      "versos_ancla": 35,
+      "dif_rv1909": -3
+    },
+    {
+      "osis": "HEB",
+      "versos_ancla": 301,
+      "dif_rv1909": -2
+    },
+    {
+      "osis": "HOS",
+      "versos_ancla": 195,
+      "dif_rv1909": -1
+    },
+    {
+      "osis": "ISA",
+      "versos_ancla": 1269,
+      "dif_rv1909": -23
+    },
+    {
+      "osis": "JAS",
+      "versos_ancla": 108,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "JDG",
+      "versos_ancla": 269,
+      "dif_rv1909": -349
+    },
+    {
+      "osis": "JER",
+      "versos_ancla": 1228,
+      "dif_rv1909": -136
+    },
+    {
+      "osis": "JHN",
+      "versos_ancla": 704,
+      "dif_rv1909": -175
+    },
+    {
+      "osis": "JOB",
+      "versos_ancla": 1013,
+      "dif_rv1909": -48
+    },
+    {
+      "osis": "JOL",
+      "versos_ancla": 72,
+      "dif_rv1909": -1
+    },
+    {
+      "osis": "JON",
+      "versos_ancla": 48,
+      "dif_rv1909": 1
+    },
+    {
+      "osis": "JOS",
+      "versos_ancla": 235,
+      "dif_rv1909": -423
+    },
+    {
+      "osis": "JUD",
+      "versos_ancla": 25,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "LAM",
+      "versos_ancla": 153,
+      "dif_rv1909": -1
+    },
+    {
+      "osis": "LEV",
+      "versos_ancla": 276,
+      "dif_rv1909": -583
+    },
+    {
+      "osis": "LUK",
+      "versos_ancla": 663,
+      "dif_rv1909": -488
+    },
+    {
+      "osis": "MAL",
+      "versos_ancla": 55,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "MAT",
+      "versos_ancla": 625,
+      "dif_rv1909": -446
+    },
+    {
+      "osis": "MIC",
+      "versos_ancla": 104,
+      "dif_rv1909": -1
+    },
+    {
+      "osis": "MRK",
+      "versos_ancla": 382,
+      "dif_rv1909": -296
+    },
+    {
+      "osis": "NAM",
+      "versos_ancla": 47,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "NEH",
+      "versos_ancla": 105,
+      "dif_rv1909": -301
+    },
+    {
+      "osis": "NUM",
+      "versos_ancla": 424,
+      "dif_rv1909": -862
+    },
+    {
+      "osis": "OBA",
+      "versos_ancla": 21,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "PHM",
+      "versos_ancla": 23,
+      "dif_rv1909": -2
+    },
+    {
+      "osis": "PHP",
+      "versos_ancla": 102,
+      "dif_rv1909": -2
+    },
+    {
+      "osis": "PRO",
+      "versos_ancla": 812,
+      "dif_rv1909": -103
+    },
+    {
+      "osis": "PSA",
+      "versos_ancla": 1722,
+      "dif_rv1909": -739
+    },
+    {
+      "osis": "REV",
+      "versos_ancla": 396,
+      "dif_rv1909": -8
+    },
+    {
+      "osis": "ROM",
+      "versos_ancla": 402,
+      "dif_rv1909": -31
+    },
+    {
+      "osis": "RUT",
+      "versos_ancla": 43,
+      "dif_rv1909": -42
+    },
+    {
+      "osis": "SNG",
+      "versos_ancla": 115,
+      "dif_rv1909": -2
+    },
+    {
+      "osis": "TIT",
+      "versos_ancla": 46,
+      "dif_rv1909": 0
+    },
+    {
+      "osis": "ZEC",
+      "versos_ancla": 204,
+      "dif_rv1909": -7
+    },
+    {
+      "osis": "ZEP",
+      "versos_ancla": 53,
+      "dif_rv1909": 0
+    }
+  ]
+}

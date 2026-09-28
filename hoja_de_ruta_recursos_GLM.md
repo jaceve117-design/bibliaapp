@@ -8,7 +8,11 @@
 > esas citas quedan como texto muerto. Ya corregido por Claude: «Lc 24:48; 1 Ts 2:5» ya no inventa
 > «Lc 24:1» ni pierde 1 Ts. Conocido y sin corregir: «2 Sam 7:12» (número + espacio + «Sam»).
 >
-> **Paso 1 — medir (script nuevo `scripts/audita-citas.mjs`):** recorrer TODAS las obras
+> **Paso 1 — medir — ✓ HECHO 2026-09-28 (GLM)**: `scripts/audita-citas.mjs` recorre las 9 obras;
+> informe en `05. Datos/auditoria-citas.md` (1.102 formas). Top confirmado con pruebas directas:
+> elípticas heredadas ×78.364 · «Lu» ×4.401 · «Co» ×3.787 · «Ac» ×3.781 · «Ge» ×3.314 ·
+> «Isaías» ×3.212 · «Salmo» ×3.054 · «Re» ×2.879 · «1 Co» (número+espacio) ×2.165 · «Nu» · «2 Co» · «Chr».
+> **Paso 1 — medir (script original):** recorrer TODAS las obras
 > (`henry`, `henry-es`, `jfb`, `jfb-es`, `barnes`, `barnes-es`, `easton`, `easton-es`, `nave`,
 > `tsk`, léxico `lexdef-es-*`, y cada obra nueva que se ingiera). Con un patrón AMPLIO de «cosa que
 > parece cita» (`palabra/abreviatura + capítulo:verso`, `cap. 3`, `ver. 5`, `vv. 3-5`, `ch. 4`),

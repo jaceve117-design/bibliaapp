@@ -168,6 +168,10 @@ export default function Lector() {
   const [versoActual, setVersoActual] = useState(1);
   const estudioRef = useRef<HTMLElement>(null);
   const estudioTocado = useRef(0);
+  // ── Versiones en paralelo (≥ 1000 px): hasta dos versiones junto a la principal ──
+  const anchoParalelo = useMedia("(min-width: 1000px)");
+  const [paralelo, setParalelo] = useState<string[] | null>(null); // null = modo apagado
+  const [textosPar, setTextosPar] = useState<Record<string, Record<string, string>>>({});
   const lexCache = useRef(cacheLex);
 
   // El SBLGNT son 27 libros. Si el lector lo tiene activo y navega al AT, la
@@ -939,6 +943,44 @@ export default function Lector() {
     };
   };
 
+  useEffect(() => {
+    try {
+      const g = localStorage.getItem("paralelo");
+      if (g) setParalelo(JSON.parse(g));
+    } catch {}
+  }, []);
+  const fijaParalelo = (v: string[] | null) => {
+    setParalelo(v);
+    try { v ? localStorage.setItem("paralelo", JSON.stringify(v)) : localStorage.removeItem("paralelo"); } catch {}
+  };
+  const extrasPar = (paralelo ?? []).filter((o) => o !== obra && (o !== "sblgnt" || NT.has(osis)));
+  const paraleloActivo = anchoParalelo && paralelo !== null;
+  // cada versión extra se carga por libro y se indexa «c.v» → texto
+  useEffect(() => {
+    if (!paraleloActivo) return;
+    for (const o of extrasPar) {
+      const clave = `par:${o}:${osis}`;
+      if (cache.has(clave)) {
+        setTextosPar((t) => (t[o] === cache.get(clave) ? t : { ...t, [o]: cache.get(clave) as Record<string, string> }));
+        continue;
+      }
+      fetch(`/data/${o}/${osis}.json`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => {
+          if (!j) return;
+          const mapa: Record<string, string> = {};
+          if (o === "sblgnt") for (const gv of j.versos as GrVerso[]) mapa[`${gv.c}.${gv.v}`] = gv.w.map((w) => w[0]).join(" ");
+          else for (const v of j.versos as Verso[]) mapa[`${v.c}.${v.v}`] = v.t;
+          cache.set(clave, mapa);
+          setTextosPar((t) => ({ ...t, [o]: mapa }));
+        })
+        .catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paraleloActivo, osis, extrasPar.join(",")]);
+  const OPCIONES_PAR = [...OBRAS, ...(NT.has(osis) ? [{ id: "sblgnt", etiqueta: "Griego" }] : [])].filter((o) => o.id !== obra);
+  const nombreObra = (id: string) => (id === "sblgnt" ? "Griego SBLGNT" : OBRAS.find((o) => o.id === id)?.etiqueta ?? id);
+
   // un panel nuevo siempre pasa al frente (también por encima del comentario)
   const nPila = pila.length;
   const nPilaAntes = useRef(0);
@@ -1271,6 +1313,14 @@ export default function Lector() {
                 {o.etiqueta}
               </button>
             ))}
+            <button
+              className={`obras-tab solo-paralelo${paralelo !== null ? " activa" : ""}`}
+              onClick={() => fijaParalelo(paralelo === null ? [OPCIONES_PAR[0]?.id ?? "vbl"] : null)}
+              aria-pressed={paralelo !== null}
+              title="Ver varias versiones lado a lado"
+            >
+              ⫴ Paralelo
+            </button>
           </div>
           <select
             className="sel"
@@ -1459,7 +1509,7 @@ export default function Lector() {
         style={{ "--estudio-w": `${anchoEstudio}px` } as React.CSSProperties}
       >
         <div
-          className={`lector-columna${pila.length && !ancho ? ` con-panel pila-${Math.min(pila.length, 2)}` : ""}`}
+          className={`lector-columna${pila.length && !ancho ? ` con-panel pila-${Math.min(pila.length, 2)}` : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
           ref={columna}
         >
           <div className="lector-titulo">
@@ -1471,8 +1521,69 @@ export default function Lector() {
             </span>
           </div>
 
+          {paraleloActivo && !cargando && !griego && !interlineal && (
+            <div className="par-elige" role="group" aria-label="Versiones en paralelo">
+              {OPCIONES_PAR.map((o) => {
+                const on = extrasPar.includes(o.id);
+                return (
+                  <button
+                    key={o.id}
+                    className={`par-chip${on ? " activa" : ""}`}
+                    aria-pressed={on}
+                    disabled={!on && extrasPar.length >= 2}
+                    onClick={() => fijaParalelo(on ? extrasPar.filter((x) => x !== o.id) : [...extrasPar, o.id])}
+                  >
+                    {on ? "✓ " : "+ "}
+                    {o.etiqueta}
+                  </button>
+                );
+              })}
+            </div>
+          )}
           {cargando ? (
             <p style={{ color: "var(--muted)" }}>…</p>
+          ) : paraleloActivo && !griego && !interlineal && extrasPar.length > 0 ? (
+            /* Versiones en paralelo: una fila por versículo, alineadas; la
+               primera columna es la versión principal y sigue siendo tocable
+               (notas, referencias, comentario lateral) como en la vista normal. */
+            <div className="paralelo" style={{ "--cols": extrasPar.length + 1 } as React.CSSProperties}>
+              <div className="par-fila par-cabeza">
+                <span>{nombreObra(obra)}</span>
+                {extrasPar.map((o) => (
+                  <span key={o}>{nombreObra(o)}</span>
+                ))}
+              </div>
+              {versos.map((v) => {
+                const nVerso = notas[claveNota(v)];
+                return (
+                  <div key={v.osis} className="par-fila">
+                    <span
+                      className={`verso versoTocable${nVerso?.color ? ` subrayado-${nVerso.color}` : ""}`}
+                      data-osis={v.osis}
+                      role="button"
+                      tabIndex={0}
+                      title={tr.abrirVerso}
+                      onClick={() => abrirReferencias(v)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          abrirReferencias(v);
+                        }
+                      }}
+                    >
+                      <sup className={`num${nVerso ? " con-nota" : ""}`}>{v.v}</sup>
+                      {v.t}
+                    </span>
+                    {extrasPar.map((o) => (
+                      <span key={o} className="par-otra" lang={o === "sblgnt" ? "el" : o === "web" ? "en" : "es"}>
+                        <sup className="num">{v.v}</sup>
+                        {textosPar[o]?.[`${v.c}.${v.v}`] ?? <span className="par-falta">—</span>}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
           ) : griego ? (
             /* Griego emparejado: el griego solo no dice nada a quien no lo lee.
                Cada versículo lleva ARRIBA su texto en la versión elegida y DEBAJO

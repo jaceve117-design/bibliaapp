@@ -1,0 +1,132 @@
+{
+  "descripcion": "Referencias cruzadas: OpenBible.info (community-voted, CC-BY 2016) + Treasury of Scripture Knowledge (R.A. Torrey, dominio público)",
+  "fuentes": [
+    {
+      "nombre": "OpenBible.info cross-references",
+      "licencia": "CC BY 2016 (declarada en el propio archivo)",
+      "url": "https://www.openbible.info/labs/cross-references/",
+      "via": "neuu-org/bible-crossrefs-dataset (CC BY 4.0)"
+    },
+    {
+      "nombre": "Treasury of Scripture Knowledge (1897, R.A. Torrey)",
+      "licencia": "Dominio público",
+      "via": "shards SoulLiberty incluidos en neuu-org/bible-crossrefs-dataset"
+    }
+  ],
+  "fecha_ingesta": "2026-09-19",
+  "crudo_en": "05. Datos/corpus_crudo/tsk_data",
+  "lineas_openbible": 343609,
+  "refs_tsk_adicionales": 130844,
+  "total_versos_con_referencias": 30412,
+  "total_referencias": 386384,
+  "porton": {
+    "origenesOk": 31084,
+    "origenesFuera": 19,
+    "destinosOk": 386384,
+    "destinosFuera": 88069,
+    "porcentaje_alineacion": "99.94%"
+  },
+  "codigos_desconocidos": [],
+  "incidentes": [
+    {
+      "ref": "GEN.1.1→JHN.1.1-John",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.1→COL.1.16-Col",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.1→PRO.8.22-Prov",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.1→ROM.1.19-Rom",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.1→PSA.148.4-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.1→PSA.89.11-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.6→JOB.26.7-Job",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.6→JER.10.12-Jer",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.6→PSA.136.5-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.6→GEN.7.11-Gen",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.6→JOB.38.22-Job",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.7→PRO.8.28-Prov",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.7→JOB.38.8-Job",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.9→JOB.38.8-Job",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.9→PSA.24.1-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.9→PSA.136.5-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.9→PRO.8.28-Prov",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.9→PSA.104.5-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.11→PSA.104.14-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.11→PSA.65.9-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.11→LUK.6.43-Luke",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.11→MAT.7.16-Matt",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.12→ISA.55.10-Isa",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.12→MAT.13.24-Matt",
+      "tipo": "destino_fuera_de_rv1909"
+    },
+    {
+      "ref": "GEN.1.14→PSA.136.7-Ps",
+      "tipo": "destino_fuera_de_rv1909"
+    }
+  ]
+}

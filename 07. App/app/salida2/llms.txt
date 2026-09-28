@@ -1,0 +1,26 @@
+# Biblia de Estudio AION
+
+> Biblia de estudio en español: texto bíblico, lenguas originales, comentarios clásicos, diccionarios y léxico, conectados por pasaje. El lector (/es/lector) se dibuja con JavaScript; para leer el contenido directamente, usa los archivos JSON de abajo (estáticos, públicos, sin clave).
+
+Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, MAT, JHN, ROM, REV…); la lista de cada obra está en su `_manifest.json`. Cada archivo de libro trae `versos` con `c` (capítulo), `v` (versículo) y `t` (texto). Las traducciones al español de los comentarios están hechas por máquina y marcadas `sin_revisar` hasta la revisión humana: cítalas como tales.
+
+## Texto bíblico
+- [Reina-Valera 1909 (dominio público)](https://bibliaapp.pages.dev/data/rv1909/JHN.json): un archivo por libro, p. ej. /data/rv1909/JHN.json
+- [Versión Biblia Libre, VBL](https://bibliaapp.pages.dev/data/vbl/_manifest.json): /data/vbl/{LIBRO}.json
+- [World English Bible](https://bibliaapp.pages.dev/data/web/_manifest.json): /data/web/{LIBRO}.json
+- [Nuevo Testamento griego SBLGNT](https://bibliaapp.pages.dev/data/sblgnt/_manifest.json): /data/sblgnt/{LIBRO}.json
+- [Texto completo en un archivo, RV1909](https://bibliaapp.pages.dev/data/busqueda/rv1909.json): líneas «LIBRO.c.v|texto»; también /data/busqueda/vbl.json
+
+## Comentarios (inglés original y español)
+- [Matthew Henry](https://bibliaapp.pages.dev/data/henry-es/_manifest.json): /data/henry/{LIBRO}.json (EN) · /data/henry-es/{LIBRO}.json (ES)
+- [Jamieson-Fausset-Brown](https://bibliaapp.pages.dev/data/jfb-es/_manifest.json): /data/jfb/ · /data/jfb-es/
+- [Albert Barnes](https://bibliaapp.pages.dev/data/barnes-es/_manifest.json): /data/barnes/ · /data/barnes-es/
+- [Nave's Topical Bible](https://bibliaapp.pages.dev/data/nave/_manifest.json): /data/nave/{LIBRO}.json
+- [Treasury of Scripture Knowledge (referencias cruzadas)](https://bibliaapp.pages.dev/data/tsk/_manifest.json): /data/tsk/{LIBRO}.json
+
+## Diccionarios y léxico
+- [Diccionario Easton](https://bibliaapp.pages.dev/data/easton-es/_manifest.json): /data/easton/ (EN) · /data/easton-es/ (ES), un archivo por letra
+- [Léxico STEPBible (hebreo y griego)](https://bibliaapp.pages.dev/data/stepbible/_manifest.json): glosas y definiciones en español en /data/stepbible/
+
+## Biblias adicionales
+- [Biblia del Oso 1569 (ortografía actualizada)](https://bibliaapp.pages.dev/data/oso1569/_manifest.json): /data/oso1569/ · Dominio público (1569) · edición getbible.net, 66 libros sin deuterocanónicos
