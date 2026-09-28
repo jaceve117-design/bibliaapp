@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(ROOT, '..', 'public', 'data');
 const OUT = path.join(DATA, 'busqueda');
-const OBRAS = ['rv1909', 'vbl'];
+const OBRAS = ['rv1909', 'oso1569', 'vbl'];
 
 fs.mkdirSync(OUT, { recursive: true });
 

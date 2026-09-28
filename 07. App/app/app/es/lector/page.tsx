@@ -47,6 +47,8 @@ const COLORES: ColorSubrayado[] = ["", "amarillo", "verde", "rosa"];
 
 const OBRAS = [
   { id: "rv1909", etiqueta: "RV1909" },
+  // Biblia del Oso 1569: edición getbible.net con ortografía actualizada, sin deuterocanónicos
+  { id: "oso1569", etiqueta: "Oso 1569" },
   // Versión Biblia Libre: español contemporáneo desde Nestle-Aland. Está para el
   // lector al que la RV1909 («á», «fué», «crió») se le hace cuesta arriba.
   { id: "vbl", etiqueta: "VBL" },

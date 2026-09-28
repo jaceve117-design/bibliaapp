@@ -195,9 +195,11 @@ Biblias con derechos de autor: el usuario pedirá los permisos de forma ordenada
 ingerir ninguna versión con derechos** hasta que haya un permiso escrito archivado en `02. Legal/`.
 
 ## Tareas pendientes previas (si aún no están hechas, van antes de la Fase 1)
-- [ ] Buscador paso 3: pestaña «Comentarios» en el panel Buscar (detalle en `bitacora_progreso_GLM.md`,
-      sección «ENCARGO PARA GLM — Buscador paso 3»). Cada obra nueva de esta hoja de ruta debe
-      entrar también en ese buscador.
+- [x] Buscador paso 3: pestaña «Comentarios» en el panel Buscar. (2026-09-28: índices troceados
+      com-{obra} bajo ~5 MB crudos ≈ 1,3 MB gzip — Henry 7 trozos, JFB 3, Barnes 6, Easton 1;
+      carga perezosa por obra, fragmento con contexto + resaltado, tocar abre la tarjeta del pasaje
+      con el comentario de la obra; Easton abre el diccionario en la entrada. Nave's y léxico
+      quedan fuera: no son pasajes. Cada obra nueva de la hoja entra con una línea en el generador.)
 - [x] Reintentar unidades fallidas: Henry 307, Barnes 46, JFB 43, Easton 17. (2026-09-28: cadenas corridas; re-ensamblados henry/barnes/jfb/easton-es con las recuperadas — Barnes +12, JFB +7)
 - [x] Ensamblar y desplegar las definiciones del léxico en español (`node bin/ensamblar.mjs --obra lexdef`)
       si la corrida ya terminó. (2026-09-28: 20.331/22.716 = 90 % desplegado — 11.680 H + 8.651 G; el freno

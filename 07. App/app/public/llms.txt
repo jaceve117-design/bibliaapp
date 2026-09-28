@@ -21,3 +21,6 @@ Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, 
 ## Diccionarios y léxico
 - [Diccionario Easton](https://bibliaapp.pages.dev/data/easton-es/_manifest.json): /data/easton/ (EN) · /data/easton-es/ (ES), un archivo por letra
 - [Léxico STEPBible (hebreo y griego)](https://bibliaapp.pages.dev/data/stepbible/_manifest.json): glosas y definiciones en español en /data/stepbible/
+
+## Biblias adicionales
+- [Biblia del Oso 1569 (ortografía actualizada)](https://bibliaapp.pages.dev/data/oso1569/_manifest.json): /data/oso1569/ · Dominio público (1569) · edición getbible.net, 66 libros sin deuterocanónicos

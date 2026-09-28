@@ -1,0 +1,410 @@
+{
+  "obra": "Biblia del Oso 1569 (ortografía actualizada)",
+  "osis_obra": "OSO1569",
+  "licencia": "Dominio público (Basilea, 1569; autor fallecido 1569) · edición electrónica: getbible.net v2 (`sse`) con ortografía modernizada",
+  "fuente": "https://api.getbible.net/v2/sse/{1..66}.json (crudo en 05. Datos/corpus_crudo/oso1569/)",
+  "fecha_ingesta": "2026-09-28",
+  "edicion": "Ortografía actualizada (Gn 1:1 «creó»; el original de 1569 escribe «crió»). Cotejo contra escaneos de archive.org pendiente de registrar como muestra verificada.",
+  "canon": "Protestante, 66 libros. SIN deuterocanónicos: la edición getbible no los trae (los intercalados del original de 1569 quedan fuera de esta edición electrónica).",
+  "idioma": "es",
+  "total_versos": 31098,
+  "incidentes": [],
+  "libros": [
+    {
+      "osis": "GEN",
+      "nombre": "Génesis",
+      "caps": 50,
+      "versos": 1533
+    },
+    {
+      "osis": "EXO",
+      "nombre": "Éxodo",
+      "caps": 40,
+      "versos": 1213
+    },
+    {
+      "osis": "LEV",
+      "nombre": "Levítico",
+      "caps": 27,
+      "versos": 859
+    },
+    {
+      "osis": "NUM",
+      "nombre": "Números",
+      "caps": 36,
+      "versos": 1288
+    },
+    {
+      "osis": "DEU",
+      "nombre": "Deuteronomio",
+      "caps": 34,
+      "versos": 959
+    },
+    {
+      "osis": "JOS",
+      "nombre": "Josué",
+      "caps": 24,
+      "versos": 658
+    },
+    {
+      "osis": "JDG",
+      "nombre": "Jueces",
+      "caps": 21,
+      "versos": 618
+    },
+    {
+      "osis": "RUT",
+      "nombre": "Rut",
+      "caps": 4,
+      "versos": 85
+    },
+    {
+      "osis": "1SA",
+      "nombre": "1 Samuel",
+      "caps": 31,
+      "versos": 810
+    },
+    {
+      "osis": "2SA",
+      "nombre": "2 Samuel",
+      "caps": 24,
+      "versos": 695
+    },
+    {
+      "osis": "1KI",
+      "nombre": "1 Reyes",
+      "caps": 22,
+      "versos": 816
+    },
+    {
+      "osis": "2KI",
+      "nombre": "2 Reyes",
+      "caps": 25,
+      "versos": 719
+    },
+    {
+      "osis": "1CH",
+      "nombre": "1 Crónicas",
+      "caps": 29,
+      "versos": 941
+    },
+    {
+      "osis": "2CH",
+      "nombre": "2 Crónicas",
+      "caps": 36,
+      "versos": 821
+    },
+    {
+      "osis": "EZR",
+      "nombre": "Esdras",
+      "caps": 10,
+      "versos": 280
+    },
+    {
+      "osis": "NEH",
+      "nombre": "Nehemías",
+      "caps": 13,
+      "versos": 406
+    },
+    {
+      "osis": "EST",
+      "nombre": "Ester",
+      "caps": 10,
+      "versos": 167
+    },
+    {
+      "osis": "JOB",
+      "nombre": "Job",
+      "caps": 42,
+      "versos": 1070
+    },
+    {
+      "osis": "PSA",
+      "nombre": "Salmos",
+      "caps": 150,
+      "versos": 2460
+    },
+    {
+      "osis": "PRO",
+      "nombre": "Proverbios",
+      "caps": 31,
+      "versos": 915
+    },
+    {
+      "osis": "ECC",
+      "nombre": "Eclesiastés",
+      "caps": 12,
+      "versos": 222
+    },
+    {
+      "osis": "SNG",
+      "nombre": "Cantares",
+      "caps": 8,
+      "versos": 117
+    },
+    {
+      "osis": "ISA",
+      "nombre": "Isaías",
+      "caps": 66,
+      "versos": 1292
+    },
+    {
+      "osis": "JER",
+      "nombre": "Jeremías",
+      "caps": 52,
+      "versos": 1363
+    },
+    {
+      "osis": "LAM",
+      "nombre": "Lamentaciones",
+      "caps": 5,
+      "versos": 154
+    },
+    {
+      "osis": "EZK",
+      "nombre": "Ezequiel",
+      "caps": 48,
+      "versos": 1273
+    },
+    {
+      "osis": "DAN",
+      "nombre": "Daniel",
+      "caps": 12,
+      "versos": 357
+    },
+    {
+      "osis": "HOS",
+      "nombre": "Oseas",
+      "caps": 14,
+      "versos": 197
+    },
+    {
+      "osis": "JOL",
+      "nombre": "Joel",
+      "caps": 3,
+      "versos": 73
+    },
+    {
+      "osis": "AMO",
+      "nombre": "Amós",
+      "caps": 9,
+      "versos": 146
+    },
+    {
+      "osis": "OBA",
+      "nombre": "Abdías",
+      "caps": 1,
+      "versos": 21
+    },
+    {
+      "osis": "JON",
+      "nombre": "Jonás",
+      "caps": 4,
+      "versos": 48
+    },
+    {
+      "osis": "MIC",
+      "nombre": "Miqueas",
+      "caps": 7,
+      "versos": 105
+    },
+    {
+      "osis": "NAM",
+      "nombre": "Nahúm",
+      "caps": 3,
+      "versos": 47
+    },
+    {
+      "osis": "HAB",
+      "nombre": "Habacuc",
+      "caps": 3,
+      "versos": 56
+    },
+    {
+      "osis": "ZEP",
+      "nombre": "Sofonías",
+      "caps": 3,
+      "versos": 53
+    },
+    {
+      "osis": "HAG",
+      "nombre": "Hageo",
+      "caps": 2,
+      "versos": 38
+    },
+    {
+      "osis": "ZEC",
+      "nombre": "Zacarías",
+      "caps": 14,
+      "versos": 211
+    },
+    {
+      "osis": "MAL",
+      "nombre": "Malaquías",
+      "caps": 4,
+      "versos": 55
+    },
+    {
+      "osis": "MAT",
+      "nombre": "Mateo",
+      "caps": 28,
+      "versos": 1071
+    },
+    {
+      "osis": "MRK",
+      "nombre": "Marcos",
+      "caps": 16,
+      "versos": 678
+    },
+    {
+      "osis": "LUK",
+      "nombre": "Lucas",
+      "caps": 24,
+      "versos": 1151
+    },
+    {
+      "osis": "JHN",
+      "nombre": "Juan",
+      "caps": 21,
+      "versos": 879
+    },
+    {
+      "osis": "ACT",
+      "nombre": "Hechos",
+      "caps": 28,
+      "versos": 1007
+    },
+    {
+      "osis": "ROM",
+      "nombre": "Romanos",
+      "caps": 16,
+      "versos": 433
+    },
+    {
+      "osis": "1CO",
+      "nombre": "1 Corintios",
+      "caps": 16,
+      "versos": 437
+    },
+    {
+      "osis": "2CO",
+      "nombre": "2 Corintios",
+      "caps": 13,
+      "versos": 257
+    },
+    {
+      "osis": "GAL",
+      "nombre": "Gálatas",
+      "caps": 6,
+      "versos": 149
+    },
+    {
+      "osis": "EPH",
+      "nombre": "Efesios",
+      "caps": 6,
+      "versos": 155
+    },
+    {
+      "osis": "PHP",
+      "nombre": "Filipenses",
+      "caps": 4,
+      "versos": 104
+    },
+    {
+      "osis": "COL",
+      "nombre": "Colosenses",
+      "caps": 4,
+      "versos": 95
+    },
+    {
+      "osis": "1TH",
+      "nombre": "1 Tesalonicenses",
+      "caps": 5,
+      "versos": 89
+    },
+    {
+      "osis": "2TH",
+      "nombre": "2 Tesalonicenses",
+      "caps": 3,
+      "versos": 47
+    },
+    {
+      "osis": "1TI",
+      "nombre": "1 Timoteo",
+      "caps": 6,
+      "versos": 113
+    },
+    {
+      "osis": "2TI",
+      "nombre": "2 Timoteo",
+      "caps": 4,
+      "versos": 83
+    },
+    {
+      "osis": "TIT",
+      "nombre": "Tito",
+      "caps": 3,
+      "versos": 46
+    },
+    {
+      "osis": "PHM",
+      "nombre": "Filemón",
+      "caps": 1,
+      "versos": 25
+    },
+    {
+      "osis": "HEB",
+      "nombre": "Hebreos",
+      "caps": 13,
+      "versos": 303
+    },
+    {
+      "osis": "JAS",
+      "nombre": "Santiago",
+      "caps": 5,
+      "versos": 108
+    },
+    {
+      "osis": "1PE",
+      "nombre": "1 Pedro",
+      "caps": 5,
+      "versos": 105
+    },
+    {
+      "osis": "2PE",
+      "nombre": "2 Pedro",
+      "caps": 3,
+      "versos": 61
+    },
+    {
+      "osis": "1JN",
+      "nombre": "1 Juan",
+      "caps": 5,
+      "versos": 105
+    },
+    {
+      "osis": "2JN",
+      "nombre": "2 Juan",
+      "caps": 1,
+      "versos": 13
+    },
+    {
+      "osis": "3JN",
+      "nombre": "3 Juan",
+      "caps": 1,
+      "versos": 14
+    },
+    {
+      "osis": "JUD",
+      "nombre": "Judas",
+      "caps": 1,
+      "versos": 25
+    },
+    {
+      "osis": "REV",
+      "nombre": "Apocalipsis",
+      "caps": 22,
+      "versos": 404
+    }
+  ]
+}

@@ -1155,3 +1155,12 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 - La corrida completa de lexdef YA estaba en el estado (la de la hoja); el ensamblado con el estado completo arrojó **20.331/22.716 (90%)**: 11.680 H + 8.651 G. Deploy `b0a44b17` — producción verificada por hash (el alias tardó en propagar: `-h` 2,87 MB). La ficha del lector muestra ES con caída al EN.
 - **El freno de emergencia hizo su trabajo**: el reintento de las ~2.385 fallidas se detuvo al 36% de rechazo (umbral 25%) — son definiciones largas donde el modelo no conserva las máscaras ⟦n⟧ del hebreo/griego. **No quemar más gasto**: esas requieren ajuste de prompt/validador del motor (revisar `validaUnidad` sobre fichas ⟦n⟧ largas) antes de reintentar. Coste de la corrida fallida: ~$0,22.
 - **Pendiente del turno siguiente**: Buscador paso 3 (especificación en la sección ENCARGO) y luego Fase 1. Gasto: $45,65 de $75.
+
+### 2026-09-28 · GLM (vigilante) — BUSCADOR PASO 3 COMPLETO: pestaña «Comentarios» desplegada
+
+- **Índices troceados** (`scripts/genera-busqueda.mjs`, segunda pasada): `com-{obra}-{nn}.json` bajo ~5 MB crudos ≈ 1,3 MB gzip en el cable (techo de la hoja) + manifiesto `com-{obra}.json` con el nº de trozos. Henry 7 · JFB 3 · Barnes 6 · Easton 1 → **122.339 párrafos buscables**. Refs corregidas (bug: interpolaba el array del capítulo — `[object Object]`).
+- **Carga perezosa por obra** (`cargaComentarios` en `lib/busqueda.ts`): manifiesto → trozos secuenciales → parseo `ref|obra|texto` → `buscaComentarios()` reutiliza `busca()` y adjunta la obra por ref. `contexto()` recorta el fragmento alrededor de la primera coincidencia.
+- **UI**: tercera pestaña «Comentarios» en el panel Buscar (y botón en el panel Diccionario), selector de comentarista (Henry/Barnes/JFB/Easton ES), resultados con chip de obra + ref + fragmento resaltado. Tocar: para Henry/JFB/Barnes abre la **tarjeta del pasaje** con el comentarista ya seleccionado en la barra; para Easton abre el **diccionario** en la entrada.
+- **Verificado end-to-end en navegador** (deploy `c90b854a`): «sangre de Cristo» en Barnes → 30 resultados («Barnes · Hebreos 9:22», «Colosenses 1:14»…) con 63 marcas de resaltado; clic → tarjeta «Hebreos 9» + Barnes en la barra. Gotcha de transporte del IAB: los evaluate largos (>~2 KB) fallan con «missing )» — minificar.
+- **Falta para cerrar la tarea previa**: auditoría Jev de Henry (secuencial, ~2 USD, horas) — lanzarla en un turno con el gateway libre.
+- Gasto: **$45,65 de $75** (Buscador paso 3 = $0: índices locales, sin traducción).
