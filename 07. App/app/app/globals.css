@@ -5473,3 +5473,160 @@ html.sin-intro .intro { display: none; }
   .intro-llama { fill: #e8b95c; }
   .intro { animation: intro-salida 0.6s ease-in 1.2s forwards !important; }
 }
+
+/* ═══ Mesa de estudio — pantallas ≥ 680 px (plegables, tablets, laptops, monitores) ═══
+   El móvil no cambia: todo esto sólo AÑADE a partir de 680 px (lib/pantalla.ts).
+   Texto a la izquierda; a la derecha una columna fija con el comentario, que
+   acompaña la lectura, y los paneles (léxico, citas, diccionario…) como pestañas.
+   Cada cambio se desliza o se funde; nada salta. */
+@media (min-width: 680px) {
+  main {
+    transition: margin-right 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  main.con-estudio { margin-right: var(--estudio-w, 420px); }
+  main.arrastrando { transition: none; }
+  main.con-estudio .lector-columna { padding-bottom: 72px; }
+
+  .estudio {
+    position: fixed;
+    top: var(--cab-h, 120px);
+    right: 0;
+    bottom: 0;
+    width: var(--estudio-w, 420px);
+    background: var(--bg-elev);
+    border-left: 1px solid var(--line);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    z-index: 30;
+    animation: estudio-entra 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    scroll-behavior: smooth;
+  }
+  .estudio.arrastrando { user-select: none; }
+  @keyframes estudio-entra {
+    from { transform: translateX(28px); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+
+  /* el borde se arrastra para ajustar el ancho (doble clic: ancho por defecto) */
+  .estudio-asa {
+    position: fixed;
+    top: var(--cab-h, 120px);
+    bottom: 0;
+    right: calc(var(--estudio-w, 420px) - 5px);
+    width: 10px;
+    cursor: col-resize;
+    z-index: 62;
+    touch-action: none;
+  }
+  .estudio-asa::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .estudio-asa:hover::after, .estudio.arrastrando .estudio-asa::after { opacity: 0.55; }
+
+  .estudio-pestanas {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: 50px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 12px;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .estudio-pestana {
+    flex: none;
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.28s ease, color 0.28s ease, border-color 0.28s ease;
+    animation: pestana-entra 0.3s ease;
+  }
+  .estudio-pestana:hover { color: var(--ink); background: var(--hover); }
+  .estudio-pestana.activa {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+  }
+  @keyframes pestana-entra {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .estudio-com {
+    padding: 18px 22px 64px;
+    transition: opacity 0.3s ease, transform 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .estudio-com:not(.visible) { opacity: 0; transform: translateX(10px); pointer-events: none; }
+  .estudio-autor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--sans);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .estudio-vacio { color: var(--muted); font-style: italic; }
+  .estudio-seccion {
+    border-radius: 10px;
+    margin: 0 -10px 6px;
+    padding: 2px 10px;
+    transition: background 0.5s ease;
+  }
+  .estudio-seccion.activa { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+  /* dentro de la columna la barra del comentario no se clava bajo la cabecera */
+  .estudio .com-toggle { position: static; }
+
+  /* los paneles se alojan en la columna, bajo las pestañas, y se funden entre sí */
+  .lex-panel.lateral {
+    inset: auto;
+    top: calc(var(--cab-h, 120px) + 50px);
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: var(--estudio-w, 420px);
+    height: auto;
+    max-height: none;
+    border-top: 0;
+    border-left: 1px solid var(--line);
+    box-shadow: none;
+    animation: none;
+    overscroll-behavior: contain;
+    transition: opacity 0.3s ease, transform 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .lex-panel.lateral.detras { opacity: 0; transform: translateX(14px); pointer-events: none; }
+  .lex-panel.lateral.frente { opacity: 1; transform: none; animation: estudio-entra 0.34s cubic-bezier(0.32, 0.72, 0, 1); }
+  .lex-panel.lateral .lex-panel-inner { padding: 4px 22px 40px; max-width: none; }
+}
+@media (min-width: 680px) and (prefers-reduced-motion: reduce) {
+  main, .estudio, .estudio-com, .estudio-pestana, .lex-panel.lateral { transition: none !important; animation: none !important; }
+}
+
+/* Plegable abierto en modo libro: si el navegador informa del pliegue
+   (Viewport Segments), el texto ocupa exacto la mitad izquierda y el estudio
+   la derecha; nada cae sobre la bisagra y el asa de ancho sobra. */
+@media (min-width: 680px) and (horizontal-viewport-segments: 2) {
+  main.con-estudio { margin-right: calc(100vw - env(viewport-segment-right 0 0, 50vw)); }
+  .estudio, .lex-panel.lateral { width: calc(100vw - env(viewport-segment-left 1 0, 50vw)); }
+  .estudio-asa { display: none; }
+}

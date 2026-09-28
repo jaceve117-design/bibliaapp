@@ -21,3 +21,4 @@ Thumbs.db
 
 # Salida alternativa del build (DIST_DIR=salida) cuando `out` queda retenida
 07. App/app/salida/
+07. App/app/salida-c/

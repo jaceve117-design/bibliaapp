@@ -9,6 +9,7 @@ import { morfGntEs } from "@/lib/morfgnt";
 import { buscaEnVarias, cargaIndice, ordenaConIA, tramosResaltados, type Resultado } from "@/lib/busqueda";
 import { cargaComentarios, buscaComentarios, contexto } from "@/lib/busqueda";
 import { parseCita, segmentarPorCitas } from "@/lib/referencias";
+import { ANCHO_ESTUDIO, useAlturaCabecera, useAnchoEstudio, useMedia } from "@/lib/pantalla";
 
 type Libro = { osis: string; nombre: string; caps: number; versos: number };
 type Verso = { c: number; v: number; osis: string; t: string };
@@ -74,6 +75,11 @@ type ComFuente = (typeof COMENTARIOS)[number]["id"];
 // obras de comentario EN servidas de /data/{ruta}/{OSIS}.json (misma forma de JSON para todas)
 const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes", easton: "easton-pasajes", valdes: "valdes" };
 const OSIS_INICIAL = "JHN";
+/** Nombre de cada panel como pestaña de la mesa de estudio (pantallas anchas). */
+const ETIQUETA_PANEL: Record<string, string> = {
+  dic: "Diccionario", busqueda: "Buscar", griego: "Griego", lex: "Léxico", refs: "Versículo",
+  cita: "Cita", termino: "Término", fuentes: "Fuentes", notas: "Notas", info: "Info",
+};
 const CAP_INICIAL = 1;
 const NT = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
 const cache = new Map<string, unknown>();
@@ -152,6 +158,16 @@ export default function Lector() {
   const [reporteCopiado, setReporteCopiado] = useState(false);
   const reTerminos = useRef<RegExp | null>(null);
   const columna = useRef<HTMLDivElement>(null);
+  // ── Mesa de estudio (pantallas ≥ 900 px: plegables, tablets, laptops) ──
+  const ancho = useMedia(`(min-width: ${ANCHO_ESTUDIO}px)`);
+  useAlturaCabecera();
+  const [anchoEstudio, setAnchoEstudio] = useAnchoEstudio();
+  const [arrastrando, setArrastrando] = useState(false);
+  // qué ocupa la columna de estudio: el comentario o el panel del frente de la pila
+  const [frente, setFrente] = useState<"com" | null>(null);
+  const [versoActual, setVersoActual] = useState(1);
+  const estudioRef = useRef<HTMLElement>(null);
+  const estudioTocado = useRef(0);
   const lexCache = useRef(cacheLex);
 
   // El SBLGNT son 27 libros. Si el lector lo tiene activo y navega al AT, la
@@ -897,6 +913,16 @@ export default function Lector() {
 
   /** Props de posición para un panel según su sitio en la pila. */
   const propsPanel = (id: string) => {
+    if (ancho) {
+      // en la mesa de estudio los paneles no se apilan: son pestañas de la
+      // columna lateral y sólo el del frente se ve (los demás, en reposo)
+      const alFrente = (frente !== "com" || !comentario) && pila[pila.length - 1] === id;
+      return {
+        className: `lex-panel lateral${alFrente ? " frente" : " detras"}`,
+        style: { zIndex: 60 },
+        onPointerDown: undefined,
+      };
+    }
     const i = pila.indexOf(id);
     const prof = i === -1 ? 0 : pila.length - 1 - i;
     const enPila = pila.length > 1;
@@ -911,6 +937,55 @@ export default function Lector() {
         if (prof > 0) setPila((p) => [...p.filter((x) => x !== id), id]);
       },
     };
+  };
+
+  // un panel nuevo siempre pasa al frente (también por encima del comentario)
+  const nPila = pila.length;
+  const nPilaAntes = useRef(0);
+  useEffect(() => {
+    if (nPila > nPilaAntes.current) setFrente(null);
+    nPilaAntes.current = nPila;
+  }, [nPila]);
+  const comEnTexto = comentario && !ancho;
+  const estudioVisible = ancho && (comentario || pila.length > 0);
+  const comAlFrente = comentario && (frente === "com" || pila.length === 0);
+  // los paneles son hermanos de <main>: el ancho se publica en la raíz
+  useEffect(() => {
+    document.documentElement.style.setProperty("--estudio-w", `${anchoEstudio}px`);
+  }, [anchoEstudio]);
+  const iniciarArrastre = (e: React.PointerEvent) => {
+    e.preventDefault();
+    setArrastrando(true);
+    const mover = (ev: PointerEvent) => setAnchoEstudio(window.innerWidth - ev.clientX);
+    const soltar = () => {
+      setArrastrando(false);
+      window.removeEventListener("pointermove", mover);
+      window.removeEventListener("pointerup", soltar);
+    };
+    window.addEventListener("pointermove", mover);
+    window.addEventListener("pointerup", soltar);
+  };
+  // el comentario acompaña la lectura: el versículo que está a media pantalla
+  // manda, y la columna se desliza a la sección que lo comenta
+  useEffect(() => {
+    if (!ancho || !comentario || !columna.current) return;
+    const io = new IntersectionObserver(
+      (entradas) => {
+        const vis = entradas.filter((x) => x.isIntersecting);
+        if (!vis.length) return;
+        const osis = (vis[0].target as HTMLElement).dataset.osis ?? "";
+        const v = Number(osis.split(".")[2]);
+        if (v) setVersoActual(v);
+      },
+      { rootMargin: "-28% 0px -62% 0px" }
+    );
+    columna.current.querySelectorAll("[data-osis]").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [ancho, comentario, osis, cap, cargando, griego, interlineal]);
+  const traerAlFrente = (id: string) => {
+    if (id === "com") return setFrente("com");
+    setFrente(null);
+    setPila((p) => [...p.filter((x) => x !== id), id]);
   };
 
   const abrirLexico = (p: Palabra) => {
@@ -1151,6 +1226,19 @@ export default function Lector() {
     setPanelRefs(null);
   };
 
+  const seccionActiva = (() => {
+    let mejor: number | null = null;
+    for (const sc of seccionesCom) if (sc.v && sc.v <= versoActual) mejor = sc.v;
+    return mejor;
+  })();
+  useEffect(() => {
+    const aside = estudioRef.current;
+    if (!aside || !comAlFrente || seccionActiva == null) return;
+    if (Date.now() - estudioTocado.current < 2500) return; // el lector está usando la columna
+    const el = aside.querySelector<HTMLElement>(`[data-v="${seccionActiva}"]`);
+    if (el) aside.scrollTo({ top: el.offsetTop - 60, behavior: "smooth" });
+  }, [seccionActiva, comAlFrente]);
+
   return (
     <>
       <Cabecera
@@ -1366,9 +1454,12 @@ export default function Lector() {
         </div>
       </Cabecera>
 
-      <main>
+      <main
+        className={estudioVisible ? `con-estudio${arrastrando ? " arrastrando" : ""}` : undefined}
+        style={{ "--estudio-w": `${anchoEstudio}px` } as React.CSSProperties}
+      >
         <div
-          className={`lector-columna${pila.length ? ` con-panel pila-${Math.min(pila.length, 2)}` : ""}`}
+          className={`lector-columna${pila.length && !ancho ? ` con-panel pila-${Math.min(pila.length, 2)}` : ""}`}
           ref={columna}
         >
           <div className="lector-titulo">
@@ -1392,13 +1483,13 @@ export default function Lector() {
               {/* El comentario también vive aquí: texto + griego + comentario a
                   la vez es justo la mesa de trabajo de quien estudia el original.
                   Antes solo aparecía en la vista sin capas. */}
-              {comentario && comFuente === "henry" && rCom && (
+              {comEnTexto && comFuente === "henry" && rCom && (
                 <div className="com-resumen">
                   <div className="com-titulo">{tr.resumenCapitulo}</div>
                   {renderMarcado(rCom)}
                 </div>
               )}
-              {comentario && comFuente !== "henry" && parrafosCom.length > 0 && (
+              {comEnTexto && comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
                   seccion={{ t: `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
@@ -1411,7 +1502,7 @@ export default function Lector() {
                 .map((gv) => {
                   const esp = versos.find((v) => v.c === gv.c && v.v === gv.v);
                   const secciones =
-                    comentario && comFuente === "henry"
+                    comEnTexto && comFuente === "henry"
                       ? seccionesCom.filter((s) => s.v === gv.v)
                       : [];
                   return (
@@ -1516,13 +1607,13 @@ export default function Lector() {
             </div>
           ) : (
             <div className="texto-biblico">
-              {comentario && comFuente === "henry" && rCom && (
+              {comEnTexto && comFuente === "henry" && rCom && (
                 <div className="com-resumen">
                   <div className="com-titulo">{tr.resumenCapitulo}</div>
                   {renderMarcado(rCom)}
                 </div>
               )}
-              {comentario && comFuente !== "henry" && parrafosCom.length > 0 && (
+              {comEnTexto && comFuente !== "henry" && parrafosCom.length > 0 && (
                 <ComentarioBloque
                   autor={`${comSel.etiqueta} · ${comSel.anio}`}
                   seccion={{ t: `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
@@ -1532,7 +1623,7 @@ export default function Lector() {
               )}
               {versos.map((v) => {
                 const secciones =
-                  comentario && comFuente === "henry"
+                  comEnTexto && comFuente === "henry"
                     ? seccionesCom.filter((s) => s.v === v.v)
                     : [];
                 const nVerso = notas[claveNota(v)];
@@ -1566,6 +1657,78 @@ export default function Lector() {
           )}
         </div>
       </main>
+
+      {estudioVisible && (
+        <aside
+          ref={estudioRef}
+          className={`estudio${arrastrando ? " arrastrando" : ""}`}
+          aria-label="Mesa de estudio"
+          onWheel={() => (estudioTocado.current = Date.now())}
+          onPointerDown={() => (estudioTocado.current = Date.now())}
+        >
+          <div
+            className="estudio-asa"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Ajustar el ancho de la columna de estudio"
+            title="Arrastra para ajustar el ancho"
+            onPointerDown={iniciarArrastre}
+            onDoubleClick={() => setAnchoEstudio(Math.min(420, window.innerWidth * 0.46))}
+          />
+          <div className="estudio-pestanas" role="tablist">
+            {comentario && (
+              <button role="tab" aria-selected={comAlFrente} className={`estudio-pestana${comAlFrente ? " activa" : ""}`} onClick={() => traerAlFrente("com")}>
+                {comSel.etiqueta}
+              </button>
+            )}
+            {pila.map((id) => {
+              const activa = !comAlFrente && pila[pila.length - 1] === id;
+              return (
+                <button key={id} role="tab" aria-selected={activa} className={`estudio-pestana${activa ? " activa" : ""}`} onClick={() => traerAlFrente(id)}>
+                  {ETIQUETA_PANEL[id] ?? id}
+                </button>
+              );
+            })}
+          </div>
+          {comentario && (
+            <div className={`estudio-com${comAlFrente ? " visible" : ""}`}>
+              <div className="estudio-autor">
+                {comSel.etiqueta} · {comSel.anio}
+                {recursoTraducido && (comFuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : usarEsCom) && (
+                  <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
+                )}
+              </div>
+              {comFuente === "henry" && rCom && (
+                <div className="com-resumen">
+                  <div className="com-titulo">{tr.resumenCapitulo}</div>
+                  {renderMarcado(rCom)}
+                </div>
+              )}
+              {comFuente !== "henry" && parrafosCom.length > 0 && (
+                <ComentarioBloque
+                  abiertoInicial
+                  autor={`${comSel.etiqueta} · ${comSel.anio}`}
+                  seccion={{ t: `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
+                  tr={tr}
+                  renderFn={renderMarcado}
+                />
+              )}
+              {comFuente === "henry" &&
+                seccionesCom.map((sec, i) => (
+                  <div key={`${osis}.${cap}-${i}`} data-v={sec.v ?? undefined} className={`estudio-seccion${sec.v != null && sec.v === seccionActiva ? " activa" : ""}`}>
+                    <ComentarioBloque abiertoInicial seccion={sec} tr={tr} renderFn={renderMarcado} />
+                  </div>
+                ))}
+              {comFuente === "henry" && !rCom && seccionesCom.length === 0 && (
+                <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
+              )}
+              {comFuente !== "henry" && parrafosCom.length === 0 && (
+                <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
+              )}
+            </div>
+          )}
+        </aside>
+      )}
 
       {busPanel && (
         <div {...propsPanel("busqueda")} role="dialog" aria-label="Buscar pasajes">
@@ -2368,13 +2531,15 @@ function ComentarioBloque({
   tr,
   renderFn,
   autor,
+  abiertoInicial = false,
 }: {
   seccion: SeccionHenry & { sinTraducir?: boolean };
   autor?: string;
+  abiertoInicial?: boolean;
   tr: ReturnType<typeof t>;
   renderFn: (texto: string) => React.ReactNode;
 }) {
-  const [abierto, setAbierto] = useState(false);
+  const [abierto, setAbierto] = useState(abiertoInicial);
   const [anclada, setAnclada] = useState(false);
   const [infoAbierta, setInfoAbierta] = useState(false);
   const barraRef = useRef<HTMLDivElement>(null);
