@@ -1141,3 +1141,11 @@ El usuario señaló que con Barnes el nombre del comentarista salía dos veces e
 3. **CORRECCIÓN a la regla 8 de la hoja**: `DIST_DIR=salida npm run build` NO aplica en este repo — el build es `next build` (salida `out/`) y el deploy de `out` funciona (decenas de deploys exitosos). El vigilante usa esa vía.
 4. **Sondeos 1.1 (Biblia del Oso)**: no hay volcado JSON de SpaSEV en GitHub. Vía limpia: módulo SWORD `SpaSEV.zip` de CrossWire (https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/SpaSEV.zip) — zip con zText comprimido LZSS: escribir el descompresor LZSS estándar de SWORD en Node (~40 líneas), verificar ortografía contra escaneos de archive.org (regla 1.1) y decidir el nombre del manifiesto según venga modernizada o no. Deuterocanónicos: ingerir con OSIS (TOB, JDT, WIS, SIR, BAR, 1MA, 2MA) si el módulo los trae.
 5. Gasto al iniciar la hoja de ruta: **$43,99 de $75**.
+
+### 2026-09-28 · GLM (vigilante hoja de ruta) — ficha léxica bilingüe desplegada · corrida completa de lexdef en marcha
+
+- **HALLAZGO**: la «corrida de lexdef terminada» era el PILOTO (48 unidades: 25 H + 23 G). Las definiciones ES completas (22.716 unidades ≈ 5,07M chars ≈ **$5**) no existían. Proyección no toca el tope ($45,43 + $5 ≈ $50,4 < $75) → corrida completa LANZADA en segundo plano (ETA 2-3 h).
+- **La ficha léxica del lector ya es bilingüe** (trabajo del relevo de las :23, asumido y desplegado en este turno — deploy `a51305ff`): `abrirLexico` carga perezosamente `lexdef-es-{h,g}.json` y muestra la definición ES cuando existe, con caída al EN si falta. Ahora mismo solo cubren el piloto; cuando termine la corrida, re-ensamblar + desplegar dará las ~22.700 definiciones.
+- **Re-ensamblados** con las unidades recuperadas por los reintentos: barnes-es (58.444, +12), jfb-es (43.220, +7), easton-es, henry-es completo. Reintentos marcados [x] en la hoja.
+- **Pendiente en turno siguiente**: al terminar lexdef → ensamblar → deploy (las ~22.700 definiciones) → marcar la previa [x]; lanzar auditoría Jev (`bin/auditar.mjs`, solo Henry, ~2 USD, horas) SECUENCIAL tras lexdef para no pelear el gateway; y la tarea de código grande: Buscador paso 3 (especificación en la sección ENCARGO de esta bitácora).
+- Gasto: **$45,43 de $75** al iniciar la corrida de lexdef.

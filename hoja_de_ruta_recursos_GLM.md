@@ -198,7 +198,7 @@ ingerir ninguna versión con derechos** hasta que haya un permiso escrito archiv
 - [ ] Buscador paso 3: pestaña «Comentarios» en el panel Buscar (detalle en `bitacora_progreso_GLM.md`,
       sección «ENCARGO PARA GLM — Buscador paso 3»). Cada obra nueva de esta hoja de ruta debe
       entrar también en ese buscador.
-- [ ] Reintentar unidades fallidas: Henry 307, Barnes 46, JFB 43, Easton 17.
+- [x] Reintentar unidades fallidas: Henry 307, Barnes 46, JFB 43, Easton 17. (2026-09-28: cadenas corridas; re-ensamblados henry/barnes/jfb/easton-es con las recuperadas — Barnes +12, JFB +7)
 - [ ] Ensamblar y desplegar las definiciones del léxico en español (`node bin/ensamblar.mjs --obra lexdef`)
       si la corrida ya terminó.
 - [ ] Auditoría Jev del corpus traducido (~2 USD).
