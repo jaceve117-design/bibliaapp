@@ -59,7 +59,8 @@ for (let i = 1; i < lineas.length; i++) {
   palabras++;
 
   if (!porVerso.has(clave)) { porVerso.set(clave, []); versos++; }
-  porVerso.get(clave).push([griego, ROL_ES[rol] ?? rol, ingles]);
+  const strong = (c[ix.strong] || '').trim();
+  porVerso.get(clave).push([griego, ROL_ES[rol] ?? rol, ingles, strong]);
 }
 
 const salida = { total: versos, palabras, v: Object.fromEntries(porVerso) };

@@ -162,6 +162,8 @@ export default function Lector() {
   // `defEs`: la definición en español de la traducción propia, si existe para
   // esa entrada; si no, la ficha muestra la inglesa (nunca un hueco).
   const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex; defEs?: string } | null>(null);
+  // Fase 2.3: sintaxis MACULA de la palabra tocada (solo NT; carga perezosa 6,5 MB una vez)
+  const [sintaxisFila, setSintaxisFila] = useState<Array<[string, string, string, string]> | null>(null);
   const [panelRefs, setPanelRefs] = useState<{ verso: Verso; refs: string[]; cargadas: boolean } | null>(null);
   // P.2: referencias cruzadas votadas de OpenBible (CC BY) para el verso del panel
   const [refsOpenBible, setRefsOpenBible] = useState<string[] | null>(null);
@@ -1747,9 +1749,35 @@ export default function Lector() {
     window.addEventListener("pointerup", soltar);
   };
 
-  const abrirLexico = (p: Palabra) => {
+  const abrirLexico = (p: Palabra, verso?: { c: number; v: number }) => {
     setLex({ palabra: p });
     const esGriego = p.s.startsWith("G");
+    // Fase 2.3: sintaxis MACULA (solo NT) — filas del verso de la palabra tocada
+    if (esGriego && verso) {
+      const claveMac = "macula:sintaxis";
+      const cargar = (idx: Record<string, Array<[string, string, string, string]>>) => {
+        const filas = idx[`${osis}.${cap}.${verso.v}`] ?? null;
+        if (filas) {
+          const strong = (p.s.match(/\d+/) || [""])[0];
+          setSintaxisFila(filas.filter((f) => f[3] === strong));
+        } else {
+          setSintaxisFila(null);
+        }
+      };
+      const enCacheMac = cache.get(claveMac) as Record<string, Array<[string, string, string, string]>> | undefined;
+      if (enCacheMac) {
+        cargar(enCacheMac);
+      } else {
+        fetch("/data/macula/sintaxis.json")
+          .then((r) => (r.ok ? r.json() : null))
+          .then((json: { v?: Record<string, Array<[string, string, string, string]>> } | null) => {
+            if (!json?.v) return;
+            cache.set(claveMac, json.v);
+            if (lex && lex.palabra === p) cargar(json.v);
+          })
+          .catch(() => setSintaxisFila(null));
+      }
+    }
     const archivo = esGriego ? "tbesg" : "tbesh";
     const cargar = (data: { entradas: Record<string, EntradaLex>; indice: Record<string, string[]> }) => {
       const intentos = [p.s, p.s.replace(/[A-Za-z]+$/, ""), p.s.replace(/[A-Za-z]+$/, "") + "G", p.s.replace(/[A-Za-z]+$/, "") + "H"];
@@ -2540,7 +2568,7 @@ export default function Lector() {
                         <button
                           key={i}
                           className="palabra"
-                          onClick={() => abrirLexico(p)}
+                          onClick={() => abrirLexico(p, v)}
                           title={`${p.s} · ${morfLegible(p.m)}`}
                         >
                           <span className="w">{p.g}</span>
@@ -3351,6 +3379,22 @@ export default function Lector() {
                   </span>
                 )}
                 <div className="lex-def">{limpiarDef(lex.defEs ?? lex.entrada.d)}</div>
+                {sintaxisFila && sintaxisFila.length > 0 && (
+                  <div className="info-seccion" style={{ marginTop: 14 }}>
+                    <div className="info-titulo">{tr.tituloSintaxis}</div>
+                    <div className="refs-lista">
+                      {sintaxisFila.map((f, i) => (
+                        <div key={i} className="ref-item" style={{ cursor: "default" }}>
+                          <b className="cita" style={{ cursor: "default" }}>{f[0]}</b>{" "}
+                          <span style={{ color: "var(--accent-strong)", fontSize: 12.5 }}>{f[1]}</span>
+                          {" — "}
+                          <span style={{ color: "var(--muted)" }}>{f[2]}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="lex-fuente">{tr.fuenteSintaxis}</div>
+                  </div>
+                )}
               </>
             ) : (
               <div className="lex-meta">Sin entrada léxica para {lex.palabra.s}.</div>
