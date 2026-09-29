@@ -1400,3 +1400,8 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - Alias ES de libros en referencias.ts (Ag, Mi, Jr… ~30 formas del motor) · pulido OCR fino de Valdés/Rand · verificación en móvil de la sección Sintaxis (2.3) · 1.3 Calvino-Valera sigue bloqueada por licencia (ver hoja).
 
 **⛔ PARADA. El usuario decide: (a) subir el tope a ~$85 para la Fase 3 completa, (b) aprobar una Fase 3 recortada, o (c) reordenar prioridades.**
+
+## 2026-09-29 — Tonos de Biblias en paralelo y de las carpetas (Claude)
+- Paralelo: cada Biblia extra con fondo `color-mix(var(--ink) N%, transparent)` — 2.ª 3 %, 3.ª 5,5 %, 4.ª+ 7 % (oscurece en claro, aclara en oscuro; respeta el contraste). Al lado: celdas redondeadas; apiladas: la franja de cada versión.
+- Carpetas del móvil (sólo < 680 px): `--bg-tarjeta` = 3,5 % de la letra sobre `--bg-elev`; en pantallas grandes manda el color de «Aa».
+- Pruebas: la ventana de pruebas integrada congela timers cuando está oculta (falsos «bloqueos»); se añadió una prueba sin interfaz con Chrome headless + CDP (Node, sin librerías) que confirmó que la app responde a 390/800/1920 px.
