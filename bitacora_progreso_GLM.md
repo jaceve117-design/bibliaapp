@@ -1364,3 +1364,11 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Carpetas en 3 posiciones** (`Hoja` = abierta · media · guardada; `offsetHoja`, `decidirHoja`): se arrastran desde la lengüeta o el 10 % superior de la tarjeta (el resto desplaza su contenido); al soltar, gesto rápido = siguiente posición, lento = la más cercana. En «media» la tarjeta ocupa la mitad y la Biblia se lee arriba (`con-hoja-media`). `--hoja-base` en <html>.
 - **Cabecera móvil en una fila**: los selectores de libro y capítulo muestran «Libros ▾» / «Caps ▾» (`.sel-rotulo`, el select transparente encima abre la lista completa); selector de Biblia con flecha propia; cabe con el contador de Recursos (probado a 360 y 390 px).
 - **Título**: nombres largos (>10 letras) en 24 px y en una sola línea («2 Tesalonicenses 1»).
+
+
+### 2026-09-29 · GLM (vigilante) — FASE 2.3 (UI) integrada: sección «Sintaxis» en la ficha léxica del NT
+
+- Al tocar una palabra griega del interlineal (capa Interlineal activa), la ficha léxica añade una sección «Sintaxis en la oración (MACULA · sin revisar)»: cada palabra del verso con su rol sintáctico en ES (verbo, sujeto, objeto directo…), la palabra griega y la traducción contextual EN. Filtrada por el mismo Strong de la palabra tocada.
+- `macula/sintaxis.json` (6,5 MB) se carga perezosamente una vez por sesión al abrir la primera ficha NT.
+- **Verificación pendiente en el móvil del usuario** (la automatización del menú Capas del IAB es frágil; el código compila y está desplegado en `bb8122dd`/última). 
+- Gasto: $49,48 de $75 (2.3 = $0).
