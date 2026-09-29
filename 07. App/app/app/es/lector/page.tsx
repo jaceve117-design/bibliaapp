@@ -148,6 +148,8 @@ export default function Lector() {
   // Fase 2.1: Theographic — personas y lugares del verso (nombres EN por ahora)
   const [teoVerso, setTeoVerso] = useState<{ p: string[]; l: string[] } | null>(null);
   const [teoFicha, setTeoFicha] = useState<{ n: string; ficha: Record<string, unknown> } | null>(null);
+  const [mapaLugar, setMapaLugar] = useState<{ n: string; lat: number; lon: number } | null>(null);
+  const [lugaresFichas, setLugaresFichas] = useState<Array<{ id: string; n: string; lat: number | null; lon: number | null; tipo: string | null; nota: string | null }> | null>(null);
   const [dicPanel, setDicPanel] = useState(false);
   const [dicIndice, setDicIndice] = useState<IndiceItem[] | null>(null);
   const [dicQuery, setDicQuery] = useState("");
@@ -1009,6 +1011,16 @@ export default function Lector() {
         cache.set("teo:verso", json.v);
         const fila = json.v[osisRef];
         setTeoVerso(fila ? { p: fila.p ?? [], l: fila.l ?? [] } : { p: [], l: [] });
+        if (fila?.l?.length && !cache.get("teo:lugares")) {
+          fetch("/data/theographic/lugares-fichas.json")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((jl: { fichas?: Array<{ id: string; n: string; lat: number | null; lon: number | null; tipo: string | null; nota: string | null }> } | null) => {
+              if (!jl?.fichas) return;
+              cache.set("teo:lugares", jl.fichas);
+              setLugaresFichas(jl.fichas);
+            })
+            .catch(() => setLugaresFichas([]));
+        }
       })
       .catch(() => setTeoVerso({ p: [], l: [] }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3209,11 +3221,26 @@ export default function Lector() {
                 )}
                 {teoVerso.l.length > 0 && (
                   <div className="refs-lista" style={{ marginTop: 8 }}>
-                    {teoVerso.l.map((n) => (
-                      <span key={n} className="ref-item" style={{ cursor: "default" }}>
-                        {n}
-                      </span>
-                    ))}
+                    {teoVerso.l.map((n) => {
+                      const fichaL = lugaresFichas?.find(function (x) { return x.n === n; });
+                      const conMapa = fichaL && fichaL.lat != null && fichaL.lon != null;
+                      return conMapa ? (
+                        <button
+                          key={n}
+                          className="ref-item tema-nave"
+                          title={tr.verTexto}
+                          onClick={function () {
+                            setMapaLugar({ n: n, lat: Number(fichaL.lat), lon: Number(fichaL.lon) });
+                          }}
+                        >
+                          {n} · mapa
+                        </button>
+                      ) : (
+                        <span key={n} className="ref-item" style={{ cursor: "default" }}>
+                          {n}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
                 {teoFicha && teoFicha.n && (
@@ -3772,6 +3799,21 @@ export default function Lector() {
             </div>
           </aside>
         </>
+      )}
+
+      {mapaLugar && (
+        <div className="mapa-overlay" role="dialog" aria-label={mapaLugar.n}>
+          <div className="mapa-cab">
+            <span className="mapa-titulo">{mapaLugar.n}</span>
+            <button className="icono-btn cerrar" onClick={() => setMapaLugar(null)} aria-label={tr.lexCerrar}>✕</button>
+          </div>
+          <iframe
+            title={mapaLugar.n}
+            className="mapa-frame"
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${mapaLugar.lon - 0.35}%2C${mapaLugar.lat - 0.25}%2C${mapaLugar.lon + 0.35}%2C${mapaLugar.lat + 0.25}&layer=mapnik&marker=${mapaLugar.lat}%2C${mapaLugar.lon}`}
+          />
+          <div className="lex-fuente" style={{ padding: "6px 10px" }}>© OpenStreetMap contributors · requiere conexión</div>
+        </div>
       )}
 
       {pasaje && (

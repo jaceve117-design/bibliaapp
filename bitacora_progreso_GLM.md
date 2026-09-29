@@ -1330,3 +1330,9 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Lector**: sección «Referencias cruzadas votadas» en el panel del verso (antes de Nave's), chips que navegan al pasaje (con cambio de libro si hace falta). i18n ES/EN.
 - **Verificado**: producción sirviendo refs.json (200, 4,2 MB); los destinos llegan limpios (Jn 3:16 → Ro 5:8, 1 Jn 4:9-10, Ro 8:32…).
 - Gasto: $49,48 de $75 (2.2 = $0).
+
+### 2026-09-29 · GLM (vigilante) — FASE 2.1 (UI) HECHA: chips de personas y lugares Theographic en el panel del verso
+
+- **Panel del verso** (donde viven TSK, Nave's y OpenBible refs): nueva sección «Personas y lugares» — chips con los nombres del verso según por-versiculo.json (carga perezosa 681 KB, una vez). Tap en persona: expande ficha con género, años (n./m. con conversión de signo negativo a «a. C.»), padre/madre/hijos resueltos a nombres. Lugares: chips informativos (el mapa Leaflet de 2.2 queda para después según la hoja, «cuidar el peso en móvil»).
+- i18n ES/EN. Verificado en navegador con vista móvil (título «Personas y lugares», ficha expandible). Gasto: $49,48 (2.1 UI = $0).
+- La traducción ES de los nombres (Aaron→Aarón… ~0,5 USD) entra cuando el usuario dé luz verde de gasto fino, o en la pasada de revisión.

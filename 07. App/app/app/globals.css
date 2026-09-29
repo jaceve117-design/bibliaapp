@@ -6708,3 +6708,31 @@ button.rec-original[aria-pressed="true"]::before {
 @media (max-width: 679px) and (prefers-reduced-motion: reduce) {
   .lex-panel.movil, .archivador, .lengueta { transition: none !important; animation: none !important; }
 }
+
+/* P.2 — Mapa de lugares Theographic (OSM embed, overlay a pantalla completa) */
+.mapa-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+.mapa-cab {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.mapa-titulo {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.mapa-frame {
+  flex: 1;
+  border: 0;
+  width: 100%;
+}
+
