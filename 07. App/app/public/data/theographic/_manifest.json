@@ -1,0 +1,17 @@
+{
+  "obra": "Theographic Bible Metadata — personas, lugares, eventos y cronología por versículo",
+  "osis_obra": "THEOGRAPHIC",
+  "licencia": "CC BY-SA 4.0 — Attribution-ShareAlike (los derivados heredan la misma licencia)",
+  "fuente": "https://github.com/robertrouse/theographic-bible-metadata (export JSON de Airtable)",
+  "fecha_ingesta": "2026-09-29",
+  "idioma": "en (nombres y textos; la traducción ES de nombres/descripciones entra por el motor, perfil glosa)",
+  "cobertura": {
+    "personas": 3067,
+    "lugares": 1274,
+    "eventos": 450,
+    "versos_con_personas": 16513,
+    "versos_con_lugares": 4811
+  },
+  "nota": "Los nombres de personas y lugares están en inglés; la traducción ES entra por el motor (perfil glosa). El texto `dictionaryText` de las personas es de Easton (EN) — en la app se enlaza a la entrada ES cuando existe.",
+  "incidentes": []
+}
