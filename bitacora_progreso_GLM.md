@@ -1372,3 +1372,6 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - `macula/sintaxis.json` (6,5 MB) se carga perezosamente una vez por sesión al abrir la primera ficha NT.
 - **Verificación pendiente en el móvil del usuario** (la automatización del menú Capas del IAB es frágil; el código compila y está desplegado en `bb8122dd`/última). 
 - Gasto: $49,48 de $75 (2.3 = $0).
+
+## 2026-09-29 — Móvil: título de sección anclado en la carpeta (Claude)
+- `.lex-panel.movil .com-toggle { position: sticky; top: 0 }`: el título de la sección que se lee queda pegado al borde superior de la carpeta (antes heredaba el `top` pensado para la cabecera de la página, ~130 px, y dejaba un hueco por donde pasaba el texto). Cada sección lleva el suyo.
