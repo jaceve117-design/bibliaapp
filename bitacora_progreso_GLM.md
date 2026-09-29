@@ -1405,3 +1405,9 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - Paralelo: cada Biblia extra con fondo `color-mix(var(--ink) N%, transparent)` — 2.ª 3 %, 3.ª 5,5 %, 4.ª+ 7 % (oscurece en claro, aclara en oscuro; respeta el contraste). Al lado: celdas redondeadas; apiladas: la franja de cada versión.
 - Carpetas del móvil (sólo < 680 px): `--bg-tarjeta` = 3,5 % de la letra sobre `--bg-elev`; en pantallas grandes manda el color de «Aa».
 - Pruebas: la ventana de pruebas integrada congela timers cuando está oculta (falsos «bloqueos»); se añadió una prueba sin interfaz con Chrome headless + CDP (Node, sin librerías) que confirmó que la app responde a 390/800/1920 px.
+
+## 2026-09-29 — Alias ES de libros en el motor de citas (GLM)
+- El MAPA de `lib/referencias.ts` acepta ahora las abreviaturas españolas que aparecían sin enlace en los comentarios traducidos: Ag, Mi, La, Ne, Es, Núm/Nm, Na, Cnt, Cn, St, Jam, Mc, Mk, Zc, Ob, Ho/Oseas, Jb, Sf/Sof, Ezd, Éxodo, 1Reyes, 2Reyes, Deut.
+- `RE_CITA` con frontera unicode `(?<![\p{L}\p{N}_])…(?![\p{L}])` + bandera `gu` (el `` de JS es ASCII y fallaba con acentos); herencia elíptica de grupos desnudos («(2:1, 4; 7:7)» hereda el libro; capCorriente encadena dentro del grupo).
+- Regresión: `scripts/casos-citas.json` 62 → 80 casos (los 20 alias nuevos, 2 ya existían) — **80/80 ok**. Commit `1082327`, pusheado (Cloudflare Pages despliega solo).
+- Sin tocar interfaz ni obra nueva: queda en parada de Puerta A esperando la coordinación del usuario con Claude.
