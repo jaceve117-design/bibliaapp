@@ -1,0 +1,41 @@
+{
+  "obra": "Bible Geocoding Data — OpenBible.info",
+  "licencia": "CC BY 4.0 · incluye datos de OpenStreetMap (ODbL)",
+  "fuente": "https://github.com/openbibleinfo/Bible-Geocoding-Data (data/ancient.jsonl)",
+  "crudo": "05. Datos/corpus_crudo/openbible_geo/",
+  "fecha_ingesta": "2026-09-29",
+  "idioma": "en",
+  "total_lugares": 1335,
+  "total_refs": 8707,
+  "descartados_sin_coordenada": [
+    {
+      "n": "Azazel",
+      "refs": 3
+    },
+    {
+      "n": "Bamah",
+      "refs": 1
+    },
+    {
+      "n": "Biziothiah",
+      "refs": 1
+    },
+    {
+      "n": "Holy Place 1",
+      "refs": 24
+    },
+    {
+      "n": "Most Holy Place 1",
+      "refs": 4
+    },
+    {
+      "n": "Nod",
+      "refs": 1
+    },
+    {
+      "n": "Nohah",
+      "refs": 1
+    }
+  ],
+  "formato": "geo.json único: lugares[{n, ll:[lat,lon], q (confianza 0-1000), t (tipo), v: refs OSIS}]"
+}

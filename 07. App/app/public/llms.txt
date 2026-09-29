@@ -12,6 +12,7 @@ Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, 
 - [Theographic Bible Metadata (personas, lugares, eventos)](https://bibliaapp.pages.dev/data/theographic/_manifest.json): /data/theographic/ · CC BY-SA 4.0 — verse-keyed, fichas de personas con genealogías y coordenadas de lugares
 - [MACULA Greek — sintaxis por palabra (CC BY 4.0, Clear Bible)](https://bibliaapp.pages.dev/data/macula/_manifest.json): /data/macula/sintaxis.json — verse-keyed: rol sintáctico, palabra griega y traducción contextual por palabra
 - [OpenBible.info Cross-References (~344k votadas, CC BY)](https://bibliaapp.pages.dev/data/openbible/refs.json): /data/openbible/refs.json — verse-keyed, ordenadas por votos
+- [OpenBible.info Bible Geocoding (~1.335 lugares bíblicos con coordenadas, CC BY 4.0)](https://bibliaapp.pages.dev/data/openbible/geo.json): /data/openbible/geo.json — lugares[{n, ll:[lat,lon], q (confianza 0-1000), t (tipo), v: refs OSIS}]; incluye datos de OpenStreetMap (ODbL)
 - [Texto completo en un archivo, RV1909](https://bibliaapp.pages.dev/data/busqueda/rv1909.json): líneas «LIBRO.c.v|texto»; también /data/busqueda/vbl.json
 
 ## Comentarios (inglés original y español)
@@ -19,6 +20,7 @@ Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, 
 - [Jamieson-Fausset-Brown](https://bibliaapp.pages.dev/data/jfb-es/_manifest.json): /data/jfb/ · /data/jfb-es/
 - [Albert Barnes](https://bibliaapp.pages.dev/data/barnes-es/_manifest.json): /data/barnes/ · /data/barnes-es/
 - [Nave's Topical Bible](https://bibliaapp.pages.dev/data/nave/_manifest.json): /data/nave/{LIBRO}.json
+- [Juan de Valdés — Romanos (1556) y 1 Corintios (1557), texto original en castellano, dominio público](https://bibliaapp.pages.dev/data/valdes/ROM.json): /data/valdes/ROM.json · /data/valdes/1CO.json (ed. Usoz, Reformistas Antiguos Españoles)
 - [Treasury of Scripture Knowledge (referencias cruzadas)](https://bibliaapp.pages.dev/data/tsk/_manifest.json): /data/tsk/{LIBRO}.json
 
 ## Diccionarios y léxico
