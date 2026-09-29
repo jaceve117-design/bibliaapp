@@ -1336,3 +1336,16 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Panel del verso** (donde viven TSK, Nave's y OpenBible refs): nueva sección «Personas y lugares» — chips con los nombres del verso según por-versiculo.json (carga perezosa 681 KB, una vez). Tap en persona: expande ficha con género, años (n./m. con conversión de signo negativo a «a. C.»), padre/madre/hijos resueltos a nombres. Lugares: chips informativos (el mapa Leaflet de 2.2 queda para después según la hoja, «cuidar el peso en móvil»).
 - i18n ES/EN. Verificado en navegador con vista móvil (título «Personas y lugares», ficha expandible). Gasto: $49,48 (2.1 UI = $0).
 - La traducción ES de los nombres (Aaron→Aarón… ~0,5 USD) entra cuando el usuario dé luz verde de gasto fino, o en la pasada de revisión.
+
+### 2026-09-29 · GLM (vigilante) — FASE 2.2 (mapa) HECHA: los lugares con coordenadas abren mapa OSM
+
+- Los chips de lugar Theographic con coordenadas son botones «X · mapa» que abren un overlay a pantalla completa con mapa OpenStreetMap (iframe embed de OSM — sin Leaflet ni dependencias; requiere conexión, se documenta en el propio mapa). Móvil primero: overlay a pantalla completa con cabecera y ✕ roja.
+- 2.3 MACULA: los repos no exponen TSV listable por API (árbol truncado) — ingesta pesada que requiere estudio de formato y conversión a índice verse-keyed compacto. Marcada para turno dedicado (los datos de sintaxis son grandes).
+- Gasto: $49,48 de $75 (mapa = $0).
+
+## 2026-09-28 — Recursos en un solo lugar + comentarios como carpetas (Claude)
+- **Panel Recursos** (botón ▦ en la cabecera, reemplaza a «Capas»; pantalla completa en móvil, lateral en tablet/escritorio): casillas por categoría — Comentarios (Henry, JFB, Barnes, Valdés), Diccionarios (Easton temas del pasaje, Diccionario bíblico), Herramientas (Mis notas, Buscar), En el texto (Diccionario en el texto, Interlineal, Griego). Marcar abre; desmarcar cierra (`alternarCom`, `cerrarItem`). En móvil, tope de 5 (resto de casillas en gris).
+- **El comentario ya no va intercalado en el texto** (`comEnTexto = false`): en móvil cada comentario activo es una carpeta del archivador (`contenidoCom` / `contenidoExtra(e)`, compartidos con la mesa), que sigue la lectura; ES/EN y «sin revisar» dentro de la tarjeta. La barra del comentarista sólo existe ≥1280.
+- **Cabecera móvil en 2 líneas**: ⌕ · Biblia · ⫴ · Libro · Cap · ▦. Las ← → pasan junto al título (‹ Juan 1 ›); deslizar de lado en el centro de la pantalla (30 px de margen por el gesto «atrás») cambia de capítulo, con vuelta de página suave (`pasarCapitulo`, clase `giro-*`).
+- **Arrastre de la carpeta** también desde su 25 % superior, o desde cualquier punto si su contenido está arriba del todo (touchmove no pasivo sólo cuando se decide arrastrar).
+- `useMedia` escucha también `resize` (algunos entornos no avisan del cambio de media query al plegar/redimensionar).
