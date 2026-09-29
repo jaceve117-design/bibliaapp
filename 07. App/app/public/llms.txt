@@ -10,6 +10,7 @@ Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, 
 - [World English Bible](https://bibliaapp.pages.dev/data/web/_manifest.json): /data/web/{LIBRO}.json
 - [Nuevo Testamento griego SBLGNT](https://bibliaapp.pages.dev/data/sblgnt/_manifest.json): /data/sblgnt/{LIBRO}.json
 - [Theographic Bible Metadata (personas, lugares, eventos)](https://bibliaapp.pages.dev/data/theographic/_manifest.json): /data/theographic/ · CC BY-SA 4.0 — verse-keyed, fichas de personas con genealogías y coordenadas de lugares
+- [OpenBible.info Cross-References (~344k votadas, CC BY)](https://bibliaapp.pages.dev/data/openbible/refs.json): /data/openbible/refs.json — verse-keyed, ordenadas por votos
 - [Texto completo en un archivo, RV1909](https://bibliaapp.pages.dev/data/busqueda/rv1909.json): líneas «LIBRO.c.v|texto»; también /data/busqueda/vbl.json
 
 ## Comentarios (inglés original y español)

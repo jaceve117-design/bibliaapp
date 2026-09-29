@@ -143,6 +143,8 @@ export default function Lector() {
   // esa entrada; si no, la ficha muestra la inglesa (nunca un hueco).
   const [lex, setLex] = useState<{ palabra: Palabra; entrada?: EntradaLex; defEs?: string } | null>(null);
   const [panelRefs, setPanelRefs] = useState<{ verso: Verso; refs: string[]; cargadas: boolean } | null>(null);
+  // P.2: referencias cruzadas votadas de OpenBible (CC BY) para el verso del panel
+  const [refsOpenBible, setRefsOpenBible] = useState<string[] | null>(null);
   const [dicPanel, setDicPanel] = useState(false);
   const [dicIndice, setDicIndice] = useState<IndiceItem[] | null>(null);
   const [dicQuery, setDicQuery] = useState("");
@@ -714,6 +716,7 @@ export default function Lector() {
   // referencias cruzadas (TSK): carga perezosa al primer clic en un número de verso
   const abrirReferencias = (v: Verso) => {
     setPanelRefs({ verso: v, refs: [], cargadas: false });
+    setRefsOpenBible(null);
     // temas de Nave's para este verso
     setNaveTemas(null);
     const claveNave = `nave:${osis}`;
@@ -975,6 +978,26 @@ export default function Lector() {
       })
       .catch(() => setDicEntrada(null));
   };
+
+  // P.2: índice global de refs cruzadas OpenBible (lazy: 4,2 MB al primer uso del panel)
+  useEffect(() => {
+    if (!panelRefs || refsOpenBible) return;
+    const osisRef = `${panelRefs.verso.osis}.${panelRefs.verso.c}.${panelRefs.verso.v}`;
+    const enCache = cache.get("ob:refs") as Record<string, string> | undefined;
+    if (enCache) {
+      setRefsOpenBible((enCache[osisRef] ?? "").split(";").filter(Boolean));
+      return;
+    }
+    fetch("/data/openbible/refs.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: { v?: Record<string, string> } | null) => {
+        if (!json?.v) return;
+        cache.set("ob:refs", json.v);
+        setRefsOpenBible((json.v[osisRef] ?? "").split(";").filter(Boolean));
+      })
+      .catch(() => setRefsOpenBible([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panelRefs?.verso.osis, panelRefs?.verso.c, panelRefs?.verso.v, refsOpenBible]);
 
   // léxico transliterado (D22): se carga al abrir el comentario; el render lo usa para términos clicables
   useEffect(() => {
@@ -3140,6 +3163,32 @@ export default function Lector() {
               )
             ) : (
               <div className="lex-meta">…</div>
+            )}
+            {refsOpenBible !== null && refsOpenBible.length > 0 && (
+              <div className="info-seccion">
+                <div className="info-titulo">{tr.tituloOpenBible}</div>
+                <div className="refs-lista">
+                  {refsOpenBible.slice(0, 24).map((ref) => {
+                    const [o, c, v] = ref.split(".");
+                    const libro = manifest?.libros.find((l) => l.osis === o);
+                    return (
+                      <button
+                        key={ref}
+                        className="ref-item"
+                        onClick={() => {
+                          if (o !== osis) setOsis(o);
+                          setCap(Number(c));
+                          setPanelRefs(null);
+                          window.scrollTo({ top: 0 });
+                        }}
+                      >
+                        <b>{libro?.nombre ?? o}</b> {c}:{v}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="lex-fuente">{tr.fuenteOpenBible}</div>
+              </div>
             )}
             {naveTemas !== null && (
               <div className="info-seccion">
