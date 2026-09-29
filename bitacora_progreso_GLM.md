@@ -1358,3 +1358,9 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Resultado**: 7.939 versos · 137.741 palabras · 0 descartadas · `macula/sintaxis.json` 5,6 MB desplegado. Integración en la vista griega/interlineal (tap → rol sintáctico + contextual EN) = turno siguiente.
 - **Choque de deploys resuelto**: dos wrangler simultáneos sobre la misma carpeta de salida — regla: un deploy a la vez, y carpeta limpia con nombre nuevo por corrida.
 - Gasto: **$49,48 de $75** (2.3 = $0: los datos vienen con las columnas necesarias, sin traducción; los roles ya están en ES).
+
+## 2026-09-28 — Móvil: recursos recordados, carpetas en 3 posiciones, cabecera en una fila (Claude)
+- **Recursos recordados**: `localStorage.recursos` (comentario principal y su fuente, Mis notas, Diccionario, Buscar, Diccionario en el texto, Interlineal, Griego); los comentarios extra ya estaban en `mesa-coms`.
+- **Carpetas en 3 posiciones** (`Hoja` = abierta · media · guardada; `offsetHoja`, `decidirHoja`): se arrastran desde la lengüeta o el 10 % superior de la tarjeta (el resto desplaza su contenido); al soltar, gesto rápido = siguiente posición, lento = la más cercana. En «media» la tarjeta ocupa la mitad y la Biblia se lee arriba (`con-hoja-media`). `--hoja-base` en <html>.
+- **Cabecera móvil en una fila**: los selectores de libro y capítulo muestran «Libros ▾» / «Caps ▾» (`.sel-rotulo`, el select transparente encima abre la lista completa); selector de Biblia con flecha propia; cabe con el contador de Recursos (probado a 360 y 390 px).
+- **Título**: nombres largos (>10 letras) en 24 px y en una sola línea («2 Tesalonicenses 1»).
