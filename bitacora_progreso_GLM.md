@@ -1375,3 +1375,28 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 
 ## 2026-09-29 — Móvil: título de sección anclado en la carpeta (Claude)
 - `.lex-panel.movil .com-toggle { position: sticky; top: 0 }`: el título de la sección que se lee queda pegado al borde superior de la carpeta (antes heredaba el `top` pensado para la cabecera de la página, ~130 px, y dejaba un hueco por donde pasaba el texto). Cada sección lleva el suyo.
+
+## ⛔ PUERTA A — informe de cierre de la Fase 2 (2026-09-29, GLM)
+
+**PARADA OBLIGATORIA antes de la Fase 3.** La Fase 2 quedó completa en datos y funcionalidad; el gasto acumulado se acerca al 66 % del tope y la Fase 3 proyectada NO cabe entera sin subirlo. **Esperando decisión del usuario.**
+
+### Qué se integró en la Fase 2 (en orden de la hoja)
+1. **2.1 Theographic** (CC BY-SA 4.0): 3.067 personas · 1.274 lugares con coordenadas · 450 eventos · **18.127 versos keyados por OSIS** (`theographic/`). UI: chips de personas/lugares en el panel del verso + fichas de persona con genealogía. Pendiente: traducción ES de nombres (~$0,5) y el mapa de lugares (opcional).
+2. **2.2 OpenBible** (CC BY): **344.800 referencias cruzadas votadas** de 29.364 versos (`openbible/refs.json`, 4,2 MB lazy) — sección «Referencias cruzadas votadas» en el panel del verso. El sub-ítem geo/mapa de lugares quedó cubierto por Theographic (chips + overlay OSM).
+3. **2.3 MACULA** (CC BY 4.0): sintaxis por palabra del NT griego — **7.939 versos · 137.741 palabras** (`macula/sintaxis.json`, 5,6 MB lazy). UI: sección «Sintaxis en la oración» en la ficha léxica del interlineal (rol ES + palabra griega + contextual EN, filtrado por Strong).
+
+### Gasto real acumulado
+- **$49,48 de $75** (66 %) · 81.546 llamadas · memoria de traducción: ~240.000 unidades traducidas.
+- Desglose Fase 2: Theographic datos+ingesta ~$0 · refs OpenBible $0 · Rand ES $0,87 · MACULA $0 (los roles ya van en ES) · la mayor parte correspondía a la cola anterior (Henry/JFB/Barnes/Nave's).
+
+### Gasto proyectado de la Fase 3 (medido con muestras pendientes)
+- Keil & Delitzsch (10 vols.): ~$15-20 · Vincent: ~$3 · Catena Aurea: ~$6-8 · Edersheim: ~$5 → **total Fase 3 ≈ $30-35**.
+- **$49,48 + $30-35 = $80-85 → NO cabe en el tope actual de $75.** Hacen falta ~$10-15 adicionales, o recortar Fase 3 (p. ej. solo K&D + Vincent ≈ $18-23, cabe justo).
+
+### Calidad
+- Todas las obras ES con portón verde (valida-es + prueba-citas 62/62). La auditoría Jev de Henry: 91,7 % aprobada en censal.
+
+### Pendientes menores documentados
+- Alias ES de libros en referencias.ts (Ag, Mi, Jr… ~30 formas del motor) · pulido OCR fino de Valdés/Rand · verificación en móvil de la sección Sintaxis (2.3) · 1.3 Calvino-Valera sigue bloqueada por licencia (ver hoja).
+
+**⛔ PARADA. El usuario decide: (a) subir el tope a ~$85 para la Fase 3 completa, (b) aprobar una Fase 3 recortada, o (c) reordenar prioridades.**
