@@ -1349,3 +1349,12 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Cabecera móvil en 2 líneas**: ⌕ · Biblia · ⫴ · Libro · Cap · ▦. Las ← → pasan junto al título (‹ Juan 1 ›); deslizar de lado en el centro de la pantalla (30 px de margen por el gesto «atrás») cambia de capítulo, con vuelta de página suave (`pasarCapitulo`, clase `giro-*`).
 - **Arrastre de la carpeta** también desde su 25 % superior, o desde cualquier punto si su contenido está arriba del todo (touchmove no pasivo sólo cuando se decide arrastrar).
 - `useMedia` escucha también `resize` (algunos entornos no avisan del cambio de media query al plegar/redimensionar).
+
+### 2026-09-29 · GLM (vigilante) — FASE 2.3 HECHA: MACULA Greek ingerida (sintaxis por palabra, verse-keyed)
+
+- **Fuente**: Clear-Bible/macula-greek, `SBLGNT/tsv/macula-greek-SBLGNT.tsv` (19,9 MB, una fila por palabra, 27 columnas: ref, role, english, text, lemma, strong, morph, frame, subjref…). CC BY 4.0.
+- **Falsas pistas descartadas**: MACTLines/bMAT.tsv y sources/MACULAJKNT.tsv = 404; el árbol por API truncaba (usar `git/trees/main` sin recursive y luego por SHA).
+- **Ingesta** (`scripts/ingesta-macula.mjs`): conversión «MAT 1:1!1» → MAT.1.1 (los prefijos cortos MAYÚSCULAS ya SON el OSIS — el bug inicial: mi mapa tenía claves largas «Matt» y el lookup daba undefined); libros numerados «1CO» (regex [0-9]?[A-Z]{2,3}); rol ES (v→verbo, s→sujeto, o→objeto directo…); se conservan palabra griega normalizada + traducción contextual EN de la columna `english`.
+- **Resultado**: 7.939 versos · 137.741 palabras · 0 descartadas · `macula/sintaxis.json` 5,6 MB desplegado. Integración en la vista griega/interlineal (tap → rol sintáctico + contextual EN) = turno siguiente.
+- **Choque de deploys resuelto**: dos wrangler simultáneos sobre la misma carpeta de salida — regla: un deploy a la vez, y carpeta limpia con nombre nuevo por corrida.
+- Gasto: **$49,48 de $75** (2.3 = $0: los datos vienen con las columnas necesarias, sin traducción; los roles ya están en ES).
