@@ -357,9 +357,15 @@ JSON COMPACTO en una sola línea, sin sangrías ni saltos: cada espacio cuesta.`
 // que produce la ingesta. Unidades = párrafos no vacíos; id estable por posición
 // (`jfb.JHN.3.14.2` = ancla 14, párrafo 2). Salida ES espejo: los párrafos aún
 // sin traducir van como "" y el lector cae al EN párrafo a párrafo.
-const comentarioEn = (id, nombre, fuente) => ({
+// opts.mascarado: enmascara hebreo/griego con ⟦n⟧ al enviar (en) y desenmascara
+// al ensamblar — el hash y la memoria de traducción siguen calculándose sobre el
+// texto ORIGINAL (enmascara es determinista, las fichas se reproducen igual).
+// opts.prompt / opts.lote: prompt propio y tamaño de lote de la obra.
+const comentarioEn = (id, nombre, fuente, opts = {}) => ({
   id,
   nombre,
+  ...(opts.prompt ? { prompt: opts.prompt } : {}),
+  ...(opts.lote ? { lote: opts.lote } : {}),
   dirEn: path.join(DATA, id),
   dirEs: path.join(DATA, `${id}-es`),
 
@@ -382,7 +388,20 @@ const comentarioEn = (id, nombre, fuente) => ({
         });
       }
     }
-    return out.map((u) => ({ ...u, h: hash(u.en), chars: u.en.length }));
+    let us = out.map((u) => ({ ...u, h: hash(u.en), chars: u.en.length }));
+    // muestra determinista para pilotos: variada en longitud, estable entre corridas
+    if (filtro.muestra) {
+      const n = Number(filtro.muestra);
+      const orden = [...us].sort((a, b) => a.chars - b.chars);
+      us = Array.from({ length: Math.min(n, orden.length) }, (_, i) => orden[Math.floor(((i + 0.5) * orden.length) / n)]);
+    }
+    if (opts.mascarado) {
+      us = us.map((u) => {
+        const { t } = enmascara(u.en);
+        return { ...u, orig: u.en, en: t };
+      });
+    }
+    return us;
   },
 
   ensambla(estado, filtro = {}) {
@@ -409,7 +428,8 @@ const comentarioEn = (id, nombre, fuente) => ({
             if (r && r.es && r.h === hash(en) && ['traducida', 'auditada', 'aprobada'].includes(r.estado)) {
               unidades++;
               hay++;
-              return r.es;
+              // con máscara: la ES guardada trae ⟦n⟧ — se restituye el original
+              return opts.mascarado ? desenmascara(r.es, enmascara(en).fichas) : r.es;
             }
             return '';
           }),
@@ -442,8 +462,7 @@ const comentarioEn = (id, nombre, fuente) => ({
   },
 });
 
-const jfb = comentarioEn(
-  'jfb',
+const jfb = comentarioEn(  'jfb',
   'A Commentary, Critical and Explanatory, on the Whole Bible — Jamieson, Fausset y Brown (1871)',
   'JFB',
   'Jamieson, Fausset and Brown Commentary (1871) · Dominio público'
@@ -452,8 +471,50 @@ const jfb = comentarioEn(
 const barnes = comentarioEn(
   'barnes',
   'Notes on the New / Old Testament — Albert Barnes (1832–1872)',
-  'Barnes',
   'Albert Barnes, Notes on the New / Old Testament (1832–1872) · Dominio público · texto original vía biblehub.com'
+);
+
+// ── 3.1 Keil & Delitzsch (AT completo; hoja de ruta Fase 3b) ────────────────
+// Prosa académica del s. XIX con transliteraciones hebreas: prompt propio y
+// máscara ⟦n⟧ como seguro para tramos en alfabeto original (el espejo de
+// biblehub casi no los trae — verificado GEN 1, PSA 110, ISA 7: 0 tramos).
+const REGLAS_KD = `Eres traductor especializado en exégesis académica bíblica del siglo XIX.
+Traduces el «Commentary on the Old Testament» de Keil y Delitzsch (trad. inglesa de T&T Clark, 1857–1878) del inglés al español.
+
+REGISTRO: académico, preciso y sobrio. K&D argumenta sobre gramática hebrea, crítica textual y historia: conserva la argumentación técnica completa. NO lo devocionalices ni lo simplifiques.
+
+REGLAS DURAS:
+1. Traduces TODO el contenido. No resumas, no omites, no añades comentario propio.
+2. Conservas íntegras las referencias bíblicas en su forma abreviada española:
+   Gen→Gn, Exo→Éx, Lev→Lv, Num→Nm, Deut→Dt, Josh→Jos, Judg→Jue, 1Ki→1 R, Isa→Is,
+   Psa→Sal, Matt→Mt, Joh→Jn, Rom→Ro, 1Co→1 Co, Heb→He, Rev→Ap. Si el original dice
+   "Gen 1:1", el español dice "Gn 1:1". Ni una referencia se pierde.
+3. Las transliteraciones del hebreo y del griego NO se tocan (bara, Elohim, Yahweh,
+   Qoheleth, theos): son pronunciación y se quedan tal cual.
+4. Terminología gramatical fija: noun→sustantivo, verb→verbo, genitive→genitivo,
+   construct state→estado constructo, apodosis→apódosis, protasis→prótasis,
+   Masoretic text→texto masorético, Pentateuch→Pentateuco, theocracy→teocracia.
+   Los nombres de conjugaciones hebreas (Kal, Niphal, Piel, Pual, Hiphil, Hophal,
+   Hithpael) NO se traducen.
+5. «LORD» (el Nombre divino) → «Jehová». «God» → «Dios». «the Lord» → «el Señor».
+6. Cifras, años y cantidades exactas. Cuando cita la Biblia en la prosa, traduces
+   alineado a Reina-Valera 1909; si el argumento depende de la palabra inglesa o
+   hebrea, conservas la distinción y lo aclaras entre corchetes: [N. del T.]
+7. Ortografía española completa, con todas sus tildes. Una unidad no se resume
+   ni se amplía: todo lo que dice el inglés, nada más.
+
+FICHAS: el texto trae marcas como ⟦1⟧, ⟦2⟧… que ocultan tramos en alfabeto hebreo
+o griego. Consérvalas EXACTAMENTE, cada una una sola vez, en el lugar que exija la
+sintaxis española. No las traduzcas, no las renumeres, no las quites, no inventes otras.
+
+SALIDA: exclusivamente un objeto JSON {"u":[{"id":"...","es":"..."}]} con una entrada por
+unidad recibida, los MISMOS id, en el mismo orden. Sin preámbulo, sin explicación, sin markdown.`;
+
+const kd = comentarioEn(
+  'kd',
+  'Commentary on the Old Testament — Keil y Delitzsch (trad. inglesa T&T Clark, 1857–1878)',
+  'C. F. Keil y F. Delitzsch, Commentary on the Old Testament (trad. inglesa T&T Clark, 1857–1878) · Dominio público · texto original vía biblehub.com',
+  { prompt: REGLAS_KD, mascarado: true }
 );
 
 // ── Definiciones del léxico (TBESH/TBESG) ──────────────────────────────────
@@ -635,7 +696,7 @@ const rand = {
   },
 };
 
-export const OBRAS = { henry, easton, glosas, naves, jfb, barnes, lexdef, rand };
+export const OBRAS = { henry, easton, glosas, naves, jfb, barnes, kd, lexdef, rand };
 
 
 export function obra(id) {
