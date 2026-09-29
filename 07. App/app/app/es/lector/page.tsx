@@ -77,6 +77,26 @@ type ComFuente = (typeof COMENTARIOS)[number]["id"];
 // obras de comentario EN servidas de /data/{ruta}/{OSIS}.json (misma forma de JSON para todas)
 const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes", easton: "easton-pasajes", valdes: "valdes" };
 const OSIS_INICIAL = "JHN";
+type Hoja = "abierta" | "media" | "guardada";
+const ORDEN_HOJA: Hoja[] = ["abierta", "media", "guardada"];
+/** Desplazamiento (px) de las carpetas en cada posición; H = alto de la carpeta. */
+const offsetHoja = (h: Hoja, H: number) => (h === "abierta" ? 0 : h === "media" ? H / 2 : H);
+/**
+ * Al soltar: un gesto rápido pasa a la posición siguiente en su dirección; uno
+ * lento se queda en la posición más cercana a donde se soltó (0, H/2 o H).
+ */
+const decidirHoja = (pos: number, vel: number, H: number, actual: Hoja): Hoja => {
+  const i = ORDEN_HOJA.indexOf(actual);
+  if (vel > 0.6) return ORDEN_HOJA[Math.min(2, i + 1)];
+  if (vel < -0.6) return ORDEN_HOJA[Math.max(0, i - 1)];
+  const puntos = [0, H / 2, H];
+  let mejor = 0;
+  puntos.forEach((v, k) => {
+    if (Math.abs(pos - v) < Math.abs(pos - puntos[mejor])) mejor = k;
+  });
+  return ORDEN_HOJA[mejor];
+};
+
 /** Grupos del canon para la navegación lateral (pantallas ≥ 1280 px). */
 const GRUPOS_LIBROS = [
   { nombre: "Ley", osis: ["GEN", "EXO", "LEV", "NUM", "DEU"] },
@@ -203,12 +223,23 @@ export default function Lector() {
   const [estiloAbierto, setEstiloAbierto] = useState<Zona | null>(null);
   // ARCHIVADOR (móvil < 680 px): las tarjetas son carpetas con lengüeta. Abierto =
   // la carpeta del frente a la vista; cerrado = sólo asoman las lengüetas abajo.
-  const [hojaAbierta, setHojaAbierta] = useState(true);
+  // posición de las carpetas: abierta (60 % de la pantalla), media (la mitad, para
+  // seguir leyendo arriba) o guardada (sólo asoman las lengüetas)
+  const [hoja, setHoja] = useState<Hoja>("abierta");
+  const hojaAbierta = hoja !== "guardada";
+  const setHojaAbierta = (v: boolean) => setHoja(v ? "abierta" : "guardada");
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--hoja-base",
+      hoja === "abierta" ? "0px" : hoja === "media" ? "calc(var(--hoja-h) / 2)" : "var(--hoja-h)"
+    );
+  }, [hoja]);
   const [menuHoja, setMenuHoja] = useState<{ id: string; x: number } | null>(null);
   // qué carpeta está al frente en el móvil (comentarios y herramientas por igual)
   const [frenteMovil, setFrenteMovil] = useState<string | null>(null);
   // panel de Recursos: el único sitio donde se activan comentarios, diccionarios y herramientas
   const [recursosAbierto, setRecursosAbierto] = useState(false);
+  const recursosCargados = useRef(false);
   // dirección de la última vuelta de página (para la animación del capítulo)
   const [giro, setGiro] = useState<"" | "adelante" | "atras">("");
   const ordenHoja = useRef<string[]>([]);
@@ -1435,6 +1466,7 @@ export default function Lector() {
     const H = window.innerHeight * 0.6;
     let modo: "?" | "v" | "h" = "?";
     let dy = 0;
+    let pos = 0;
     const mover = (ev: PointerEvent) => {
       const dx = ev.clientX - x0;
       const d = ev.clientY - y0;
@@ -1446,10 +1478,11 @@ export default function Lector() {
         }
       }
       if (modo !== "v") return;
-      dy = hojaAbierta ? Math.max(0, Math.min(H, d)) : Math.max(-H, Math.min(0, d));
+      const base = offsetHoja(hoja, H);
+      pos = Math.max(0, Math.min(H, base + d));
+      dy = pos - base;
       html.style.setProperty("--hoja-dy", `${dy}px`);
-      const frac = hojaAbierta ? dy / H : 1 + dy / H;
-      html.style.setProperty("--hoja-op", String(1 - frac * 0.65));
+      html.style.setProperty("--hoja-op", String(1 - (pos / H) * 0.65));
     };
     const soltar = (ev: PointerEvent) => {
       window.removeEventListener("pointermove", mover);
@@ -1460,8 +1493,7 @@ export default function Lector() {
       html.style.removeProperty("--hoja-op");
       if (modo === "v") {
         const vel = dy / Math.max(1, performance.now() - t0);
-        if (hojaAbierta && (dy > H / 3 || vel > 0.6)) setHojaAbierta(false);
-        else if (!hojaAbierta && (-dy > H / 5 || vel < -0.6)) setHojaAbierta(true);
+        setHoja(decidirHoja(pos, vel, H, hoja));
         return;
       }
       if (modo === "h") return; // sólo se desplazó la tira
@@ -1470,8 +1502,8 @@ export default function Lector() {
       const id = leng?.dataset.id;
       if (id) {
         setFrenteMovil(id);
-        setHojaAbierta(true);
-      } else if (!hojaAbierta) setHojaAbierta(true);
+        setHoja((h) => (h === "guardada" ? "abierta" : h));
+      } else if (hoja === "guardada") setHoja("abierta");
     };
     window.addEventListener("pointermove", mover);
     window.addEventListener("pointerup", soltar);
@@ -1520,25 +1552,25 @@ export default function Lector() {
     };
   }, []);
 
-  // la carpeta del frente también se arrastra desde su 25 % superior (o desde
-  // cualquier punto si su contenido ya está arriba del todo), como una hoja nativa
-  const refHoja = useRef({ abierta: hojaAbierta });
-  refHoja.current.abierta = hojaAbierta;
+  // la carpeta del frente también se arrastra desde su 10 % superior (el resto de
+  // la tarjeta desplaza su contenido con normalidad), hacia sus tres posiciones
+  const refHoja = useRef({ hoja });
+  refHoja.current.hoja = hoja;
   useEffect(() => {
     if (ancho) return;
     const html = document.documentElement;
     let tarjeta: HTMLElement | null = null;
-    let x0 = 0, y0 = 0, t0 = 0, arriba = false, modo: "?" | "v" | "no" = "?", dy = 0;
+    let x0 = 0, y0 = 0, t0 = 0, arriba = false, modo: "?" | "v" | "no" = "?", dy = 0, pos = 0;
     const inicio = (e: TouchEvent) => {
       const el = (e.target as HTMLElement).closest<HTMLElement>(".lex-panel.movil.frente");
-      tarjeta = el && refHoja.current.abierta ? el : null;
+      tarjeta = el && refHoja.current.hoja !== "guardada" ? el : null;
       if (!tarjeta) return;
       const t = e.touches[0];
       const r = tarjeta.getBoundingClientRect();
       x0 = t.clientX;
       y0 = t.clientY;
       t0 = performance.now();
-      arriba = y0 - r.top < r.height * 0.25;
+      arriba = y0 - r.top < Math.max(44, window.innerHeight * 0.6 * 0.1);
       modo = "?";
       dy = 0;
     };
@@ -1549,15 +1581,17 @@ export default function Lector() {
       const dx = t.clientX - x0;
       if (modo === "?") {
         if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(d)) { modo = "no"; return; }
-        if (d > 8 && (arriba || tarjeta.scrollTop <= 0)) { modo = "v"; html.classList.add("hoja-arrastrando"); }
+        if (Math.abs(d) > 8 && arriba) { modo = "v"; html.classList.add("hoja-arrastrando"); }
         else if (Math.abs(d) > 8) { modo = "no"; return; }
         else return;
       }
       e.preventDefault();
       const H = window.innerHeight * 0.6;
-      dy = Math.max(0, Math.min(H, d - 8));
+      const base = offsetHoja(refHoja.current.hoja, H);
+      pos = Math.max(0, Math.min(H, base + d - Math.sign(d) * 8));
+      dy = pos - base;
       html.style.setProperty("--hoja-dy", `${dy}px`);
-      html.style.setProperty("--hoja-op", String(1 - (dy / H) * 0.65));
+      html.style.setProperty("--hoja-op", String(1 - (pos / H) * 0.65));
     };
     const fin = () => {
       if (modo === "v") {
@@ -1566,7 +1600,7 @@ export default function Lector() {
         html.style.removeProperty("--hoja-op");
         const H = window.innerHeight * 0.6;
         const vel = dy / Math.max(1, performance.now() - t0);
-        if (dy > H / 3 || vel > 0.6) setHojaAbierta(false);
+        setHoja(decidirHoja(pos, vel, H, refHoja.current.hoja));
       }
       tarjeta = null;
       modo = "?";
@@ -2002,6 +2036,35 @@ export default function Lector() {
     if (el) aside.scrollTo({ top: el.offsetTop - 60, behavior: "smooth" });
   }, [seccionActiva, comAlFrente]);
 
+  // los recursos activos se recuerdan entre visitas (los comentarios extra ya
+  // viven en `mesa-coms`); se restauran una vez al abrir la app
+  useEffect(() => {
+    try {
+      const g = JSON.parse(localStorage.getItem("recursos") ?? "null");
+      if (g) {
+        if (g.f && COMENTARIOS.some((c) => c.id === g.f)) setComFuente(g.f);
+        if (g.com) setComentario(true);
+        if (g.notas) setPanelNotas(true);
+        if (g.dic) abrirDic();
+        if (g.bus) setBusPanel(true);
+        if (g.det) setDicEnTexto(true);
+        if (g.inter) setInterlineal(true);
+        else if (g.gr) setGriego(true);
+      }
+    } catch {}
+    recursosCargados.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (!recursosCargados.current) return;
+    try {
+      localStorage.setItem(
+        "recursos",
+        JSON.stringify({ com: comentario, f: comFuente, notas: panelNotas, dic: dicPanel, bus: busPanel, det: dicEnTexto, inter: interlineal, gr: griego })
+      );
+    } catch {}
+  }, [comentario, comFuente, panelNotas, dicPanel, busPanel, dicEnTexto, interlineal, griego]);
+
   /** Contenido del comentario principal (cuadro de la mesa o carpeta del archivador). */
   const contenidoCom = (
               <div className="estudio-com visible cambio-suave" key={`${comFuente}-${osis}-${cap}`}>
@@ -2128,6 +2191,7 @@ export default function Lector() {
           >
             ⫴
           </button>
+          <span className="sel-rotulo" data-rotulo="Libros">
           <select
             className="sel"
             aria-label={tr.libro}
@@ -2150,6 +2214,8 @@ export default function Lector() {
               </option>
             ))}
           </select>
+          </span>
+          <span className={`sel-rotulo${pendiente ? " requerido" : ""}`} data-rotulo="Caps">
             <select
             ref={capRef}
             className={`sel sel-cap${pendiente ? " requerido" : ""}`}
@@ -2179,6 +2245,7 @@ export default function Lector() {
               </option>
             ))}
           </select>
+          </span>
           <button
             className={`recursos-btn${[comentario, dicEnTexto, interlineal, griego, panelNotas, dicPanel, busPanel].some(Boolean) ? " activa" : ""}`}
             onClick={() => setRecursosAbierto(true)}
@@ -2265,7 +2332,7 @@ export default function Lector() {
         style={{ "--estudio-w": `${anchoEstudio}px`, ...(ancho ? { marginRight: mesa.mr, paddingBottom: mesa.pb } : {}), ...(anchoNav ? { marginLeft: navW } : {}) } as React.CSSProperties}
       >
         <div
-          className={`lector-columna${itemsHoja.length && !ancho ? (hojaAbierta ? " con-hoja" : " con-hoja-cerrada") : ""}${giro ? ` giro-${giro}` : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
+          className={`lector-columna${itemsHoja.length && !ancho ? (hoja === "abierta" ? " con-hoja" : hoja === "media" ? " con-hoja-media" : " con-hoja-cerrada") : ""}${giro ? ` giro-${giro}` : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
           ref={columna}
         >
           <div className="lector-titulo">
@@ -2273,7 +2340,7 @@ export default function Lector() {
               <button className="titulo-flecha" onClick={() => pasarCapitulo(-1)} aria-label={tr.anterior} title={tr.anterior}>
                 ‹
               </button>
-              <h1 className="serif-display">
+              <h1 className={`serif-display${(info?.nombre ?? texto?.nombre ?? "").length > 10 ? " titulo-largo" : ""}`}>
                 {info?.nombre ?? texto?.nombre ?? "…"} {cap}
               </h1>
               <button className="titulo-flecha" onClick={() => pasarCapitulo(1)} aria-label={tr.siguiente} title={tr.siguiente}>

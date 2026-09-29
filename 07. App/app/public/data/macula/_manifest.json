@@ -1,0 +1,11 @@
+{
+  "obra": "MACULA Greek New Testament — sintaxis por palabra (Clear Bible)",
+  "osis_obra": "MACULA",
+  "licencia": "CC BY 4.0 — Clear Bible (ClearLearning)",
+  "fuente": "https://github.com/Clear-Bible/macula-greek — SBLGNT/tsv/macula-greek-SBLGNT.tsv",
+  "fecha_ingesta": "2026-09-29",
+  "formato": "por verso: [[griego normalizado, rol ES, traducción contextual EN]…]",
+  "roles": "v=verbo, s=sujeto, o=objeto directo, io=objeto indirecto, o2=objeto secundario, adv=adverbial, p=preposición, vc=copulativo, aux=auxiliar, fn=palabra de función",
+  "total": 7939,
+  "palabras": 137741
+}
