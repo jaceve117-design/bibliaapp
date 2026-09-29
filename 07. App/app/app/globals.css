@@ -6905,3 +6905,36 @@ button.rec-original[aria-pressed="true"]::before {
   }
   .lex-panel.movil .estudio-autor { margin-bottom: 8px; }
 }
+
+/* ═══ Biblias en paralelo: cada versión extra con un tono propio ═══
+   Se mezcla un poco del color de la LETRA con el fondo: en tema claro oscurece,
+   en oscuro aclara (una sola regla para ambos, y respeta el contraste elegido).
+   Principal: sin tono · 2.ª: 3 % · 3.ª: 5,5 % · 4.ª y 5.ª: 7 %. */
+:root {
+  --tono-par-1: color-mix(in srgb, var(--ink) 3%, transparent);
+  --tono-par-2: color-mix(in srgb, var(--ink) 5.5%, transparent);
+  --tono-par-3: color-mix(in srgb, var(--ink) 7%, transparent);
+  /* tarjetas y cuadros de estudio: un punto distintos del fondo de lectura */
+  --bg-tarjeta: color-mix(in srgb, var(--ink) 3.5%, var(--bg-elev));
+}
+/* al lado: cada columna extra con su tono, en celdas suaves */
+.paralelo:not(.apilado) .par-fila:not(.par-cabeza) > .par-otra { border-radius: 8px; padding: 4px 10px; margin: -4px 0; transition: background 0.3s ease; }
+.paralelo:not(.apilado) .par-fila > .par-otra:nth-child(2) { background: var(--tono-par-1); }
+.paralelo:not(.apilado) .par-fila > .par-otra:nth-child(3) { background: var(--tono-par-2); }
+.paralelo:not(.apilado) .par-fila > .par-otra:nth-child(n + 4) { background: var(--tono-par-3); }
+.paralelo:not(.apilado) .par-cabeza > span:nth-child(2) { padding-left: 10px; }
+.paralelo:not(.apilado) .par-cabeza > span:nth-child(n + 3) { padding-left: 10px; }
+/* apiladas: la franja de cada versión extra, con su tono */
+.paralelo.apilado .par-otra { border-radius: 0 8px 8px 0; padding-top: 3px; padding-bottom: 3px; padding-right: 8px; }
+.paralelo.apilado .par-fila > .par-otra:nth-child(2) { background: var(--tono-par-1); }
+.paralelo.apilado .par-fila > .par-otra:nth-child(3) { background: var(--tono-par-2); }
+.paralelo.apilado .par-fila > .par-otra:nth-child(n + 4) { background: var(--tono-par-3); }
+
+/* ═══ Tarjetas (sólo móvil): levemente distintas del fondo de lectura ═══
+   En pantallas grandes los cuadros ya tienen su color propio con «Aa». */
+@media (max-width: 679px) {
+  .lex-panel.movil { background-color: var(--bg-tarjeta); }
+  .lex-panel.movil .lex-cabecera,
+  .lex-panel.movil .com-toggle { background-color: var(--bg-tarjeta); }
+  .lengueta.frente { background: var(--bg-tarjeta); }
+}
