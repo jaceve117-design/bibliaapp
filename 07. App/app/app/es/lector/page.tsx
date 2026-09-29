@@ -145,6 +145,9 @@ export default function Lector() {
   const [panelRefs, setPanelRefs] = useState<{ verso: Verso; refs: string[]; cargadas: boolean } | null>(null);
   // P.2: referencias cruzadas votadas de OpenBible (CC BY) para el verso del panel
   const [refsOpenBible, setRefsOpenBible] = useState<string[] | null>(null);
+  // Fase 2.1: Theographic — personas y lugares del verso (nombres EN por ahora)
+  const [teoVerso, setTeoVerso] = useState<{ p: string[]; l: string[] } | null>(null);
+  const [teoFicha, setTeoFicha] = useState<{ n: string; ficha: Record<string, unknown> } | null>(null);
   const [dicPanel, setDicPanel] = useState(false);
   const [dicIndice, setDicIndice] = useState<IndiceItem[] | null>(null);
   const [dicQuery, setDicQuery] = useState("");
@@ -717,6 +720,8 @@ export default function Lector() {
   const abrirReferencias = (v: Verso) => {
     setPanelRefs({ verso: v, refs: [], cargadas: false });
     setRefsOpenBible(null);
+    setTeoVerso(null);
+    setTeoFicha(null);
     // temas de Nave's para este verso
     setNaveTemas(null);
     const claveNave = `nave:${osis}`;
@@ -996,6 +1001,16 @@ export default function Lector() {
         setRefsOpenBible((json.v[osisRef] ?? "").split(";").filter(Boolean));
       })
       .catch(() => setRefsOpenBible([]));
+    // Theographic: personas y lugares del verso (por-versiculo.json, 681 KB, una vez)
+    fetch("/data/theographic/por-versiculo.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: { v?: Record<string, { p?: string[]; l?: string[] }> } | null) => {
+        if (!json?.v) return;
+        cache.set("teo:verso", json.v);
+        const fila = json.v[osisRef];
+        setTeoVerso(fila ? { p: fila.p ?? [], l: fila.l ?? [] } : { p: [], l: [] });
+      })
+      .catch(() => setTeoVerso({ p: [], l: [] }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panelRefs?.verso.osis, panelRefs?.verso.c, panelRefs?.verso.v, refsOpenBible]);
 
@@ -3163,6 +3178,66 @@ export default function Lector() {
               )
             ) : (
               <div className="lex-meta">…</div>
+            )}
+            {teoVerso && (teoVerso.p.length > 0 || teoVerso.l.length > 0) && (
+              <div className="info-seccion">
+                <div className="info-titulo">{tr.tituloTheographic}</div>
+                {teoVerso.p.length > 0 && (
+                  <div className="refs-lista">
+                    {teoVerso.p.map((n) => (
+                      <button
+                        key={n}
+                        className={`ref-item tema-nave${teoFicha?.n === n ? " activa" : ""}`}
+                        onClick={async () => {
+                          if (teoFicha?.n === n) { setTeoFicha(null); return; }
+                          const claveTeo = "teo:personas";
+                          let fichas = cache.get(claveTeo) as Array<Record<string, unknown>> | undefined;
+                          if (!fichas) {
+                            const json = await (await fetch("/data/theographic/personas.json")).json();
+                            fichas = (json.fichas ?? []) as Array<Record<string, unknown>>;
+                            cache.set(claveTeo, fichas);
+                          }
+                          const ficha = (fichas as Array<Record<string, unknown>>).find(function (x) { return x.n === n; });
+                          setTeoFicha(ficha ? { n: n, ficha: ficha } : { n: n, ficha: {} });
+                        }}
+                        title={tr.theographicFuente}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {teoVerso.l.length > 0 && (
+                  <div className="refs-lista" style={{ marginTop: 8 }}>
+                    {teoVerso.l.map((n) => (
+                      <span key={n} className="ref-item" style={{ cursor: "default" }}>
+                        {n}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {teoFicha && teoFicha.n && (
+                  <div className="lex-def" style={{ marginTop: 10 }}>
+                    {(() => {
+                      const ficha = teoFicha.ficha as {
+                        g?: string; nac?: string | null; mue?: string | null;
+                        padre?: string[] | null; madre?: string[] | null; hijos?: string[] | null;
+                      };
+                      const partes: string[] = [];
+                      if (ficha.g) partes.push(ficha.g === "varón" ? "Varón" : "Mujer");
+                      const anios: string[] = [];
+                      if (ficha.nac != null) anios.push("n. " + String(ficha.nac).replace("^-", "a. C. "));
+                      if (ficha.mue != null) anios.push("m. " + String(ficha.mue).replace("^-", "a. C. "));
+                      if (anios.length) partes.push(anios.join(", "));
+                      if (ficha.padre?.length) partes.push("Hijo de " + ficha.padre.join(", "));
+                      if (ficha.madre?.length) partes.push("Hijo de " + ficha.madre.join(", "));
+                      if (ficha.hijos?.length) partes.push("Padre de " + ficha.hijos.join(", "));
+                      return partes.join(" · ");
+                    })()}
+                  </div>
+                )}
+                <div className="lex-fuente">{tr.theographicFuente}</div>
+              </div>
             )}
             {refsOpenBible !== null && refsOpenBible.length > 0 && (
               <div className="info-seccion">

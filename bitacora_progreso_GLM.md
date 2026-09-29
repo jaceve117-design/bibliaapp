@@ -1322,3 +1322,11 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Licencia CC BY-SA 4.0**: crédito añadido a llms.txt; nota de ShareAlike (derivados heredan).
 - **PENDIENTE (próximo turno)**: integración en el lector — chips de personas/lugares en el panel del verso (por-versiculo.json), fichas de persona con genealogía (personas.json), línea de tiempo por libro (eventos.json). Traducción ES de nombres/descripciones cortas por el motor, perfil glosa (~0,5 USD).
 - Gasto: $48,61 (2.1 ingesta = $0; la traducción ES de nombres entra después).
+
+### 2026-09-29 · GLM (vigilante) — FASE 2.2 (refs) HECHA: OpenBible Cross-References en el panel del verso
+
+- **Fuente**: openbible.info/labs/cross-references (CC BY) — 344.800 referencias votadas de 29.364 versos, los 66 libros. Zip descargado (`cross_references.txt`, TSV «From Verse \t To Verse \t Votes»).
+- **Ingesta** (`scripts/ingesta-openbible.mjs`): conversión a OSIS de 3 letras (AMBOS extremos del rango — bug corregido: el «1John.4.10» final de un rango quedaba sin convertir), destinos ordenados por votos, índice compacto `public/data/openbible/refs.json` (4,2 MB, carga perezosa al primer uso del panel).
+- **Lector**: sección «Referencias cruzadas votadas» en el panel del verso (antes de Nave's), chips que navegan al pasaje (con cambio de libro si hace falta). i18n ES/EN.
+- **Verificado**: producción sirviendo refs.json (200, 4,2 MB); los destinos llegan limpios (Jn 3:16 → Ro 5:8, 1 Jn 4:9-10, Ro 8:32…).
+- Gasto: $49,48 de $75 (2.2 = $0).
