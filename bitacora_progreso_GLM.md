@@ -1314,3 +1314,11 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Deslizar hacia abajo** desde la tira: carpeta y tira siguen al dedo (`--hoja-dy`, sólo transform), el contenido se atenúa (`--hoja-op`); al soltar se guarda si bajó > 1/3 o fue rápido. Guardado = sólo asoman las lengüetas; deslizar hacia arriba o tocar una lengüeta la saca. Deslizar nunca cierra: sólo ✕.
 - ▾ = «Cambiar por…» (Diccionario, Buscar, Mis notas): abre ese recurso y cierra el actual.
 - Código: `propsPanel` rama móvil (`lex-panel movil frente|detras|guardada`), `iniciarHoja`, `cerrarPanel` (compartido con Esc), CSS «ARCHIVADOR».
+
+### 2026-09-29 · GLM (vigilante) — FASE 2.1 HECHA: Theographic Bible Metadata ingerida (datos verse-keyed por OSIS)
+
+- **Fuente**: GitHub robertrouse/theographic-bible-metadata, export JSON de Airtable (CC BY-SA 4.0). Descargados people/places/events/peopleGroups JSONs (crudo en 05. Datos/corpus_crudo/theographic/).
+- **Ingesta** (`scripts/ingesta-theographic.mjs`): 3.067 personas (con genealogías resueltas a nombres: padre/madre/hijos, años ±AC, texto de diccionario embebido), 1.274 lugares (coordenadas openBible), 450 eventos (participantes y versos resueltos), **18.127 versos keyados por OSIS** (conversión de prefijos tipo «Gen» → GEN; 66 libros cubiertos).
+- **Licencia CC BY-SA 4.0**: crédito añadido a llms.txt; nota de ShareAlike (derivados heredan).
+- **PENDIENTE (próximo turno)**: integración en el lector — chips de personas/lugares en el panel del verso (por-versiculo.json), fichas de persona con genealogía (personas.json), línea de tiempo por libro (eventos.json). Traducción ES de nombres/descripciones cortas por el motor, perfil glosa (~0,5 USD).
+- Gasto: $48,61 (2.1 ingesta = $0; la traducción ES de nombres entra después).
