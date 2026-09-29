@@ -1411,3 +1411,39 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - `RE_CITA` con frontera unicode `(?<![\p{L}\p{N}_])…(?![\p{L}])` + bandera `gu` (el `` de JS es ASCII y fallaba con acentos); herencia elíptica de grupos desnudos («(2:1, 4; 7:7)» hereda el libro; capCorriente encadena dentro del grupo).
 - Regresión: `scripts/casos-citas.json` 62 → 80 casos (los 20 alias nuevos, 2 ya existían) — **80/80 ok**. Commit `1082327`, pusheado (Cloudflare Pages despliega solo).
 - Sin tocar interfaz ni obra nueva: queda en parada de Puerta A esperando la coordinación del usuario con Claude.
+
+---
+
+## ▶ 2026-09-29 — DECISIÓN DEL USUARIO Y REPARTO DE TRABAJO (Claude, a pedido del usuario)
+
+### Decisión tras la Puerta A
+- **Fase 3b aprobada**: sólo **3.1 Keil & Delitzsch** y **3.2 Vincent**, dentro del tope actual de **75 USD** (gasto hoy 49,48). **3.3 Catena Aurea y 3.4 Edersheim quedan APLAZADAS** hasta que el usuario suba el tope: no empezarlas.
+- **No aprobado todavía**: traducción ES de nombres Theographic (~0,50 USD) — queda pendiente de decisión del usuario; no ejecutarla.
+- Calvino-Valera (1.3) sigue bloqueada por licencia (sin cambios).
+- Si la proyección medida con la muestra de 3.1 hace pasar el gasto de 75 USD → ⛔ parar e informar (regla 4 de la hoja).
+
+### QUIÉN HACE QUÉ (para no pisarse: trabajamos en la MISMA carpeta)
+
+**GLM — datos, traducción e ingesta (Fase 3b)**
+1. 3.1 Keil & Delitzsch: fuente de dominio público, limpieza, obra `kd` en `11. Motor de Traducción/lib/obras.mjs` (modelo henry/jfb, **enmascarar hebreo/griego** con ⟦n⟧), muestra → proyección → corrida → ensamblado a `07. App/app/public/data/kd/` y `kd-es/` (mismo formato JSON que `jfb/` y `jfb-es/`: `{osis, fuente, c:{cap:[{v,p:[…]}]}}`).
+2. 3.2 Vincent (NT): igual, carpetas `vincent/` y `vincent-es/`.
+3. Portón de calidad (valida-es + prueba-citas) y bitácora con gasto real.
+
+**Archivos de GLM** (sólo él los toca): `11. Motor de Traducción/**` · `07. App/app/public/data/**` · `07. App/app/scripts/ingesta-*`, `limpia-*`, `rescata-*` y los scripts de datos que cree · `05. Datos/**` · `hoja_de_ruta_recursos_GLM.md` · `public/llms.txt` (añadir obras nuevas).
+
+**Claude — interfaz**
+1. Revisar e integrar en móvil (archivador) y en la mesa lo nuevo de la Fase 2: personas y lugares (Theographic), referencias votadas (OpenBible), sintaxis (MACULA).
+2. Portada (`/es`): nueva, con logo, funciones y botón de instalar.
+3. Limpieza del CSS duplicado de `app/globals.css`.
+4. **Registrar en el lector las obras nuevas de GLM** (K&D y Vincent) cuando él avise «datos listos»: entradas en `COMENTARIOS` / `RUTA_COMENTARIO`, panel de Recursos y Fuentes.
+
+**Archivos de Claude** (sólo él los toca): `07. App/app/app/**` (incl. `es/lector/page.tsx`, `globals.css`, `layout.tsx`, `manifest.ts`) · `07. App/app/components/**` · `07. App/app/lib/**` (salvo que GLM necesite un cambio en `lib/referencias.ts`: pedirlo en la bitácora) · `07. App/app/scripts/genera-*` de interfaz (iconos, easton-pasajes, nave-temas, intro).
+
+### Reglas de convivencia
+- **Commits**: cada uno `git add <sus rutas>` — **nunca `git add -A` ni `git commit -a`** (ya pasó dos veces que un commit se llevó el trabajo del otro).
+- **Compilar**: una sola compilación a la vez (Next lo exige). Carpeta propia por build: `DIST_DIR=salida-$(date +%s)`; si sale «Another next build process is already running», esperar y reintentar.
+- **Publicar**:
+  - **GLM publica sólo en vista previa**: `npx wrangler pages deploy <carpeta> --project-name=bibliaapp --branch=glm` (URL `glm.bibliaapp.pages.dev`) para verificar sus datos.
+  - **Producción (`--branch=main`) la publica Claude**, tras validar el conjunto. Cuando GLM tenga algo listo, lo anota aquí con «✅ LISTO PARA PRODUCCIÓN: …» y Claude lo integra y publica.
+  - Motivo: al compartir carpeta, publicar desde un lado puede subir cambios a medias del otro.
+- **Avisos**: por esta bitácora. Si uno necesita que el otro cambie algo de sus archivos, lo pide aquí con «→ PEDIDO A CLAUDE:» / «→ PEDIDO A GLM:».

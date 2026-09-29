@@ -213,13 +213,13 @@ parar y dejar el informe para el usuario.
 
 ---
 
-## ⛔ PUERTA A — informe antes de la Fase 3
+## ✅ PUERTA A — superada (2026-09-29): el usuario aprobó la **Fase 3b** (sólo 3.1 y 3.2, dentro del tope de 75 USD)
 Dejar en la bitácora: qué se integró, gasto real acumulado, gasto proyectado de la Fase 3 medido
 con muestras. **Esperar a que el usuario suba el tope.**
 
 ---
 
-## FASE 3 — Salto de calidad exegética (≈30–35 USD)
+## FASE 3 — Salto de calidad exegética · **APROBADA LA 3b: 3.1 + 3.2 (≈18–23 USD)**; 3.3 y 3.4 aplazadas
 
 Todas son obras de comentario versículo a versículo → mismo patrón que `henry`/`jfb`/`barnes`:
 carpeta original + carpeta `-es`, obra nueva en `lib/obras.mjs`, muestra → proyección → corrida completa.
@@ -230,10 +230,10 @@ carpeta original + carpeta `-es`, obra nueva en `lib/obras.mjs`, muestra → pro
   griego** (mismo sistema ⟦n⟧ del léxico) para que vuelvan intactos. ≈15–20 USD.
 ### [ ] 3.2 Marvin Vincent — *Word Studies in the New Testament* (1887)
 - Dominio público. Estudio de palabras griegas por versículo. Enmascarar el griego. ≈3 USD.
-### [ ] 3.3 Tomás de Aquino — *Catena Aurea* (Evangelios; trad. inglesa de Newman, 1841–45)
+### [⏸ aplazada — no empezar] 3.3 Tomás de Aquino — *Catena Aurea* (Evangelios; trad. inglesa de Newman, 1841–45)
 - Dominio público. Cadena de citas de los Padres (Agustín, Crisóstomo, Jerónimo…) por versículo.
   Conservar la atribución de cada cita. Etiqueta: «Patrística». ≈6–8 USD.
-### [ ] 3.4 Alfred Edersheim — *Life and Times of Jesus the Messiah*, *The Temple*, *Sketches of Jewish Social Life*
+### [⏸ aplazada — no empezar] 3.4 Alfred Edersheim — *Life and Times of Jesus the Messiah*, *The Temple*, *Sketches of Jewish Social Life*
 - Dominio público. Obras no versiculares: sección «Trasfondo» con índice inverso versículo → capítulo,
   como en 1.3. ≈5 USD.
 
