@@ -6888,3 +6888,20 @@ button.rec-original[aria-pressed="true"]::before {
     background-size: 10px 6px;
   }
 }
+
+/* ── Carpeta del móvil: el título de la sección que se lee se ancla al BORDE
+   SUPERIOR de la carpeta (no bajo la cabecera de la página, que dejaba un hueco
+   de ~130 px por donde pasaba el texto). Cada sección lleva el suyo: al abrir
+   la siguiente, su título toma el relevo arriba. ── */
+@media (max-width: 679px) {
+  .lex-panel.movil .com-toggle {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
+  .lex-panel.movil .com-toggle.abierto {
+    box-shadow: 0 8px 14px -10px rgba(0, 0, 0, 0.55);
+    border-radius: 0 0 8px 8px;
+  }
+  .lex-panel.movil .estudio-autor { margin-bottom: 8px; }
+}
