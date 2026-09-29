@@ -19,7 +19,13 @@ export function useMedia(consulta: string): boolean {
     const cambia = () => setSi(mq.matches);
     cambia();
     mq.addEventListener("change", cambia);
-    return () => mq.removeEventListener("change", cambia);
+    // algunos navegadores (y la emulación de tamaños) no avisan del cambio de la
+    // media query al plegar/desplegar o redimensionar: se comprueba también en resize
+    window.addEventListener("resize", cambia);
+    return () => {
+      mq.removeEventListener("change", cambia);
+      window.removeEventListener("resize", cambia);
+    };
   }, [consulta]);
   return si;
 }

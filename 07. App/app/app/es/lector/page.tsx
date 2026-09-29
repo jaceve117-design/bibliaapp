@@ -205,6 +205,12 @@ export default function Lector() {
   // la carpeta del frente a la vista; cerrado = sólo asoman las lengüetas abajo.
   const [hojaAbierta, setHojaAbierta] = useState(true);
   const [menuHoja, setMenuHoja] = useState<{ id: string; x: number } | null>(null);
+  // qué carpeta está al frente en el móvil (comentarios y herramientas por igual)
+  const [frenteMovil, setFrenteMovil] = useState<string | null>(null);
+  // panel de Recursos: el único sitio donde se activan comentarios, diccionarios y herramientas
+  const [recursosAbierto, setRecursosAbierto] = useState(false);
+  // dirección de la última vuelta de página (para la animación del capítulo)
+  const [giro, setGiro] = useState<"" | "adelante" | "atras">("");
   const ordenHoja = useRef<string[]>([]);
   // menú de recurso de una pestaña: se abre SÓLO con su flecha ▾
   const [menuRecurso, setMenuRecurso] = useState<{ id: string; x: number; y: number } | null>(null);
@@ -1141,7 +1147,7 @@ export default function Lector() {
     }
     // móvil: carpeta del archivador; sólo la del frente se ve, las demás esperan
     // detrás con su lengüeta (la «baraja» anterior queda sustituida)
-    const alFrente = pila[pila.length - 1] === id;
+    const alFrente = frenteHoja === id;
     return {
       className: `lex-panel movil${alFrente ? " frente" : " detras"}${hojaAbierta ? "" : " guardada"}`,
       style: { zIndex: alFrente ? 61 : 60 },
@@ -1196,6 +1202,7 @@ export default function Lector() {
     if (nPila > nPilaAntes.current) {
       const id = pila[pila.length - 1];
       if (id) setActivo((a) => ({ ...a, [zonaEf(id)]: id }));
+      if (id) setFrenteMovil(id);
       setHojaAbierta(true);
     }
     nPilaAntes.current = nPila;
@@ -1257,7 +1264,8 @@ export default function Lector() {
     return () => window.removeEventListener("keydown", h);
   }, []);
 
-  const comEnTexto = comentario && !ancho;
+  // el comentario ya no va intercalado en el texto: vive en su carpeta (móvil) o cuadro (mesa)
+  const comEnTexto = false;
   // saneo: un id repetido hace que React deje pestañas huérfanas («cuadros falsos»
   // con el id por nombre); una entrada sin recurso válido no se muestra
   const comsLimpios = comsExtra.filter(
@@ -1267,7 +1275,7 @@ export default function Lector() {
     if (comsLimpios.length !== comsExtra.length) setComsExtra(comsLimpios);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comsExtra]);
-  const extrasVisibles = ancho && comentario ? comsLimpios : [];
+  const extrasVisibles = comentario ? comsLimpios : [];
   const fuentesExtra = [...new Set(extrasVisibles.map((e) => e.fuente))].filter((f) => f !== "henry").join(",");
   useEffect(() => {
     if (!fuentesExtra) return;
@@ -1290,6 +1298,8 @@ export default function Lector() {
     return (d.json.c[String(cap)] ?? []).flatMap((a) => a.p.filter(Boolean).map((x) => (a.v > 0 ? `${a.v}. ${x}` : x)));
   };
   const esCom = (id: string) => id === "com" || comsLimpios.some((e) => e.id === id);
+  const itemsHoja = [...(comentario ? ["com"] : []), ...extrasVisibles.map((e) => e.id), ...pila];
+  const frenteHoja = frenteMovil && itemsHoja.includes(frenteMovil) ? frenteMovil : pila[pila.length - 1] ?? itemsHoja[itemsHoja.length - 1];
   const fuenteDe = (id: string): ComFuente | undefined => (id === "com" ? comFuente : comsLimpios.find((e) => e.id === id)?.fuente);
   /** Clase y variables de estilo del cuadro según su zona (color de fondo y escala de letra). */
   const ZOOM = { "-2": 0.8, "-1": 0.9, "0": 1, "1": 1.12, "2": 1.25, "3": 1.4 } as Record<string, number>;
@@ -1337,7 +1347,7 @@ export default function Lector() {
   const estudioVisible = ancho && abiertas.length > 0;
   // cuántas Biblias caben lado a lado en el hueco que deja la mesa (mín. 2 extra, máx. 4)
   const maxPar = !anchoParalelo ? 2 : Math.max(2, Math.min(4, Math.floor((ventW - navW - (ancho ? mesa.mr : 0) - 64) / 300) - 1));
-  const comAlFrente = comentario && activoEn(zonaEf("com")) === "com";
+  const comAlFrente = comentario && (ancho ? activoEn(zonaEf("com")) === "com" : frenteHoja === "com" && hojaAbierta);
   // los paneles son hermanos de <main>: el ancho se publica en la raíz
   useEffect(() => {
     document.documentElement.style.setProperty("--estudio-w", `${anchoEstudio}px`);
@@ -1345,7 +1355,7 @@ export default function Lector() {
   // el comentario acompaña la lectura: el versículo que está a media pantalla
   // manda, y la columna se desliza a la sección que lo comenta
   useEffect(() => {
-    if (!ancho || !comentario || !columna.current) return;
+    if (!comentario || !columna.current) return;
     const io = new IntersectionObserver(
       (entradas) => {
         const vis = entradas.filter((x) => x.isIntersecting);
@@ -1362,11 +1372,12 @@ export default function Lector() {
   refTeclas.current = (e: KeyboardEvent) => {
     const el = e.target as HTMLElement;
     if (e.ctrlKey || e.metaKey || e.altKey || el.closest?.("input, textarea, select, [contenteditable]")) return;
-    if (e.key === "ArrowLeft") { e.preventDefault(); ir(-1); window.scrollTo({ top: 0, behavior: "smooth" }); }
-    else if (e.key === "ArrowRight") { e.preventDefault(); adelante(1); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); pasarCapitulo(-1); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); pasarCapitulo(1); }
     else if (e.key === "/") { e.preventDefault(); abrirBusqueda(); }
     else if (e.key === "Escape") {
       if (ajustes) return setAjustes(ajustes === "menu" ? null : "menu");
+      if (recursosAbierto) return setRecursosAbierto(false);
       if (vistazo) return setVistazo(null);
       const id = pila[pila.length - 1];
       if (id) cerrarPanel(id);
@@ -1387,12 +1398,24 @@ export default function Lector() {
     cerrar[id]?.();
   };
   // móvil: como mucho 5 carpetas; al abrir la sexta se cierra la más antigua
+  /** Cierra una carpeta/cuadro: comentario principal, comentario extra o herramienta. */
+  const cerrarItem = (id: string) => {
+    if (id === "com") {
+      const [primero, ...resto] = comsLimpios;
+      if (primero) {
+        // el siguiente comentario activo pasa a ser el principal
+        setComFuente(primero.fuente);
+        setComsExtra(resto);
+      } else setComentario(false);
+    } else if (comsLimpios.some((e) => e.id === id)) quitarExtra(id);
+    else cerrarPanel(id);
+  };
   useEffect(() => {
-    if (!ancho && pila.length > 5) cerrarPanel(ordenHoja.current.find((x) => pila.includes(x)) ?? pila[0]);
+    if (!ancho && itemsHoja.length > 5) cerrarItem(ordenHoja.current.find((x) => itemsHoja.includes(x)) ?? itemsHoja[0]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pila, ancho]);
+  }, [itemsHoja.join(","), ancho]);
   // orden ESTABLE de las lengüetas (el de apertura): elegir una no las reordena
-  ordenHoja.current = [...ordenHoja.current.filter((x) => pila.includes(x)), ...pila.filter((x) => !ordenHoja.current.includes(x))];
+  ordenHoja.current = [...ordenHoja.current.filter((x) => itemsHoja.includes(x)), ...itemsHoja.filter((x) => !ordenHoja.current.includes(x))];
 
   /**
    * Gesto del archivador sobre la tira de lengüetas:
@@ -1442,10 +1465,11 @@ export default function Lector() {
         return;
       }
       if (modo === "h") return; // sólo se desplazó la tira
-      const leng = (ev.target as HTMLElement).closest<HTMLElement>(".lengueta") ?? el.closest<HTMLElement>(".lengueta");
+      const bajo = ev.target instanceof Element ? ev.target : null;
+      const leng = bajo?.closest<HTMLElement>(".lengueta") ?? el.closest<HTMLElement>(".lengueta");
       const id = leng?.dataset.id;
       if (id) {
-        setPila((p) => [...p.filter((x) => x !== id), id]);
+        setFrenteMovil(id);
         setHojaAbierta(true);
       } else if (!hojaAbierta) setHojaAbierta(true);
     };
@@ -1453,6 +1477,111 @@ export default function Lector() {
     window.addEventListener("pointerup", soltar);
     window.addEventListener("pointercancel", soltar);
   };
+
+  /** Capítulo anterior/siguiente con una vuelta de página suave. */
+  const pasarCapitulo = (d: -1 | 1) => {
+    setGiro(d > 0 ? "adelante" : "atras");
+    if (d > 0) adelante(1);
+    else ir(-1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  useEffect(() => {
+    if (!giro) return;
+    const t = setTimeout(() => setGiro(""), 500);
+    return () => clearTimeout(t);
+  }, [giro, cap, osis]);
+  // deslizar de lado en el CENTRO de la pantalla cambia de capítulo; los 30 px de
+  // cada borde se dejan libres para el gesto «atrás» del sistema
+  const refPasar = useRef(pasarCapitulo);
+  refPasar.current = pasarCapitulo;
+  useEffect(() => {
+    const zona = columna.current;
+    if (!zona) return;
+    let x0 = 0, y0 = 0, t0 = 0, valido = false;
+    const inicio = (e: TouchEvent) => {
+      const t = e.touches[0];
+      x0 = t.clientX;
+      y0 = t.clientY;
+      t0 = Date.now();
+      valido = e.touches.length === 1 && x0 > 30 && x0 < window.innerWidth - 30 && !(e.target as HTMLElement).closest("button, select, input, .interlin, .paralelo, .gr-par");
+    };
+    const fin = (e: TouchEvent) => {
+      if (!valido) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x0;
+      const dy = t.clientY - y0;
+      if (Date.now() - t0 < 700 && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8) refPasar.current(dx < 0 ? 1 : -1);
+    };
+    zona.addEventListener("touchstart", inicio, { passive: true });
+    zona.addEventListener("touchend", fin, { passive: true });
+    return () => {
+      zona.removeEventListener("touchstart", inicio);
+      zona.removeEventListener("touchend", fin);
+    };
+  }, []);
+
+  // la carpeta del frente también se arrastra desde su 25 % superior (o desde
+  // cualquier punto si su contenido ya está arriba del todo), como una hoja nativa
+  const refHoja = useRef({ abierta: hojaAbierta });
+  refHoja.current.abierta = hojaAbierta;
+  useEffect(() => {
+    if (ancho) return;
+    const html = document.documentElement;
+    let tarjeta: HTMLElement | null = null;
+    let x0 = 0, y0 = 0, t0 = 0, arriba = false, modo: "?" | "v" | "no" = "?", dy = 0;
+    const inicio = (e: TouchEvent) => {
+      const el = (e.target as HTMLElement).closest<HTMLElement>(".lex-panel.movil.frente");
+      tarjeta = el && refHoja.current.abierta ? el : null;
+      if (!tarjeta) return;
+      const t = e.touches[0];
+      const r = tarjeta.getBoundingClientRect();
+      x0 = t.clientX;
+      y0 = t.clientY;
+      t0 = performance.now();
+      arriba = y0 - r.top < r.height * 0.25;
+      modo = "?";
+      dy = 0;
+    };
+    const mover = (e: TouchEvent) => {
+      if (!tarjeta || modo === "no") return;
+      const t = e.touches[0];
+      const d = t.clientY - y0;
+      const dx = t.clientX - x0;
+      if (modo === "?") {
+        if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(d)) { modo = "no"; return; }
+        if (d > 8 && (arriba || tarjeta.scrollTop <= 0)) { modo = "v"; html.classList.add("hoja-arrastrando"); }
+        else if (Math.abs(d) > 8) { modo = "no"; return; }
+        else return;
+      }
+      e.preventDefault();
+      const H = window.innerHeight * 0.6;
+      dy = Math.max(0, Math.min(H, d - 8));
+      html.style.setProperty("--hoja-dy", `${dy}px`);
+      html.style.setProperty("--hoja-op", String(1 - (dy / H) * 0.65));
+    };
+    const fin = () => {
+      if (modo === "v") {
+        html.classList.remove("hoja-arrastrando");
+        html.style.setProperty("--hoja-dy", "0px");
+        html.style.removeProperty("--hoja-op");
+        const H = window.innerHeight * 0.6;
+        const vel = dy / Math.max(1, performance.now() - t0);
+        if (dy > H / 3 || vel > 0.6) setHojaAbierta(false);
+      }
+      tarjeta = null;
+      modo = "?";
+    };
+    document.addEventListener("touchstart", inicio, { passive: true });
+    document.addEventListener("touchmove", mover, { passive: false });
+    document.addEventListener("touchend", fin, { passive: true });
+    document.addEventListener("touchcancel", fin, { passive: true });
+    return () => {
+      document.removeEventListener("touchstart", inicio);
+      document.removeEventListener("touchmove", mover);
+      document.removeEventListener("touchend", fin);
+      document.removeEventListener("touchcancel", fin);
+    };
+  }, [ancho]);
 
   const traerAlFrente = (id: string) => {
     setActivo((a) => ({ ...a, [zonaEf(id)]: id }));
@@ -1542,6 +1671,28 @@ export default function Lector() {
     else setComsExtra((prev) => prev.map((e) => (e.id === id ? { ...e, fuente: f } : e)));
   };
   const quitarExtra = (id: string) => setComsExtra((prev) => prev.filter((e) => e.id !== id));
+  // Recursos: un comentario está activo si es el principal o uno de los extra
+  const comActivo = (f: ComFuente) => (comentario && comFuente === f) || comsLimpios.some((e) => e.fuente === f);
+  const lleno = !ancho && itemsHoja.length >= 5;
+  const alternarCom = (f: ComFuente) => {
+    if (comActivo(f)) {
+      if (comentario && comFuente === f) cerrarItem("com");
+      else setComsExtra((prev) => prev.filter((e) => e.fuente !== f));
+      return;
+    }
+    if (lleno) return;
+    setHojaAbierta(true);
+    if (!comentario) {
+      setComFuente(f);
+      setComentario(true);
+      setFrenteMovil("com");
+      return;
+    }
+    const id = `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+    setComsExtra((prev) => [...prev, { id, fuente: f }]);
+    setFrenteMovil(id);
+    setActivo((a) => ({ ...a, [zonaEf(id)]: id }));
+  };
 
   /** Bordes entre zonas: v = ancho de la derecha · h = reparto arriba/abajo · b = alto de abajo. */
   const arrastrarBorde = (tipo: "v" | "h" | "b" | "a") => (e: React.PointerEvent) => {
@@ -1851,6 +2002,91 @@ export default function Lector() {
     if (el) aside.scrollTo({ top: el.offsetTop - 60, behavior: "smooth" });
   }, [seccionActiva, comAlFrente]);
 
+  /** Contenido del comentario principal (cuadro de la mesa o carpeta del archivador). */
+  const contenidoCom = (
+              <div className="estudio-com visible cambio-suave" key={`${comFuente}-${osis}-${cap}`}>
+              {(recursoTraducido || comSel.nativo) && (
+                <div className="estudio-autor">
+                  {(comFuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : usarEsCom) && (
+                    <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
+                  )}
+                  {comSel.nativo ? (
+                    <span className="rec-idioma-fijo" title="Obra escrita en castellano por su autor">ES</span>
+                  ) : (
+                    <span className="rec-idioma tarjeta-idioma" role="group" aria-label="Idioma del recurso">
+                      <button type="button" className={`rec-idioma-tab${comIdioma === "es" ? " activa" : ""}`} onClick={() => setComIdioma("es")} aria-pressed={comIdioma === "es"}>
+                        ES
+                      </button>
+                      <button type="button" className={`rec-idioma-tab${comIdioma === "en" ? " activa" : ""}`} onClick={() => setComIdioma("en")} aria-pressed={comIdioma === "en"}>
+                        EN
+                      </button>
+                    </span>
+                  )}
+                </div>
+              )}
+              {comFuente === "henry" && rCom && (
+                <div className="com-resumen">
+                  <div className="com-titulo">{tr.resumenCapitulo}</div>
+                  {renderMarcado(rCom)}
+                </div>
+              )}
+              {comFuente !== "henry" && parrafosCom.length > 0 && (
+                <ComentarioBloque
+                  autor={`${comSel.etiqueta} · ${comSel.anio}`}
+                  seccion={{ t: comFuente === "easton" ? tr.eastonTemasTitulo : `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
+                  tr={tr}
+                  renderFn={comFuente === "easton" ? renderEaston : renderMarcado}
+                />
+              )}
+              {comFuente === "henry" &&
+                seccionesCom.map((sec, i) => (
+                  <div key={`${osis}.${cap}-${i}`} data-v={sec.v ?? undefined} className={`estudio-seccion${sec.v != null && sec.v === seccionActiva ? " activa" : ""}`}>
+                    <ComentarioBloque seccion={sec} tr={tr} renderFn={renderMarcado} />
+                  </div>
+                ))}
+              {comFuente === "henry" && !rCom && seccionesCom.length === 0 && (
+                <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
+              )}
+              {comFuente !== "henry" && parrafosCom.length === 0 && (
+                <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
+              )}
+            </div>
+  );
+  /** Contenido de un comentario extra. */
+  const contenidoExtra = (e: { id: string; fuente: ComFuente }) => (
+                <div className="estudio-com visible cambio-suave" key={`${e.fuente}-${osis}-${cap}`}>
+                  {(e.fuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : datosCom[e.fuente]?.es) && (
+                    <div className="estudio-autor">
+                      <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
+                    </div>
+                  )}
+                  {e.fuente === "henry" ? (
+                    <>
+                      {rCom && (
+                        <div className="com-resumen">
+                          <div className="com-titulo">{tr.resumenCapitulo}</div>
+                          {renderMarcado(rCom)}
+                        </div>
+                      )}
+                      {seccionesCom.map((sec, i) => (
+                        <div key={`${e.id}-${osis}.${cap}-${i}`} className="estudio-seccion">
+                          <ComentarioBloque seccion={sec} tr={tr} renderFn={renderMarcado} />
+                        </div>
+                      ))}
+                    </>
+                  ) : parrafosDe(e.fuente).length ? (
+                    <ComentarioBloque
+                      autor={`${COMENTARIOS.find((c) => c.id === e.fuente)?.etiqueta} · ${COMENTARIOS.find((c) => c.id === e.fuente)?.anio}`}
+                      seccion={{ t: e.fuente === "easton" ? tr.eastonTemasTitulo : `${tr.capitulo} ${cap}`, v: null, p: parrafosDe(e.fuente), sinTraducir: false }}
+                      tr={tr}
+                      renderFn={e.fuente === "easton" ? renderEaston : renderMarcado}
+                    />
+                  ) : (
+                    <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
+                  )}
+                </div>
+  );
+
   return (
     <>
       <Cabecera
@@ -1873,6 +2109,9 @@ export default function Lector() {
         }
       >
         <div className="cabecera-sub-inner barra-lectura">
+          <button className="icono-btn" onClick={abrirBusqueda} aria-label="Buscar pasajes y diccionario" title="Buscar pasajes y diccionario">
+            ⌕
+          </button>
           <select className="sel sel-biblia" aria-label="Biblia" value={obra} onChange={(e) => setObra(e.target.value)}>
             {OBRAS.map((o) => (
               <option key={o.id} value={o.id}>
@@ -1940,85 +2179,17 @@ export default function Lector() {
               </option>
             ))}
           </select>
-          {/* Capas del texto con casillas: lo que se SUPERPONE a la lectura. */}
-          <div className="capas-wrap">
-            <button
-              className={`capas-btn${dicEnTexto || interlineal || griego || panelNotas ? " activa" : ""}`}
-              onClick={() => setCapasAbierto(!capasAbierto)}
-              aria-expanded={capasAbierto}
-              aria-label="Capas del texto"
-              title="Capas del texto: diccionario, interlineal, griego, notas"
-            >
-              ◫<span className="capas-txt"> Capas</span>
-              {[dicEnTexto, interlineal, griego, panelNotas].filter(Boolean).length > 0 && (
-                <span className="capas-n">{[dicEnTexto, interlineal, griego, panelNotas].filter(Boolean).length}</span>
-              )}
-              <span className="capas-flecha" aria-hidden="true">▾</span>
-            </button>
-            {capasAbierto && (
-              <div className="capas-popo" role="group" aria-label="Capas del texto">
-                <label className="capa-op">
-                  <input
-                    type="checkbox"
-                    checked={dicEnTexto}
-                    onChange={() => {
-                      setDicEnTexto(!dicEnTexto);
-                      // el índice de titulares se necesita tanto como el interruptor
-                      if (!dicEnTexto && !dicIndice) abrirDic();
-                    }}
-                  />
-                  <span>{tr.dicEnTexto}</span>
-                </label>
-                <label className="capa-op">
-                  <input
-                    type="checkbox"
-                    checked={interlineal}
-                    onChange={(e) => {
-                      setInterlineal(e.target.checked);
-                      if (e.target.checked) setGriego(false);
-                    }}
-                  />
-                  <span>Interlineal ({NT.has(osis) ? "griego" : "hebreo"})</span>
-                </label>
-                {/* El SBLGNT son 27 libros: en el AT la opción ni se ofrece. */}
-                {NT.has(osis) && (
-                  <label className="capa-op">
-                    <input
-                      type="checkbox"
-                      checked={griego}
-                      onChange={(e) => {
-                        setGriego(e.target.checked);
-                        if (e.target.checked) setInterlineal(false);
-                      }}
-                    />
-                    <span>Griego SBLGNT</span>
-                  </label>
-                )}
-                <label className="capa-op">
-                  <input
-                    type="checkbox"
-                    checked={panelNotas}
-                    onChange={(e) => {
-                      setPanelNotas(e.target.checked);
-                      setMsgNotas(null);
-                    }}
-                  />
-                  <span>{tr.notas}</span>
-                </label>
-              </div>
+          <button
+            className={`recursos-btn${[comentario, dicEnTexto, interlineal, griego, panelNotas, dicPanel, busPanel].some(Boolean) ? " activa" : ""}`}
+            onClick={() => setRecursosAbierto(true)}
+            aria-label="Recursos"
+            title="Recursos: comentarios, diccionarios, herramientas y capas del texto"
+          >
+            ▦<span className="capas-txt"> Recursos</span>
+            {itemsHoja.length + [dicEnTexto, interlineal, griego].filter(Boolean).length > 0 && (
+              <span className="capas-n">{new Set([...itemsHoja, ...(dicEnTexto ? ["t1"] : []), ...(interlineal ? ["t2"] : []), ...(griego ? ["t3"] : [])]).size}</span>
             )}
-          </div>
-          <div className="lector-acciones">
-            <button className="icono-btn" onClick={abrirBusqueda} aria-label="Buscar pasajes y diccionario" title="Buscar pasajes y diccionario">
-              ⌕
-            </button>
-            <button className="icono-btn" onClick={() => ir(-1)} aria-label={tr.anterior} title={tr.anterior}>
-              ←
-            </button>
-            <button className="icono-btn" onClick={() => adelante(1)} aria-label={tr.siguiente} title={tr.siguiente}>
-              →
-            </button>
-          </div>
+          </button>
         </div>
         {/* Barra de recursos: [obra ▾] · [ES|EN si hay traducción] · [☑ mostrar]
             Nada de una zona de clic a lo ancho: cada control es suyo, y así el
@@ -2094,13 +2265,21 @@ export default function Lector() {
         style={{ "--estudio-w": `${anchoEstudio}px`, ...(ancho ? { marginRight: mesa.mr, paddingBottom: mesa.pb } : {}), ...(anchoNav ? { marginLeft: navW } : {}) } as React.CSSProperties}
       >
         <div
-          className={`lector-columna${pila.length && !ancho ? (hojaAbierta ? " con-hoja" : " con-hoja-cerrada") : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
+          className={`lector-columna${itemsHoja.length && !ancho ? (hojaAbierta ? " con-hoja" : " con-hoja-cerrada") : ""}${giro ? ` giro-${giro}` : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
           ref={columna}
         >
           <div className="lector-titulo">
-            <h1 className="serif-display">
-              {info?.nombre ?? texto?.nombre ?? "…"} {cap}
-            </h1>
+            <div className="titulo-nav">
+              <button className="titulo-flecha" onClick={() => pasarCapitulo(-1)} aria-label={tr.anterior} title={tr.anterior}>
+                ‹
+              </button>
+              <h1 className="serif-display">
+                {info?.nombre ?? texto?.nombre ?? "…"} {cap}
+              </h1>
+              <button className="titulo-flecha" onClick={() => pasarCapitulo(1)} aria-label={tr.siguiente} title={tr.siguiente}>
+                ›
+              </button>
+            </div>
             <span className="ref-osis">
               {osis}.{cap} · {manifest?.osis_obra ?? ""}
             </span>
@@ -2433,14 +2612,37 @@ export default function Lector() {
         </nav>
       )}
 
-      {!ancho && pila.length > 0 && (
+      {!ancho && comentario && (
+        <section
+          ref={estudioRef}
+          className={`lex-panel movil${frenteHoja === "com" ? " frente" : " detras"}${hojaAbierta ? "" : " guardada"}`}
+          style={{ zIndex: frenteHoja === "com" ? 61 : 60 }}
+          aria-label={comSel.etiqueta}
+          onWheel={() => (estudioTocado.current = Date.now())}
+        >
+          <div className="lex-panel-inner">{contenidoCom}</div>
+        </section>
+      )}
+      {!ancho &&
+        extrasVisibles.map((e) => (
+          <section
+            key={e.id}
+            className={`lex-panel movil${frenteHoja === e.id ? " frente" : " detras"}${hojaAbierta ? "" : " guardada"}`}
+            style={{ zIndex: frenteHoja === e.id ? 61 : 60 }}
+            aria-label={etiquetaDe(e.id)}
+          >
+            <div className="lex-panel-inner">{contenidoExtra(e)}</div>
+          </section>
+        ))}
+
+      {!ancho && itemsHoja.length > 0 && (
         <div className={`archivador${hojaAbierta ? " abierto" : ""}`} aria-label="Carpetas abiertas">
           <div className="archivador-tira" onPointerDown={iniciarHoja} role="tablist">
-            {ordenHoja.current.filter((id) => pila.includes(id)).map((id) => {
-              const frente = pila[pila.length - 1] === id;
+            {ordenHoja.current.filter((id) => itemsHoja.includes(id)).map((id) => {
+              const frente = frenteHoja === id;
               return (
                 <div key={id} data-id={id} role="tab" aria-selected={frente} className={`lengueta${frente ? " frente" : ""}`}>
-                  <span className="lengueta-nombre">{ETIQUETA_PANEL[id] ?? id}</span>
+                  <span className="lengueta-nombre">{etiquetaDe(id)}</span>
                   <button
                     className={`lengueta-flecha${menuHoja?.id === id ? " activa" : ""}`}
                     aria-label="Cambiar por otro recurso"
@@ -2451,7 +2653,7 @@ export default function Lector() {
                   >
                     ▾
                   </button>
-                  <button className="lengueta-x" aria-label={`Cerrar ${ETIQUETA_PANEL[id] ?? id}`} onClick={() => cerrarPanel(id)}>
+                  <button className="lengueta-x" aria-label={`Cerrar ${etiquetaDe(id)}`} onClick={() => cerrarItem(id)}>
                     ✕
                   </button>
                 </div>
@@ -2461,12 +2663,27 @@ export default function Lector() {
           {menuHoja && (
             <div className="hoja-popo" role="menu" style={{ left: Math.max(8, Math.min(menuHoja.x - 20, ventW - 228)) }}>
               <div className="hoja-popo-t">Cambiar por…</div>
+              {esCom(menuHoja.id) &&
+                COMENTARIOS.map((c) => (
+                  <button
+                    key={c.id}
+                    role="menuitem"
+                    className={`recurso-op${fuenteDe(menuHoja.id) === c.id ? " activa" : ""}`}
+                    onClick={() => {
+                      cambiarFuente(menuHoja.id, c.id as ComFuente);
+                      setMenuHoja(null);
+                    }}
+                  >
+                    <span>{c.etiqueta}</span>
+                    <small>{c.anio}</small>
+                  </button>
+                ))}
               {([
                 ["dic", "Diccionario", () => abrirDic()],
                 ["busqueda", "Buscar", () => abrirBusqueda()],
                 ["notas", "Mis notas", () => setPanelNotas(true)],
               ] as const)
-                .filter(([id]) => id !== menuHoja.id)
+                .filter(([id]) => id !== menuHoja.id && !esCom(menuHoja.id))
                 .map(([id, nombre, abrir]) => (
                   <button
                     key={id}
@@ -2690,45 +2907,12 @@ export default function Lector() {
               onWheel={() => (estudioTocado.current = Date.now())}
               onPointerDown={() => (estudioTocado.current = Date.now())}
             >
-              <div className="estudio-com visible cambio-suave" key={`${comFuente}-${osis}-${cap}`}>
-              {recursoTraducido && (comFuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : usarEsCom) && (
-                <div className="estudio-autor">
-                  <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
-                </div>
-              )}
-              {comFuente === "henry" && rCom && (
-                <div className="com-resumen">
-                  <div className="com-titulo">{tr.resumenCapitulo}</div>
-                  {renderMarcado(rCom)}
-                </div>
-              )}
-              {comFuente !== "henry" && parrafosCom.length > 0 && (
-                <ComentarioBloque
-                  autor={`${comSel.etiqueta} · ${comSel.anio}`}
-                  seccion={{ t: comFuente === "easton" ? tr.eastonTemasTitulo : `${tr.capitulo} ${cap} — ${comSel.nativo ? tr.comModoNativo : usarEsCom ? tr.comModoEs : tr.jfbModo}`, v: null, p: parrafosCom, sinTraducir: false }}
-                  tr={tr}
-                  renderFn={comFuente === "easton" ? renderEaston : renderMarcado}
-                />
-              )}
-              {comFuente === "henry" &&
-                seccionesCom.map((sec, i) => (
-                  <div key={`${osis}.${cap}-${i}`} data-v={sec.v ?? undefined} className={`estudio-seccion${sec.v != null && sec.v === seccionActiva ? " activa" : ""}`}>
-                    <ComentarioBloque seccion={sec} tr={tr} renderFn={renderMarcado} />
-                  </div>
-                ))}
-              {comFuente === "henry" && !rCom && seccionesCom.length === 0 && (
-                <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
-              )}
-              {comFuente !== "henry" && parrafosCom.length === 0 && (
-                <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
-              )}
-            </div>
+              {contenidoCom}
             </section>
           )}
           {extrasVisibles.map((e) => {
             const r = rectsZona[zonaEf(e.id)];
             if (!r) return null;
-            const par = e.fuente === "henry" ? [] : parrafosDe(e.fuente);
             const sel = COMENTARIOS.find((c) => c.id === e.fuente);
             return (
               <section
@@ -2737,37 +2921,7 @@ export default function Lector() {
                 style={{ ...contenidoDe(r), ...estiloDe(zonaEf(e.id)).vars }}
                 aria-label={sel?.etiqueta}
               >
-                <div className="estudio-com visible cambio-suave" key={`${e.fuente}-${osis}-${cap}`}>
-                  {(e.fuente === "henry" ? idiomaEfectivo === "es" && esCapDisp : datosCom[e.fuente]?.es) && (
-                    <div className="estudio-autor">
-                      <span className="badge-revision" title={tr.estadoNota}>{tr.sinRevisar}</span>
-                    </div>
-                  )}
-                  {e.fuente === "henry" ? (
-                    <>
-                      {rCom && (
-                        <div className="com-resumen">
-                          <div className="com-titulo">{tr.resumenCapitulo}</div>
-                          {renderMarcado(rCom)}
-                        </div>
-                      )}
-                      {seccionesCom.map((sec, i) => (
-                        <div key={`${e.id}-${osis}.${cap}-${i}`} className="estudio-seccion">
-                          <ComentarioBloque seccion={sec} tr={tr} renderFn={renderMarcado} />
-                        </div>
-                      ))}
-                    </>
-                  ) : par.length ? (
-                    <ComentarioBloque
-                      autor={`${sel?.etiqueta} · ${sel?.anio}`}
-                      seccion={{ t: e.fuente === "easton" ? tr.eastonTemasTitulo : `${tr.capitulo} ${cap}`, v: null, p: par, sinTraducir: false }}
-                      tr={tr}
-                      renderFn={e.fuente === "easton" ? renderEaston : renderMarcado}
-                    />
-                  ) : (
-                    <p className="estudio-vacio">Este capítulo aún no tiene comentario en esta obra.</p>
-                  )}
-                </div>
+                {contenidoExtra(e)}
               </section>
             );
           })}
@@ -3565,6 +3719,97 @@ export default function Lector() {
             <div className="lex-fuente">{tr.fuenteNotas}</div>
           </div>
         </div>
+      )}
+
+      {recursosAbierto && (
+        <>
+          <div className="ajustes-velo" onClick={() => setRecursosAbierto(false)} aria-hidden="true" />
+          <aside className="ajustes recursos" role="dialog" aria-label="Recursos">
+            <div className="ajustes-cab">
+              <span className="ajustes-titulo">Recursos</span>
+              <button className="icono-btn cerrar" onClick={() => setRecursosAbierto(false)} aria-label={tr.lexCerrar} title={tr.lexCerrar}>
+                ✕
+              </button>
+            </div>
+            <div className="ajustes-cuerpo cambio-suave">
+              <p className="lex-meta" style={{ marginTop: 0 }}>
+                Marca lo que quieras usar: cada recurso se abre como {ancho ? "un cuadro de la mesa" : "una carpeta abajo"}
+                {ancho ? "" : " (hasta 5)"}. Desmárcalo para cerrarlo.
+              </p>
+              <div className="ajustes-rotulo">Comentarios</div>
+              {COMENTARIOS.filter((c) => c.id !== "easton").map((c) => (
+                <label key={c.id} className={`recurso-fila${!comActivo(c.id as ComFuente) && lleno ? " inactiva" : ""}`}>
+                  <span className="ajustes-txt">
+                    <b>{c.etiqueta}</b>
+                    <small>{c.anio}</small>
+                  </span>
+                  <input type="checkbox" checked={comActivo(c.id as ComFuente)} disabled={!comActivo(c.id as ComFuente) && lleno} onChange={() => alternarCom(c.id as ComFuente)} />
+                </label>
+              ))}
+              <div className="ajustes-rotulo">Diccionarios</div>
+              <label className={`recurso-fila${!comActivo("easton") && lleno ? " inactiva" : ""}`}>
+                <span className="ajustes-txt">
+                  <b>Easton · temas del pasaje</b>
+                  <small>Las entradas del diccionario que citan cada versículo</small>
+                </span>
+                <input type="checkbox" checked={comActivo("easton")} disabled={!comActivo("easton") && lleno} onChange={() => alternarCom("easton")} />
+              </label>
+              <label className={`recurso-fila${!dicPanel && lleno ? " inactiva" : ""}`}>
+                <span className="ajustes-txt">
+                  <b>Diccionario bíblico</b>
+                  <small>Buscar cualquier término (Easton)</small>
+                </span>
+                <input type="checkbox" checked={dicPanel} disabled={!dicPanel && lleno} onChange={() => (dicPanel ? setDicPanel(false) : abrirDic())} />
+              </label>
+              <div className="ajustes-rotulo">Herramientas</div>
+              <label className={`recurso-fila${!panelNotas && lleno ? " inactiva" : ""}`}>
+                <span className="ajustes-txt">
+                  <b>{tr.notas}</b>
+                  <small>Tus notas y subrayados, en este dispositivo</small>
+                </span>
+                <input type="checkbox" checked={panelNotas} disabled={!panelNotas && lleno} onChange={(e) => { setPanelNotas(e.target.checked); setMsgNotas(null); }} />
+              </label>
+              <label className={`recurso-fila${!busPanel && lleno ? " inactiva" : ""}`}>
+                <span className="ajustes-txt">
+                  <b>Buscar</b>
+                  <small>Pasajes, comentarios y diccionario</small>
+                </span>
+                <input type="checkbox" checked={busPanel} disabled={!busPanel && lleno} onChange={() => (busPanel ? setBusPanel(false) : abrirBusqueda())} />
+              </label>
+              <div className="ajustes-rotulo">En el texto</div>
+              <label className="recurso-fila">
+                <span className="ajustes-txt">
+                  <b>{tr.dicEnTexto}</b>
+                  <small>Subraya los nombres con entrada en el diccionario</small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={dicEnTexto}
+                  onChange={() => {
+                    setDicEnTexto(!dicEnTexto);
+                    if (!dicEnTexto && !dicIndice) abrirDic();
+                  }}
+                />
+              </label>
+              <label className="recurso-fila">
+                <span className="ajustes-txt">
+                  <b>Interlineal ({NT.has(osis) ? "griego" : "hebreo"})</b>
+                  <small>Palabra por palabra con su significado</small>
+                </span>
+                <input type="checkbox" checked={interlineal} onChange={(e) => { setInterlineal(e.target.checked); if (e.target.checked) setGriego(false); }} />
+              </label>
+              {NT.has(osis) && (
+                <label className="recurso-fila">
+                  <span className="ajustes-txt">
+                    <b>Griego SBLGNT</b>
+                    <small>Cada versículo con su texto griego debajo</small>
+                  </span>
+                  <input type="checkbox" checked={griego} onChange={(e) => { setGriego(e.target.checked); if (e.target.checked) setInterlineal(false); }} />
+                </label>
+              )}
+            </div>
+          </aside>
+        </>
       )}
 
       {ajustes && (
