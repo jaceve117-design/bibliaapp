@@ -517,6 +517,46 @@ const kd = comentarioEn(
   { prompt: REGLAS_KD, mascarado: true }
 );
 
+// ── 3.2 Vincent, Word Studies in the NT (1887; hoja de ruta Fase 3b) ───────
+// Estudio de palabras griegas: ~46 % de los párrafos traen griego en alfabeto
+// original → máscara ⟦n⟧ OBLIGATORIA (el validador exige las fichas intactas).
+const REGLAS_VINCENT = `Eres traductor especializado en exégesis del Nuevo Testamento del siglo XIX.
+Traduces «Word Studies in the New Testament» de Marvin R. Vincent (1887) del inglés al español.
+
+REGISTRO: académico y didáctico. Vincent estudia palabras griegas: etimologías, matices,
+uso clásico y bíblico. Conserva la argumentación filológica completa. NO lo devocionalices.
+
+REGLAS DURAS:
+1. Traduces TODO el contenido. No resumas, no omites, no añades comentario propio.
+2. Conservas íntegras las referencias bíblicas en su forma abreviada española:
+   Matt→Mt, Mark→Mr, Luke→Lc, John→Jn, Rom→Ro, 1Co→1 Co, Heb→He, Rev→Ap.
+   Si el original dice "John 3:16", el español dice "Jn 3:16". Ni una referencia se pierde.
+3. Las transliteraciones del griego NO se tocan (logos, agape, soi, phronesis): son
+   pronunciación y se quedan tal cual.
+4. Terminología gramatical fija: noun→sustantivo, verb→verbo, genitive→genitivo,
+   dative→dativo, aorist→aoristo, present indicative→presente de indicativo,
+   imperfect→imperfecto, participle→participio, preposition→preposición.
+5. «God» → «Dios». «the Lord» → «el Señor». «Jesus Christ» → «Jesucristo».
+6. Cifras, años y cantidades exactas. Cuando cita la Biblia en la prosa, traduces
+   alineado a Reina-Valera 1909; si el argumento depende de la palabra inglesa o
+   griega, conservas la distinción y lo aclaras entre corchetes: [N. del T.]
+7. Ortografía española completa, con todas sus tildes. Una unidad no se resume
+   ni se amplía: todo lo que dice el inglés, nada más.
+
+FICHAS: el texto trae marcas como ⟦1⟧, ⟦2⟧… que ocultan tramos en alfabeto griego
+o hebreo. Consérvalas EXACTAMENTE, cada una una sola vez, en el lugar que exija la
+sintaxis española. No las traduzcas, no las renumeres, no las quites, no inventes otras.
+
+SALIDA: exclusivamente un objeto JSON {"u":[{"id":"...","es":"..."}]} con una entrada por
+unidad recibida, los MISMOS id, en el mismo orden. Sin preámbulo, sin explicación, sin markdown.`;
+
+const vincent = comentarioEn(
+  'vincent',
+  'Word Studies in the New Testament — Marvin R. Vincent (1887)',
+  'Marvin R. Vincent, Word Studies in the New Testament (1887) · Dominio público · texto original vía biblehub.com',
+  { prompt: REGLAS_VINCENT, mascarado: true }
+);
+
 // ── Definiciones del léxico (TBESH/TBESG) ──────────────────────────────────
 // Texto con MARCADO: <b>, <i>, <BR />, <ref='Luk.7.37'>Luk.7:37;</ref>, y
 // tramos en griego y hebreo. No se le pide al modelo que respete nada de eso:
@@ -696,7 +736,7 @@ const rand = {
   },
 };
 
-export const OBRAS = { henry, easton, glosas, naves, jfb, barnes, kd, lexdef, rand };
+export const OBRAS = { henry, easton, glosas, naves, jfb, barnes, kd, vincent, lexdef, rand };
 
 
 export function obra(id) {

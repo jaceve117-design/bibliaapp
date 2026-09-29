@@ -1,0 +1,150 @@
+{
+  "obra": "Word Studies in the New Testament — Marvin R. Vincent (1887)",
+  "osis_obra": "VINCENT",
+  "licencia": "Dominio público (1887; autor †1922, obra pre-1929) — ver Ficha - Vincent.md",
+  "fuente": "https://biblehub.com/commentaries/vws/ — espejo del texto PD original",
+  "fecha_ingesta": "2026-09-29",
+  "idioma": "en",
+  "alcance": "NT completo: 27 libros. Estudio de palabras griegas por versículo; el griego va en el texto (la obra del motor aplica máscara ⟦n⟧).",
+  "total_anclas": 5851,
+  "tramos_alfabeto_original_crudo_html": 0,
+  "nota": "Vincent comenta por anclas de versículo. La cabecera léxica de cada ancla (palabra + griego) es contenido y se conserva como primer párrafo.",
+  "incidentes": [],
+  "libros": [
+    {
+      "osis": "1CO",
+      "caps_vistos": 16,
+      "anclas": 309
+    },
+    {
+      "osis": "1JN",
+      "caps_vistos": 5,
+      "anclas": 104
+    },
+    {
+      "osis": "1PE",
+      "caps_vistos": 5,
+      "anclas": 98
+    },
+    {
+      "osis": "1TH",
+      "caps_vistos": 5,
+      "anclas": 84
+    },
+    {
+      "osis": "1TI",
+      "caps_vistos": 6,
+      "anclas": 109
+    },
+    {
+      "osis": "2CO",
+      "caps_vistos": 13,
+      "anclas": 206
+    },
+    {
+      "osis": "2JN",
+      "caps_vistos": 1,
+      "anclas": 13
+    },
+    {
+      "osis": "2PE",
+      "caps_vistos": 3,
+      "anclas": 56
+    },
+    {
+      "osis": "2TH",
+      "caps_vistos": 3,
+      "anclas": 43
+    },
+    {
+      "osis": "2TI",
+      "caps_vistos": 4,
+      "anclas": 82
+    },
+    {
+      "osis": "3JN",
+      "caps_vistos": 1,
+      "anclas": 14
+    },
+    {
+      "osis": "ACT",
+      "caps_vistos": 28,
+      "anclas": 693
+    },
+    {
+      "osis": "COL",
+      "caps_vistos": 4,
+      "anclas": 93
+    },
+    {
+      "osis": "EPH",
+      "caps_vistos": 6,
+      "anclas": 145
+    },
+    {
+      "osis": "GAL",
+      "caps_vistos": 6,
+      "anclas": 148
+    },
+    {
+      "osis": "HEB",
+      "caps_vistos": 13,
+      "anclas": 291
+    },
+    {
+      "osis": "JAS",
+      "caps_vistos": 5,
+      "anclas": 98
+    },
+    {
+      "osis": "JHN",
+      "caps_vistos": 21,
+      "anclas": 731
+    },
+    {
+      "osis": "JUD",
+      "caps_vistos": 1,
+      "anclas": 22
+    },
+    {
+      "osis": "LUK",
+      "caps_vistos": 24,
+      "anclas": 790
+    },
+    {
+      "osis": "MAT",
+      "caps_vistos": 28,
+      "anclas": 461
+    },
+    {
+      "osis": "MRK",
+      "caps_vistos": 16,
+      "anclas": 383
+    },
+    {
+      "osis": "PHM",
+      "caps_vistos": 1,
+      "anclas": 24
+    },
+    {
+      "osis": "PHP",
+      "caps_vistos": 4,
+      "anclas": 95
+    },
+    {
+      "osis": "REV",
+      "caps_vistos": 22,
+      "anclas": 360
+    },
+    {
+      "osis": "ROM",
+      "caps_vistos": 16,
+      "anclas": 355
+    },
+    {
+      "osis": "TIT",
+      "caps_vistos": 3,
+      "anclas": 44
+    }
+  ]
+}
