@@ -34,10 +34,9 @@ const MAPA: Record<string, string> = {
   '3Jn': '3JN', '3Jo': '3JN', '3John': '3JN', Jud: 'JUD', Jude: 'JUD', Jd: 'JUD',
   Rev: 'REV', Ap: 'REV', Apoc: 'REV',
   // — P.1/Puerta: abreviaturas ES del motor y ediciones Usoz (auditoria-citas.md) —
-  Ag: 'HAG', Mi: 'MIC', La: 'LAM', Ne: 'NEH', Es: 'EST', Núm: 'NUM', Nm: 'NUM',
+  Ag: 'HAG', La: 'LAM', Es: 'EST',
   Na: 'NAM', Cnt: 'SNG', St: 'JAS', Mc: 'MRK', Zc: 'ZEC', Cn: 'SNG', Ob: 'OBA',
-  Éxodo: 'EXO', Ho: 'HOS', Oseas: 'HOS', Jam: 'JAS', Jb: 'JOB', Sf: 'ZEP',
-  Mk: 'MRK', Ezd: 'EZR', '1Reyes': '1KI', '2Reyes': '2KI', Sof: 'ZEP', Deut: 'DEU',
+  Jam: 'JAS', Jb: 'JOB', Sf: 'ZEP', Ezd: 'EZR', '1Reyes': '1KI', '2Reyes': '2KI',
   // — P.1 (auditoria-citas.md): abreviaturas y formas que RE_CITA no capturaba —
   // numeradas con espacio («1 Co 9:1», «2 Sam 7:12», «1 Ts 2:5»…): el motor de
   // traducción y Usoz las escriben así. Las ambiguas van también a AMBIGUOS.

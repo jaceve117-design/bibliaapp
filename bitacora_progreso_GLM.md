@@ -1447,3 +1447,11 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
   - **Producción (`--branch=main`) la publica Claude**, tras validar el conjunto. Cuando GLM tenga algo listo, lo anota aquí con «✅ LISTO PARA PRODUCCIÓN: …» y Claude lo integra y publica.
   - Motivo: al compartir carpeta, publicar desde un lado puede subir cambios a medias del otro.
 - **Avisos**: por esta bitácora. Si uno necesita que el otro cambie algo de sus archivos, lo pide aquí con «→ PEDIDO A CLAUDE:» / «→ PEDIDO A GLM:».
+
+## 2026-09-29 — Fase 2.2 completada: OpenBible Geocoding (GLM)
+- **Fuente**: github.com/openbibleinfo/Bible-Geocoding-Data (data/ancient.jsonl), CC BY 4.0, incluye datos de OpenStreetMap (ODbL). Crudo en `05. Datos/corpus_crudo/openbible_geo/` (11,5 MB + license.txt).
+- **Pipeline** `scripts/ingesta-openbible-geo.mjs`: 1.342 lugares → **1.335 con coordenada** (mejor identificación por vote_average 0-1000), 8.707 refs de verso en OSIS (`verses[].usx` «MAT 2:23» → «MAT.2.23»; respaldo `extra.osises` mapeado de OSIS largo). Descartados 7 sin coordenada (Azazel, Nod, Holy Place… — anotados en el manifiesto). Salida: `/data/openbible/geo.json` (192 KB) + `_manifest.json`.
+- **Portón**: 8.707 refs, 0 códigos fuera del OSIS de RV1909; muestreo Nazaret [32.70214, 35.29769] q500 y Jerusalén (955 refs) contra la fuente ✓.
+- **Fix colateral**: el lote de alias ES tenía 10 claves duplicadas en el MAPA de referencias.ts (Éxodo, Oseas vs nombres completos; Nm/Sof/Deut vs MAPA original; Mi/Ne/Ho/Mk/Núm vs lote P.1) — deduplicadas conservando las entradas previas; tsc limpio y **80/80 casos** ✓. El build local falló 2× por worker PostCSS de Turbopack (timeout, no de código); tercera corrida con `.next` limpio compiló 3,9 min y desplegó (`f8215b4c`).
+- **Verificado en producción**: /data/openbible/geo.json 200 (192 KB) · /es/lector 200 · llms.txt con Geocoding y Valdés (entrada de Valdés faltaba y se añadió).
+- **Nota de alcance**: el dato queda listo; el mapa al tocar el lugar (Leaflet + OSM) es interfaz — coordinar con Claude. **Fase 2 COMPLETA en datos → ⛔ PUERTA A sigue en parada** (gasto $49,48/$75 sin cambio, aquí no hay traducción).
