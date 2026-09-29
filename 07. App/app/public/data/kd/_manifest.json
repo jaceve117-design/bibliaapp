@@ -1,0 +1,210 @@
+{
+  "obra": "Commentary on the Old Testament — Carl Friedrich Keil y Franz Delitzsch (trad. inglesa T&T Clark, 1857–1878)",
+  "osis_obra": "KD",
+  "licencia": "Dominio público (autores †1888/1890; traducción inglesa del s. XIX) — ver Ficha - Keil y Delitzsch.md",
+  "fuente": "https://biblehub.com/commentaries/kad/ — espejo del texto PD original, designado en la ficha",
+  "fecha_ingesta": "2026-09-29",
+  "idioma": "en",
+  "alcance": "AT completo: 39 libros (Génesis–Malaquías). La edición inglesa translitera el hebreo/griego.",
+  "total_anclas": 10030,
+  "tramos_alfabeto_original": 0,
+  "nota": "K&D comenta por anclas de versículo; los versos sin ancla quedan cubiertos por el bloque anterior. El bloque v:'Intro' del capítulo 1 es la introducción del libro.",
+  "incidentes": [],
+  "libros": [
+    {
+      "osis": "1CH",
+      "caps_vistos": 29,
+      "anclas": 367
+    },
+    {
+      "osis": "1KI",
+      "caps_vistos": 22,
+      "anclas": 431
+    },
+    {
+      "osis": "1SA",
+      "caps_vistos": 31,
+      "anclas": 494
+    },
+    {
+      "osis": "2CH",
+      "caps_vistos": 36,
+      "anclas": 378
+    },
+    {
+      "osis": "2KI",
+      "caps_vistos": 25,
+      "anclas": 386
+    },
+    {
+      "osis": "2SA",
+      "caps_vistos": 24,
+      "anclas": 421
+    },
+    {
+      "osis": "AMO",
+      "caps_vistos": 9,
+      "anclas": 62
+    },
+    {
+      "osis": "DAN",
+      "caps_vistos": 12,
+      "anclas": 235
+    },
+    {
+      "osis": "DEU",
+      "caps_vistos": 34,
+      "anclas": 421
+    },
+    {
+      "osis": "ECC",
+      "caps_vistos": 12,
+      "anclas": 191
+    },
+    {
+      "osis": "EST",
+      "caps_vistos": 10,
+      "anclas": 102
+    },
+    {
+      "osis": "EXO",
+      "caps_vistos": 40,
+      "anclas": 421
+    },
+    {
+      "osis": "EZK",
+      "caps_vistos": 48,
+      "anclas": 193
+    },
+    {
+      "osis": "EZR",
+      "caps_vistos": 10,
+      "anclas": 146
+    },
+    {
+      "osis": "GEN",
+      "caps_vistos": 50,
+      "anclas": 429
+    },
+    {
+      "osis": "HAB",
+      "caps_vistos": 3,
+      "anclas": 27
+    },
+    {
+      "osis": "HAG",
+      "caps_vistos": 2,
+      "anclas": 18
+    },
+    {
+      "osis": "HOS",
+      "caps_vistos": 14,
+      "anclas": 122
+    },
+    {
+      "osis": "ISA",
+      "caps_vistos": 66,
+      "anclas": 683
+    },
+    {
+      "osis": "JDG",
+      "caps_vistos": 21,
+      "anclas": 360
+    },
+    {
+      "osis": "JER",
+      "caps_vistos": 52,
+      "anclas": 564
+    },
+    {
+      "osis": "JOB",
+      "caps_vistos": 42,
+      "anclas": 344
+    },
+    {
+      "osis": "JOL",
+      "caps_vistos": 3,
+      "anclas": 30
+    },
+    {
+      "osis": "JON",
+      "caps_vistos": 4,
+      "anclas": 22
+    },
+    {
+      "osis": "JOS",
+      "caps_vistos": 24,
+      "anclas": 365
+    },
+    {
+      "osis": "LAM",
+      "caps_vistos": 5,
+      "anclas": 91
+    },
+    {
+      "osis": "LEV",
+      "caps_vistos": 27,
+      "anclas": 354
+    },
+    {
+      "osis": "MAL",
+      "caps_vistos": 4,
+      "anclas": 21
+    },
+    {
+      "osis": "MIC",
+      "caps_vistos": 7,
+      "anclas": 46
+    },
+    {
+      "osis": "NAM",
+      "caps_vistos": 3,
+      "anclas": 20
+    },
+    {
+      "osis": "NEH",
+      "caps_vistos": 13,
+      "anclas": 193
+    },
+    {
+      "osis": "NUM",
+      "caps_vistos": 36,
+      "anclas": 406
+    },
+    {
+      "osis": "OBA",
+      "caps_vistos": 1,
+      "anclas": 14
+    },
+    {
+      "osis": "PRO",
+      "caps_vistos": 31,
+      "anclas": 764
+    },
+    {
+      "osis": "PSA",
+      "caps_vistos": 150,
+      "anclas": 667
+    },
+    {
+      "osis": "RUT",
+      "caps_vistos": 4,
+      "anclas": 48
+    },
+    {
+      "osis": "SNG",
+      "caps_vistos": 8,
+      "anclas": 97
+    },
+    {
+      "osis": "ZEC",
+      "caps_vistos": 14,
+      "anclas": 73
+    },
+    {
+      "osis": "ZEP",
+      "caps_vistos": 3,
+      "anclas": 24
+    }
+  ]
+}

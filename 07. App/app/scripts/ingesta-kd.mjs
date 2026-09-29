@@ -108,6 +108,9 @@ function parsearPagina(html) {
     const parras = [];
     for (const trozo of seg.split(/<p[^>]*>/)) {
       const t = limpiar(trozo);
+      // footer que biblehub inyecta por página (929 = 1 por capítulo): chrome del
+      // sitio, no de la obra — se descarta (documentado en el manifiesto)
+      if (/Commentary on the Old Testament, by Carl Friedrich Keil/.test(t) && /Courtesy/i.test(t)) continue;
       if (t) parras.push(t);
     }
     if (parras.length) anclas.push({ cap, v, p: parras });
