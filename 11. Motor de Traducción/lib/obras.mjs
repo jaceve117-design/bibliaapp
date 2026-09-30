@@ -360,6 +360,9 @@ JSON COMPACTO en una sola línea, sin sangrías ni saltos: cada espacio cuesta.`
 // opts.mascarado: enmascara hebreo/griego con ⟦n⟧ al enviar (en) y desenmascara
 // al ensamblar — el hash y la memoria de traducción siguen calculándose sobre el
 // texto ORIGINAL (enmascara es determinista, las fichas se reproducen igual).
+// opts.mascaraRE: fuente de RegExp alternativa (los tramos que la obra necesita
+// ocultar, p. ej. con diacríticos combinantes). DEBE ser estable para la obra:
+// si cambia, los resultados ya guardados de esa obra hay que purgarlos.
 // opts.prompt / opts.lote: prompt propio y tamaño de lote de la obra.
 const comentarioEn = (id, nombre, fuente, opts = {}) => ({
   id,
@@ -396,8 +399,9 @@ const comentarioEn = (id, nombre, fuente, opts = {}) => ({
       us = Array.from({ length: Math.min(n, orden.length) }, (_, i) => orden[Math.floor(((i + 0.5) * orden.length) / n)]);
     }
     if (opts.mascarado) {
+      const re = opts.mascaraRE ? new RegExp(opts.mascaraRE, 'g') : null;
       us = us.map((u) => {
-        const { t } = enmascara(u.en);
+        const { t } = re ? enmascaraCon(re, u.en) : enmascara(u.en);
         return { ...u, orig: u.en, en: t };
       });
     }
@@ -429,7 +433,9 @@ const comentarioEn = (id, nombre, fuente, opts = {}) => ({
               unidades++;
               hay++;
               // con máscara: la ES guardada trae ⟦n⟧ — se restituye el original
-              return opts.mascarado ? desenmascara(r.es, enmascara(en).fichas) : r.es;
+              if (!opts.mascarado) return r.es;
+              const re = opts.mascaraRE ? new RegExp(opts.mascaraRE, 'g') : null;
+              return desenmascara(r.es, (re ? enmascaraCon(re, en) : enmascara(en)).fichas);
             }
             return '';
           }),
@@ -554,7 +560,19 @@ const vincent = comentarioEn(
   'vincent',
   'Word Studies in the New Testament — Marvin R. Vincent (1887)',
   'Marvin R. Vincent, Word Studies in the New Testament (1887) · Dominio público · texto original vía biblehub.com',
-  { prompt: REGLAS_VINCENT, mascarado: true }
+  {
+    prompt: REGLAS_VINCENT,
+    mascarado: true,
+    // el griego del espejo llega de entidades HTML con los diacríticos COMBINANTES
+    // separados de su base (U+0300-036F) — sin ellos cada palabra se partiría en
+    // varias fichas con acentos huérfanos. Clase estable y exclusiva de esta obra.
+    mascaraRE:
+      "<ref='[^']*'>[\\s\\S]*?</ref>" +
+      "|<[^>]+>" +
+      "|&[a-z]+;" +
+      "|[\\u0370-\\u03FF\\u1F00-\\u1FFF\\u0590-\\u05FF\\uFB1D-\\uFB4F\\u0300-\\u036F]+" +
+      "(?:[\\s.,·;'’()-]*[\\u0370-\\u03FF\\u1F00-\\u1FFF\\u0590-\\u05FF\\uFB1D-\\uFB4F\\u0300-\\u036F]+)*",
+  }
 );
 
 // ── Definiciones del léxico (TBESH/TBESG) ──────────────────────────────────
@@ -577,8 +595,13 @@ const RE_MASCARA = new RegExp(
 );
 
 export function enmascara(texto) {
+  return enmascaraCon(RE_MASCARA, texto);
+}
+
+/** Enmascarado con una RegExp dada (ver opts.mascaraRE en comentarioEn). */
+export function enmascaraCon(re, texto) {
   const fichas = [];
-  const t = String(texto).replace(RE_MASCARA, (m) => {
+  const t = String(texto).replace(re, (m) => {
     fichas.push(m);
     return `⟦${fichas.length}⟧`;
   });
