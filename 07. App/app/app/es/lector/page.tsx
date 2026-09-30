@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Cabecera from "@/components/Cabecera";
 import Tema from "@/components/Tema";
 import TamTexto from "@/components/TamTexto";
+import DiagnosticoSeccion from "@/components/DiagnosticoSeccion";
 import { t } from "@/lib/i18n";
 import { parejaDe } from "@/lib/alinea-gr";
 import { morfGntEs } from "@/lib/morfgnt";
@@ -248,7 +249,7 @@ export default function Lector() {
   // menú de recurso de una pestaña: se abre SÓLO con su flecha ▾
   const [menuRecurso, setMenuRecurso] = useState<{ id: string; x: number; y: number } | null>(null);
   // Ajustes: panel lateral con tema, letra, información, fuentes, derechos y apoyo
-  const [ajustes, setAjustes] = useState<null | "menu" | "info" | "fuentes" | "derechos" | "apoyar">(null);
+  const [ajustes, setAjustes] = useState<null | "menu" | "info" | "fuentes" | "derechos" | "apoyar" | "diagnostico">(null);
   const [capasAbierto, setCapasAbierto] = useState(false);
   const [tamGeneral, setTamGeneral] = useState("1");
   const [contraste, setContraste] = useState<"normal" | "alto" | "maximo">("normal");
@@ -3934,7 +3935,7 @@ export default function Lector() {
                 </button>
               )}
               <span className="ajustes-titulo">
-                {{ menu: "Ajustes", info: tr.info, fuentes: tr.fuentes, derechos: "Derechos de las traducciones", apoyar: tr.apoyarTitulo }[ajustes]}
+                {{ menu: "Ajustes", info: tr.info, fuentes: tr.fuentes, derechos: "Derechos de las traducciones", apoyar: tr.apoyarTitulo, diagnostico: "Diagnóstico" }[ajustes]}
               </span>
               <button className="icono-btn cerrar" onClick={() => setAjustes(null)} aria-label={tr.lexCerrar} title={tr.lexCerrar}>
                 ✕
@@ -3986,6 +3987,7 @@ export default function Lector() {
                     ["fuentes", "≣", tr.fuentes, "Obras, licencias y cómo reportar un error"],
                     ["derechos", "©", "Derechos de las traducciones", "Licencia de las traducciones al español"],
                     ["apoyar", "♥", tr.apoyarTitulo, "Cómo sostener el proyecto"],
+                    ["diagnostico", "☰", "Diagnóstico", "Registro interno de errores y toques (solo en este dispositivo)"],
                   ] as const).map(([id, ico, t, d]) => (
                     <button key={id} className="ajustes-item" onClick={() => setAjustes(id)}>
                       <span className="ajustes-ico" aria-hidden="true">{ico}</span>
@@ -4150,6 +4152,11 @@ export default function Lector() {
                 <div className="info-seccion">
                   {/* Sin medios de pago hasta tener datos reales y verificados. */}
                   <div className="lex-def">{tr.apoyarProximamente}</div>
+                </div>
+              )}
+              {ajustes === "diagnostico" && (
+                <div className="info-seccion">
+                  <DiagnosticoSeccion />
                 </div>
               )}
             </div>

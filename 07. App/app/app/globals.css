@@ -6938,3 +6938,15 @@ button.rec-original[aria-pressed="true"]::before {
   .lex-panel.movil .com-toggle { background-color: var(--bg-tarjeta); }
   .lengueta.frente { background: var(--bg-tarjeta); }
 }
+
+/* — Diagnóstico (sección de Ajustes; GLM, pedido del usuario) — */
+.diagnostico-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+.diagnostico-acciones .icono-btn {
+  font-size: 0.86rem;
+  padding: 8px 12px;
+}

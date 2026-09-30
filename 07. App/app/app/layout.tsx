@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import RegistrarSW from "@/components/RegistrarSW";
+import DiagnosticoGlobal from "@/components/DiagnosticoGlobal";
 import Intro from "@/components/Intro";
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default function RootLayout({
         <Intro />
         {children}
         <RegistrarSW />
+        <DiagnosticoGlobal />
       </body>
     </html>
   );
