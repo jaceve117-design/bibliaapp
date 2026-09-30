@@ -12,8 +12,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 const obra = process.argv[2];
-if (!obra || !["jfb", "barnes", "henry"].includes(obra)) {
-  console.error("uso: node scripts/valida-es.mjs jfb|barnes|henry");
+if (!obra || !["jfb", "barnes", "henry", "kd", "vincent"].includes(obra)) {
+  console.error("uso: node scripts/valida-es.mjs jfb|barnes|henry|kd|vincent");
   process.exit(1);
 }
 const DATA = path.join(process.cwd(), "07. App", "app", "public", "data");
@@ -47,6 +47,14 @@ const PERMITIDOS = [
   // (estilo del autor, verificado una a una el 2026-09-27)
   /ad leones—Away with Christians/, /Nip the mischief in the bud/, /and it encircles all/,
   /before I am entreated/, /feelings of a physician/, /Away to thy cell/, /to mind the same thing/,
+  // K&D: títulos y citas verificadas una a una (2026-09-30) — quedan en EN por práctica editorial
+  /Layard's Nineveh and (?:its Remains|Babylon)/, /Layard, Nineveh and Babylon/,
+  /The Dirge of Coheleth/, /just as when the straw was/,
+  /Phys\. Geogr\. of the Holy Land/, /The Speaker's Commentary/,
+  /The Song of Songs/, /"The Song,"/,
+  /Terencio \(And\. I 5\. 16\)/,
+  // notas del traductor con el original inglés entre corchetes: deliberado por construcción
+  /\[N\. del T\.: [^\]]*\]/,
 ];
 // fuentes del impreso que vienen truncadas en el EN original (el ES las refleja fielmente;
 // precedente: JN 18.2 idx20 de Henry). Formato: OSIS.cap.verso.párrafo
