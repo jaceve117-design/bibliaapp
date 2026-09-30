@@ -1494,3 +1494,8 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Extras del turno (pedido directo del usuario)**: sección Diagnóstico en Ajustes (toques/respuestas/errores + informes .md/.txt) desplegada en rama glm; geocoding OpenBible (2.2) completado antes de la puerta A.
 - **Deuda menor documentada (no bloquea, rescatable en consola de revisión)**: 223 párrafos kd + 20 vincent + 34 barnes sin traducir; pulido OCR fino de Valdés/Rand; morfología griega sin cotejar con el intro de TAGNT.
 - **PARADO AQUÍ**: Puerta B = informe y parada obligatoria antes de la Fase 4. Pendientes del usuario: prueba móvil de la Sintaxis MACULA y de la sección Diagnóstico (botones ya corregidos), glosas Theographic ES (~$0,5, sin aprobar), decisión sobre 1.3 Calvino-Valera (bloqueada por licencia), y publicación a main de K&D+Vincent+Diagnóstico por parte de Claude.
+
+## 2026-09-30 — PUBLICADO A MAIN POR GLM con aprobación explícita del usuario
+- El usuario dijo «publica tú lo que ya está listo, tienes mi aprobación» — GLM construyó desde main (`99db3e8`) y desplegó a producción (`--branch=main`, deploy `190848cc`): **K&D (kd/ + kd-es/), Vincent (vincent/ + vincent-es/), sección Diagnóstico (con clase diag-btn corregida) y reparación del campo fuente de barnes-es**.
+- Verificado en producción: lector 200 · kd-es/GEN.json e ISA.json 200 · vincent-es/JHN.json 200 · kd/GEN.json y vincent/JHN.json 200 · llms.txt 200 · «Diagnóstico» presente en el paquete (2 menciones).
+- **Pendiente de interfaz (archivos de Claude)**: registrar K&D y Vincent en el selector COMENTARIOS / RUTA_COMENTARIO del lector, paneles Recursos y Fuentes — el dato ya está publicado; el selector los mostrará cuando Claude añada sus entradas.
