@@ -55,6 +55,12 @@ const PERMITIDOS = [
   /Terencio \(And\. I 5\. 16\)/,
   // notas del traductor con el original inglés entre corchetes: deliberado por construcción
   /\[N\. del T\.: [^\]]*\]/,
+  // Vincent: títulos y citas verificadas una a una (2026-09-30)
+  /Ancient Rome in the Light of Recent Discoveries/, /left in the lurch/,
+  /John the Smith/, /to raise the land/, /Voyage and Shipwreck of St\. Paul/,
+  /Troil\. and Cress\./, /grucched agens the Maudeleyn/, /Life and Times of Jesus/,
+  /Dean Plumptre en [“"']The Expositor/, /el inglés the horse o the cavalry/,
+  /artículo definido .* the: .las dos alas/,
 ];
 // fuentes del impreso que vienen truncadas en el EN original (el ES las refleja fielmente;
 // precedente: JN 18.2 idx20 de Henry). Formato: OSIS.cap.verso.párrafo

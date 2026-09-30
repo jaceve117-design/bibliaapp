@@ -20,6 +20,7 @@ Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, 
 - [Jamieson-Fausset-Brown](https://bibliaapp.pages.dev/data/jfb-es/_manifest.json): /data/jfb/ · /data/jfb-es/
 - [Albert Barnes](https://bibliaapp.pages.dev/data/barnes-es/_manifest.json): /data/barnes/ · /data/barnes-es/
 - [Keil y Delitzsch, Commentary on the Old Testament (AT completo; trad. inglesa T&T Clark 1857–78, dominio público)](https://bibliaapp.pages.dev/data/kd-es/_manifest.json): /data/kd/{LIBRO}.json (EN) · /data/kd-es/{LIBRO}.json (ES, sin revisar)
+- [Marvin Vincent, Word Studies in the New Testament (1887, dominio público)](https://bibliaapp.pages.dev/data/vincent-es/_manifest.json): /data/vincent/{LIBRO}.json (EN, con griego) · /data/vincent-es/{LIBRO}.json (ES, sin revisar, griego restituido)
 - [Nave's Topical Bible](https://bibliaapp.pages.dev/data/nave/_manifest.json): /data/nave/{LIBRO}.json
 - [Juan de Valdés — Romanos (1556) y 1 Corintios (1557), texto original en castellano, dominio público](https://bibliaapp.pages.dev/data/valdes/ROM.json): /data/valdes/ROM.json · /data/valdes/1CO.json (ed. Usoz, Reformistas Antiguos Españoles)
 - [Treasury of Scripture Knowledge (referencias cruzadas)](https://bibliaapp.pages.dev/data/tsk/_manifest.json): /data/tsk/{LIBRO}.json

@@ -103,9 +103,12 @@ function parsearPagina(html) {
     const v = Number(mHref[2]);
     const parras = [];
     for (const trozo of seg.split(/<p[^>]*>/)) {
-      const t = limpiar(trozo);
-      // footer por página del sitio: chrome, no de la obra
-      if (/Word Studies in the New Testament/.test(t) && /(Courtesy|public domain)/i.test(t)) continue;
+      let t = limpiar(trozo);
+      // footer del sitio PEGADO al final del último párrafo del capítulo (260 de 260):
+      // «…contenido. Vincent's Word Studies, by Marvin R. Vincent [1886]. Text Courtesy…»
+      // se RECORTA el sufijo (no se tira el párrafo: lleva contenido real delante);
+      // si el trozo era solo footer, queda vacío y no se agrega
+      t = t.replace(/\s*Vincent'?s Word Studies, by Marvin R\. Vincent \[\d{4}\]\.[\s\S]*$/, "").trim();
       if (t) parras.push(t);
     }
     if (parras.length) anclas.push({ cap, v, p: parras });

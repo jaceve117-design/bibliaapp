@@ -3,10 +3,10 @@
   "osis_obra": "VINCENT",
   "licencia": "Dominio público (1887; autor †1922, obra pre-1929) — ver Ficha - Vincent.md",
   "fuente": "https://biblehub.com/commentaries/vws/ — espejo del texto PD original",
-  "fecha_ingesta": "2026-09-29",
+  "fecha_ingesta": "2026-09-30",
   "idioma": "en",
   "alcance": "NT completo: 27 libros. Estudio de palabras griegas por versículo; el griego va en el texto (la obra del motor aplica máscara ⟦n⟧).",
-  "total_anclas": 5851,
+  "total_anclas": 5763,
   "tramos_alfabeto_original_crudo_html": 0,
   "nota": "Vincent comenta por anclas de versículo. La cabecera léxica de cada ancla (palabra + griego) es contenido y se conserva como primer párrafo.",
   "incidentes": [],
@@ -14,7 +14,7 @@
     {
       "osis": "1CO",
       "caps_vistos": 16,
-      "anclas": 309
+      "anclas": 304
     },
     {
       "osis": "1JN",
@@ -29,7 +29,7 @@
     {
       "osis": "1TH",
       "caps_vistos": 5,
-      "anclas": 84
+      "anclas": 81
     },
     {
       "osis": "1TI",
@@ -39,22 +39,22 @@
     {
       "osis": "2CO",
       "caps_vistos": 13,
-      "anclas": 206
+      "anclas": 203
     },
     {
       "osis": "2JN",
       "caps_vistos": 1,
-      "anclas": 13
+      "anclas": 12
     },
     {
       "osis": "2PE",
       "caps_vistos": 3,
-      "anclas": 56
+      "anclas": 55
     },
     {
       "osis": "2TH",
       "caps_vistos": 3,
-      "anclas": 43
+      "anclas": 41
     },
     {
       "osis": "2TI",
@@ -69,7 +69,7 @@
     {
       "osis": "ACT",
       "caps_vistos": 28,
-      "anclas": 693
+      "anclas": 679
     },
     {
       "osis": "COL",
@@ -84,22 +84,22 @@
     {
       "osis": "GAL",
       "caps_vistos": 6,
-      "anclas": 148
+      "anclas": 147
     },
     {
       "osis": "HEB",
       "caps_vistos": 13,
-      "anclas": 291
+      "anclas": 289
     },
     {
       "osis": "JAS",
       "caps_vistos": 5,
-      "anclas": 98
+      "anclas": 95
     },
     {
       "osis": "JHN",
       "caps_vistos": 21,
-      "anclas": 731
+      "anclas": 725
     },
     {
       "osis": "JUD",
@@ -109,17 +109,17 @@
     {
       "osis": "LUK",
       "caps_vistos": 24,
-      "anclas": 790
+      "anclas": 779
     },
     {
       "osis": "MAT",
       "caps_vistos": 28,
-      "anclas": 461
+      "anclas": 441
     },
     {
       "osis": "MRK",
       "caps_vistos": 16,
-      "anclas": 383
+      "anclas": 377
     },
     {
       "osis": "PHM",
@@ -129,22 +129,22 @@
     {
       "osis": "PHP",
       "caps_vistos": 4,
-      "anclas": 95
+      "anclas": 94
     },
     {
       "osis": "REV",
       "caps_vistos": 22,
-      "anclas": 360
+      "anclas": 356
     },
     {
       "osis": "ROM",
       "caps_vistos": 16,
-      "anclas": 355
+      "anclas": 351
     },
     {
       "osis": "TIT",
       "caps_vistos": 3,
-      "anclas": 44
+      "anclas": 43
     }
   ]
 }
