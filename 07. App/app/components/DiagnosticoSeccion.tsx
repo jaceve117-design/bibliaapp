@@ -62,21 +62,21 @@ export default function DiagnosticoSeccion() {
           : ""}
       </div>
       <div className="diagnostico-acciones">
-        <button className="icono-btn" onClick={() => descargar(1, "md")}>
+        <button className="diag-btn" onClick={() => descargar(1, "md")}>
           Informe .md · última hora
         </button>
-        <button className="icono-btn" onClick={() => descargar(24, "md")}>
+        <button className="diag-btn" onClick={() => descargar(24, "md")}>
           Informe .md · 24 h
         </button>
-        <button className="icono-btn" onClick={() => descargar(null, "txt")}>
+        <button className="diag-btn" onClick={() => descargar(null, "txt")}>
           Registro .txt · completo
         </button>
       </div>
       <div className="diagnostico-acciones">
-        <button className="icono-btn" onClick={pausar}>
+        <button className="diag-btn" onClick={pausar}>
           {estado?.pausado ? "Reanudar captura" : "Pausar captura"}
         </button>
-        <button className="icono-btn" onClick={vaciar}>
+        <button className="diag-btn" onClick={vaciar}>
           Vaciar registro
         </button>
       </div>
