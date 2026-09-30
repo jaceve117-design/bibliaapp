@@ -16,6 +16,14 @@ const DATA = "public/data";
 const COMENTARIOS = ["henry", "jfb", "barnes", "kd", "vincent", "valdes"];
 const VERSO = ["nave", "tsk", "easton"];
 
+// capítulos válidos por libro según la Biblia base (RV1909): el diccionario de
+// Easton cita referencias imposibles (Génesis 66/79) y ensuciarían el badge
+const capsValidos = {};
+{
+  const mf = JSON.parse(fs.readFileSync(path.join(DATA, "rv1909/_manifest.json"), "utf8"));
+  for (const l of mf.libros) capsValidos[l.osis] = l.caps;
+}
+
 const capsDeComentario = (dir) => {
   if (!fs.existsSync(dir)) return null;
   const caps = new Set();
@@ -60,8 +68,10 @@ const salida = {};
 for (const [r, caps] of Object.entries(indices)) {
   if (!caps) { console.log(`  · ${r}: sin datos, omitido`); continue; }
   for (const k of caps) {
-    const [osis, cap] = k.split(".");
-    ((salida[osis] ??= {})[r] ??= []).push(Number(cap));
+    const [osis, capStr] = k.split(".");
+    const cap = Number(capStr);
+    if (cap > (capsValidos[osis] ?? 0)) continue; // cita imposible del diccionario: fuera
+    ((salida[osis] ??= {})[r] ??= []).push(cap);
   }
 }
 // ordenar caps
