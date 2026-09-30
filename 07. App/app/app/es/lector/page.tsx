@@ -77,6 +77,12 @@ const COMENTARIOS = [
 type ComFuente = (typeof COMENTARIOS)[number]["id"];
 // obras de comentario EN servidas de /data/{ruta}/{OSIS}.json (misma forma de JSON para todas)
 const RUTA_COMENTARIO: Partial<Record<ComFuente, string>> = { jfb: "jfb", barnes: "barnes", easton: "easton-pasajes", valdes: "valdes" };
+// nombres cortos para el badge del título (cobertura.json — genera-cobertura.mjs)
+const NOMBRE_RECURSO: Record<string, string> = {
+  henry: "Matthew Henry", jfb: "Jamieson-Fausset-Brown", barnes: "Albert Barnes",
+  kd: "Keil y Delitzsch", vincent: "Marvin Vincent", valdes: "Juan de Valdés",
+  nave: "Nave's (temas)", tsk: "Referencias cruzadas (TSK)", easton: "Diccionario Easton",
+};
 const OSIS_INICIAL = "JHN";
 type Hoja = "abierta" | "media" | "guardada";
 const ORDEN_HOJA: Hoja[] = ["abierta", "media", "guardada"];
@@ -1311,6 +1317,21 @@ export default function Lector() {
   }, [comsExtra]);
   const extrasVisibles = comentario ? comsLimpios : [];
   const fuentesExtra = [...new Set(extrasVisibles.map((e) => e.fuente))].filter((f) => f !== "henry").join(",");
+  // Índice de cobertura (scripts/genera-cobertura.mjs): qué recursos tienen
+  // contenido para cada libro/capítulo — alimenta el badge del título.
+  const [cobertura, setCobertura] = useState<{ osis: Record<string, Record<string, number[]>> } | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    fetch("/data/cobertura.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (vivo && j) setCobertura(j); })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, []);
+  const recursosCap = cobertura?.osis?.[osis]
+    ? Object.keys(cobertura.osis[osis]).filter((r) => cobertura.osis[osis][r].includes(Number(cap)))
+    : [];
+  const nombresRecursosCap = recursosCap.map((r) => NOMBRE_RECURSO[r] ?? r).join(" · ");
   useEffect(() => {
     if (!fuentesExtra) return;
     let vivo = true;
@@ -2376,9 +2397,21 @@ export default function Lector() {
                 ›
               </button>
             </div>
-            <span className="ref-osis">
-              {osis}.{cap} · {manifest?.osis_obra ?? ""}
-            </span>
+            <div className="titulo-lateral">
+              {recursosCap.length > 0 && (
+                <button
+                  className="badge-recursos"
+                  onClick={() => setRecursosAbierto(true)}
+                  title={`Recursos para ${info?.nombre ?? ""} ${cap}: ${nombresRecursosCap}`}
+                  aria-label={`Recursos de este capítulo: ${recursosCap.length}. ${nombresRecursosCap}`}
+                >
+                  ▦ <b>{recursosCap.length}</b>
+                </button>
+              )}
+              <span className="ref-osis">
+                {osis}.{cap} · {manifest?.osis_obra ?? ""}
+              </span>
+            </div>
           </div>
 
           {paraleloActivo && !cargando && !griego && !interlineal && (

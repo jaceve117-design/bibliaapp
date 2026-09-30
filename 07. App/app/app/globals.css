@@ -6972,3 +6972,39 @@ button.rec-original[aria-pressed="true"]::before {
 }
 .diag-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
 .diag-btn:active { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+/* — Título de capítulo anclado + badge de recursos (pedido del usuario, GLM 2026-09-30) — */
+.lector-titulo {
+  position: sticky;
+  top: calc(var(--altura-cabecera, 130px) + 6px);
+  z-index: 40;
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding-top: 10px;
+  align-items: center;
+}
+.lector-titulo .titulo-lateral {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.badge-recursos {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1;
+  color: var(--ink-soft);
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 999px;
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.badge-recursos b { color: var(--accent-strong); font-size: 13px; }
+.badge-recursos:hover, .badge-recursos:active { border-color: var(--accent); color: var(--accent-strong); }

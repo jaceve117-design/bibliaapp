@@ -1,34 +1,37 @@
 # Biblia de Estudio AION
 
-> Biblia de estudio en español: texto bíblico, lenguas originales, comentarios clásicos, diccionarios y léxico, conectados por pasaje. El lector (/es/lector) se dibuja con JavaScript; para leer el contenido directamente, usa los archivos JSON de abajo (estáticos, públicos, sin clave).
+> Biblia de estudio en español: texto bíblico, lenguas originales, comentarios clásicos, diccionarios y léxico, conectados alrededor de cada pasaje. El lector (/es/lector) se dibuja con JavaScript; para leer el contenido directamente, usa los archivos JSON de abajo (estáticos, públicos, sin clave).
 
-Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, MAT, JHN, ROM, REV…); la lista de cada obra está en su `_manifest.json`. Cada archivo de libro trae `versos` con `c` (capítulo), `v` (versículo) y `t` (texto). Las traducciones al español de los comentarios están hechas por máquina y marcadas `sin_revisar` hasta la revisión humana: cítalas como tales.
+Convenciones: libros con código OSIS de 3 letras en mayúscula (GEN, EXO, PSA, MAT, JHN, REV…); la lista de cada obra está en su `_manifest.json`. Cada archivo de libro trae `versos` con `c` (capítulo), `v` (versículo) y `t` (texto). Las traducciones al español de los comentarios están hechas por máquina y marcadas `sin_revisar` hasta la revisión humana: cítalas como tales. Índice de qué recursos cubren cada libro/capítulo: `/data/cobertura.json`.
 
 ## Texto bíblico
-- [Reina-Valera 1909 (dominio público)](https://bibliaapp.pages.dev/data/rv1909/JHN.json): un archivo por libro, p. ej. /data/rv1909/JHN.json
-- [Versión Biblia Libre, VBL](https://bibliaapp.pages.dev/data/vbl/_manifest.json): /data/vbl/{LIBRO}.json
-- [World English Bible](https://bibliaapp.pages.dev/data/web/_manifest.json): /data/web/{LIBRO}.json
-- [Nuevo Testamento griego SBLGNT](https://bibliaapp.pages.dev/data/sblgnt/_manifest.json): /data/sblgnt/{LIBRO}.json
-- [Theographic Bible Metadata (personas, lugares, eventos)](https://bibliaapp.pages.dev/data/theographic/_manifest.json): /data/theographic/ · CC BY-SA 4.0 — verse-keyed, fichas de personas con genealogías y coordenadas de lugares
-- [MACULA Greek — sintaxis por palabra (CC BY 4.0, Clear Bible)](https://bibliaapp.pages.dev/data/macula/_manifest.json): /data/macula/sintaxis.json — verse-keyed: rol sintáctico, palabra griega y traducción contextual por palabra
-- [OpenBible.info Cross-References (~344k votadas, CC BY)](https://bibliaapp.pages.dev/data/openbible/refs.json): /data/openbible/refs.json — verse-keyed, ordenadas por votos
-- [OpenBible.info Bible Geocoding (~1.335 lugares bíblicos con coordenadas, CC BY 4.0)](https://bibliaapp.pages.dev/data/openbible/geo.json): /data/openbible/geo.json — lugares[{n, ll:[lat,lon], q (confianza 0-1000), t (tipo), v: refs OSIS}]; incluye datos de OpenStreetMap (ODbL)
+- [Reina-Valera 1909 (dominio público)](https://bibliaapp.pages.dev/data/rv1909/JHN.json): un archivo por libro — **66 libros, Biblia completa** (AT + NT)
+- [Versión Biblia Libre, VBL](https://bibliaapp.pages.dev/data/vbl/_manifest.json): /data/vbl/{LIBRO}.json — Biblia completa
+- [World English Bible](https://bibliaapp.pages.dev/data/web/_manifest.json): /data/web/{LIBRO}.json — Biblia completa en inglés
+- [Biblia del Oso 1569 (ortografía actualizada)](https://bibliaapp.pages.dev/data/oso1569/_manifest.json): /data/oso1569/ — **66 libros, Biblia completa** (dominio público, 1569; edición getbible.net, sin deuterocanónicos)
+- [Nuevo Testamento griego SBLGNT](https://bibliaapp.pages.dev/data/sblgnt/_manifest.json): /data/sblgnt/{LIBRO}.json — **27 libros del NT** (~137.000 palabras con lema y análisis morfológico; CC BY 4.0). Nota de versificación: el texto crítico no incluye Mc 16:9-20, Jn 7:53-8:11 ni otros 8 pasajes menores (documentado en el manifiesto)
+- [MACULA Greek — sintaxis por palabra (CC BY 4.0, Clear Bible)](https://bibliaapp.pages.dev/data/macula/_manifest.json): /data/macula/sintaxis.json — **los 27 libros del NT** (~7.939 versos): rol sintáctico, palabra griega y traducción contextual por palabra
+- [Theographic Bible Metadata (personas, lugares, eventos)](https://bibliaapp.pages.dev/data/theographic/_manifest.json): /data/theographic/ — **66 libros** (18.127 versos keyados): fichas de 3.067 personas con genealogías, 1.274 lugares con coordenadas, 450 eventos (CC BY-SA 4.0)
+- [OpenBible.info Cross-References (~344k votadas, CC BY)](https://bibliaapp.pages.dev/data/openbible/refs.json): /data/openbible/refs.json — **66 libros** (29.364 versos origen), ordenadas por votos
+- [OpenBible.info Bible Geocoding (1.335 lugares con coordenadas, CC BY 4.0)](https://bibliaapp.pages.dev/data/openbible/geo.json): /data/openbible/geo.json — lugares[{n, ll:[lat,lon], q (confianza 0-1000), t (tipo), v: 8.707 refs OSIS}]; incluye datos de OpenStreetMap (ODbL)
 - [Texto completo en un archivo, RV1909](https://bibliaapp.pages.dev/data/busqueda/rv1909.json): líneas «LIBRO.c.v|texto»; también /data/busqueda/vbl.json
 
-## Comentarios (inglés original y español)
-- [Matthew Henry](https://bibliaapp.pages.dev/data/henry-es/_manifest.json): /data/henry/{LIBRO}.json (EN) · /data/henry-es/{LIBRO}.json (ES)
-- [Jamieson-Fausset-Brown](https://bibliaapp.pages.dev/data/jfb-es/_manifest.json): /data/jfb/ · /data/jfb-es/
-- [Albert Barnes](https://bibliaapp.pages.dev/data/barnes-es/_manifest.json): /data/barnes/ · /data/barnes-es/
-- [Keil y Delitzsch, Commentary on the Old Testament (AT completo; trad. inglesa T&T Clark 1857–78, dominio público)](https://bibliaapp.pages.dev/data/kd-es/_manifest.json): /data/kd/{LIBRO}.json (EN) · /data/kd-es/{LIBRO}.json (ES, sin revisar)
-- [Marvin Vincent, Word Studies in the New Testament (1887, dominio público)](https://bibliaapp.pages.dev/data/vincent-es/_manifest.json): /data/vincent/{LIBRO}.json (EN, con griego) · /data/vincent-es/{LIBRO}.json (ES, sin revisar, griego restituido)
-- [Nave's Topical Bible](https://bibliaapp.pages.dev/data/nave/_manifest.json): /data/nave/{LIBRO}.json
-- [Juan de Valdés — Romanos (1556) y 1 Corintios (1557), texto original en castellano, dominio público](https://bibliaapp.pages.dev/data/valdes/ROM.json): /data/valdes/ROM.json · /data/valdes/1CO.json (ed. Usoz, Reformistas Antiguos Españoles)
-- [Treasury of Scripture Knowledge (referencias cruzadas)](https://bibliaapp.pages.dev/data/tsk/_manifest.json): /data/tsk/{LIBRO}.json
+## Comentarios (inglés original y español; ES por máquina, sin revisar)
+- [Matthew Henry, Complete Commentary (1706)](https://bibliaapp.pages.dev/data/henry-es/_manifest.json): /data/henry/{LIBRO}.json (EN) · /data/henry-es/{LIBRO}.json (ES) — **66 libros, Biblia completa**; ~243.000 párrafos
+- [Jamieson-Fausset-Brown (1871)](https://bibliaapp.pages.dev/data/jfb-es/_manifest.json): /data/jfb/ · /data/jfb-es/ — **66 libros, Biblia completa** (19.768 anclas)
+- [Albert Barnes (1832–1872)](https://bibliaapp.pages.dev/data/barnes-es/_manifest.json): /data/barnes/ · /data/barnes-es/ — **32 libros**: NT completo (27) + Génesis, Job, Salmos, Isaías y Daniel (los libros que Barnes nunca escribió están excluidos: las ediciones «completas» modernas los rellenan con otros autores sin acreditar); 12.224 anclas
+- [Keil y Delitzsch, Commentary on the Old Testament (trad. inglesa T&T Clark 1857–78)](https://bibliaapp.pages.dev/data/kd-es/_manifest.json): /data/kd/{LIBRO}.json (EN) · /data/kd-es/{LIBRO}.json (ES) — **39 libros, AT completo** (Génesis–Malaquías); 10.030 anclas, hebreo/griego transliterado o restituido
+- [Marvin Vincent, Word Studies in the New Testament (1887)](https://bibliaapp.pages.dev/data/vincent-es/_manifest.json): /data/vincent/{LIBRO}.json (EN, con griego) · /data/vincent-es/{LIBRO}.json (ES, griego restituido) — **27 libros del NT**; 5.763 anclas, estudio de palabras griegas por versículo
+- [Juan de Valdés — Romanos (1556) y 1 Corintios (1557), texto original en castellano](https://bibliaapp.pages.dev/data/valdes/ROM.json): /data/valdes/ROM.json · /data/valdes/1CO.json — **2 libros** (ed. Usoz, Reformistas Antiguos Españoles)
+- [Nave's Topical Bible (temas por versículo)](https://bibliaapp.pages.dev/data/nave/_manifest.json): /data/nave/{LIBRO}.json — **66 libros**, ~17.000 versos con temas
+- [Treasury of Scripture Knowledge (referencias cruzadas)](https://bibliaapp.pages.dev/data/tsk/_manifest.json): /data/tsk/{LIBRO}.json — **66 libros** (~140.000 versos con referencias)
 
 ## Diccionarios y léxico
-- [Diccionario Easton](https://bibliaapp.pages.dev/data/easton-es/_manifest.json): /data/easton/ (EN) · /data/easton-es/ (ES), un archivo por letra
-- [Diccionario de W. W. Rand (ES)](https://bibliaapp.pages.dev/data/rand-es/rand-es.json): /data/rand/ (EN) · /data/rand-es/rand-es.json (ES), un solo archivo por obra
-- [Léxico STEPBible (hebreo y griego)](https://bibliaapp.pages.dev/data/stepbible/_manifest.json): glosas y definiciones en español en /data/stepbible/
+- [Diccionario Easton (1897)](https://bibliaapp.pages.dev/data/easton-es/_manifest.json): /data/easton/ (EN) · /data/easton-es/ (ES), un archivo por letra — ~3.800 entradas; índice inverso por versículo en /data/easton-pasajes/ (66 libros)
+- [Diccionario de W. W. Rand (ES)](https://bibliaapp.pages.dev/data/rand-es/rand-es.json): /data/rand/ (EN) · /data/rand-es/rand-es.json (ES), un solo archivo — ~1.800 entradas
+- [Léxico STEPBible (hebreo y griego)](https://bibliaapp.pages.dev/data/stepbible/_manifest.json): glosas y definiciones en español (TBESH/TBESG, ~22.700 términos; CC BY 4.0, Tyndale House) · transliterado en /data/lexico-translit.json
+- [Morfología griega explicada en español](https://bibliaapp.pages.dev/data/morfologia/): códigos de análisis del SBLGNT traducidos (2 archivos)
 
-## Biblias adicionales
-- [Biblia del Oso 1569 (ortografía actualizada)](https://bibliaapp.pages.dev/data/oso1569/_manifest.json): /data/oso1569/ · Dominio público (1569) · edición getbible.net, 66 libros sin deuterocanónicos
+## Herramientas
+- [Índice de cobertura de recursos](https://bibliaapp.pages.dev/data/cobertura.json): /data/cobertura.json — por libro (OSIS) y recurso, qué capítulos tienen contenido (alimenta el badge «▦ n» del lector)
+- [Índice de búsqueda](https://bibliaapp.pages.dev/data/busqueda/): texto completo de RV1909 y VBL en un archivo por obra
