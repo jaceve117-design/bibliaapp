@@ -248,6 +248,12 @@ export default function Lector() {
   const [frenteMovil, setFrenteMovil] = useState<string | null>(null);
   // panel de Recursos: el único sitio donde se activan comentarios, diccionarios y herramientas
   const [recursosAbierto, setRecursosAbierto] = useState(false);
+  // panel de Recursos abierto DESDE el badge: sólo muestra los recursos con
+  // contenido para el libro/capítulo actual (pedido del usuario)
+  const [recursosFiltrado, setRecursosFiltrado] = useState(false);
+  // título de capítulo colapsado al avanzar (gesto hacia arriba) y restaurado
+  // al retroceder — sólo móvil/tablet (pedido del usuario)
+  const [tituloCompacto, setTituloCompacto] = useState(false);
   const recursosCargados = useRef(false);
   // dirección de la última vuelta de página (para la animación del capítulo)
   const [giro, setGiro] = useState<"" | "adelante" | "atras">("");
@@ -1331,6 +1337,23 @@ export default function Lector() {
   const recursosCap = cobertura?.osis?.[osis]
     ? Object.keys(cobertura.osis[osis]).filter((r) => cobertura.osis[osis][r].includes(Number(cap)))
     : [];
+  useEffect(() => {
+    if (!recursosAbierto && recursosFiltrado) setRecursosFiltrado(false);
+  }, [recursosAbierto, recursosFiltrado]);
+  useEffect(() => {
+    let ultimo = window.scrollY;
+    const enScroll = () => {
+      if (window.innerWidth >= 1000) { setTituloCompacto(false); ultimo = window.scrollY; return; }
+      const y = window.scrollY;
+      if (y < 80) { setTituloCompacto(false); ultimo = y; return; }
+      const d = y - ultimo;
+      if (d > 14) setTituloCompacto(true);
+      else if (d < -14) setTituloCompacto(false);
+      ultimo = y;
+    };
+    window.addEventListener("scroll", enScroll, { passive: true });
+    return () => window.removeEventListener("scroll", enScroll);
+  }, []);
   const nombresRecursosCap = recursosCap.map((r) => NOMBRE_RECURSO[r] ?? r).join(" · ");
   useEffect(() => {
     if (!fuentesExtra) return;
@@ -2298,7 +2321,7 @@ export default function Lector() {
           </span>
           <button
             className={`recursos-btn${[comentario, dicEnTexto, interlineal, griego, panelNotas, dicPanel, busPanel].some(Boolean) ? " activa" : ""}`}
-            onClick={() => setRecursosAbierto(true)}
+            onClick={() => { setRecursosFiltrado(false); setRecursosAbierto(true); }}
             aria-label="Recursos"
             title="Recursos: comentarios, diccionarios, herramientas y capas del texto"
           >
@@ -2385,7 +2408,7 @@ export default function Lector() {
           className={`lector-columna${itemsHoja.length && !ancho ? (hoja === "abierta" ? " con-hoja" : hoja === "media" ? " con-hoja-media" : " con-hoja-cerrada") : ""}${giro ? ` giro-${giro}` : ""}${paraleloActivo && extrasPar.length ? " ancha" : ""}`}
           ref={columna}
         >
-          <div className="lector-titulo">
+          <div className={`lector-titulo${tituloCompacto ? " compacto" : ""}`}>
             <div className="titulo-nav">
               <button className="titulo-flecha" onClick={() => pasarCapitulo(-1)} aria-label={tr.anterior} title={tr.anterior}>
                 ‹
@@ -2401,7 +2424,7 @@ export default function Lector() {
               {recursosCap.length > 0 && (
                 <button
                   className="badge-recursos"
-                  onClick={() => setRecursosAbierto(true)}
+                  onClick={() => { setRecursosFiltrado(true); setRecursosAbierto(true); }}
                   title={`Recursos para ${info?.nombre ?? ""} ${cap}: ${nombresRecursosCap}`}
                   aria-label={`Recursos de este capítulo: ${recursosCap.length}. ${nombresRecursosCap}`}
                 >
@@ -3881,8 +3904,20 @@ export default function Lector() {
                 Marca lo que quieras usar: cada recurso se abre como {ancho ? "un cuadro de la mesa" : "una carpeta abajo"}
                 {ancho ? "" : " (hasta 5)"}. Desmárcalo para cerrarlo.
               </p>
+              {recursosFiltrado && (
+                <div className="rec-filtro-leyenda">
+                  <b>Recursos disponibles en {info?.nombre ?? ""} {cap}</b>
+                  <span>{nombresRecursosCap}</span>
+                  {(recursosCap.includes("nave") || recursosCap.includes("tsk")) && (
+                    <small>Nave's y TSK se muestran al tocar un versículo.</small>
+                  )}
+                  <button className="rec-filtro-todos" onClick={() => setRecursosFiltrado(false)}>
+                    Ver todos los recursos
+                  </button>
+                </div>
+              )}
               <div className="ajustes-rotulo">Comentarios</div>
-              {COMENTARIOS.filter((c) => c.id !== "easton").map((c) => (
+              {COMENTARIOS.filter((c) => c.id !== "easton" && (!recursosFiltrado || recursosCap.includes(c.id))).map((c) => (
                 <label key={c.id} className={`recurso-fila${!comActivo(c.id as ComFuente) && lleno ? " inactiva" : ""}`}>
                   <span className="ajustes-txt">
                     <b>{c.etiqueta}</b>
@@ -3891,6 +3926,8 @@ export default function Lector() {
                   <input type="checkbox" checked={comActivo(c.id as ComFuente)} disabled={!comActivo(c.id as ComFuente) && lleno} onChange={() => alternarCom(c.id as ComFuente)} />
                 </label>
               ))}
+              {(!recursosFiltrado || recursosCap.includes("easton")) && (
+              <>
               <div className="ajustes-rotulo">Diccionarios</div>
               <label className={`recurso-fila${!comActivo("easton") && lleno ? " inactiva" : ""}`}>
                 <span className="ajustes-txt">
@@ -3899,6 +3936,14 @@ export default function Lector() {
                 </span>
                 <input type="checkbox" checked={comActivo("easton")} disabled={!comActivo("easton") && lleno} onChange={() => alternarCom("easton")} />
               </label>
+              </>)}
+              {recursosFiltrado ? (
+                <button className="rec-filtro-todos" style={{ marginTop: 14 }} onClick={() => setRecursosFiltrado(false)}>
+                  Ver todos los recursos
+                </button>
+              ) : (
+              <>
+              <div className="ajustes-rotulo">Herramientas</div>
               <label className={`recurso-fila${!dicPanel && lleno ? " inactiva" : ""}`}>
                 <span className="ajustes-txt">
                   <b>Diccionario bíblico</b>
@@ -3951,6 +3996,8 @@ export default function Lector() {
                   </span>
                   <input type="checkbox" checked={griego} onChange={(e) => { setGriego(e.target.checked); if (e.target.checked) setInterlineal(false); }} />
                 </label>
+              )}
+              </>
               )}
             </div>
           </aside>

@@ -7008,3 +7008,52 @@ button.rec-original[aria-pressed="true"]::before {
 }
 .badge-recursos b { color: var(--accent-strong); font-size: 13px; }
 .badge-recursos:hover, .badge-recursos:active { border-color: var(--accent); color: var(--accent-strong); }
+
+/* — Refinamiento del título anclado (pedido del usuario, GLM 2026-09-30): hueco
+   cero bajo la cabecera, fondo sólido, y colapso al avanzar (gesto hacia arriba)
+   con restauración al retroceder — sólo móvil/tablet; en PC nunca colapsa. — */
+.lector-titulo {
+  top: var(--altura-cabecera, 130px);
+  background: var(--bg);
+  padding-top: 8px;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+  transition: padding 0.22s ease, margin 0.22s ease;
+}
+.lector-titulo h1 { transition: font-size 0.22s ease; }
+.lector-titulo.compacto {
+  padding-top: 4px;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+.lector-titulo.compacto h1 { font-size: 16px; }
+.lector-titulo.compacto .ref-osis { font-size: 10px; }
+.lector-titulo.compacto .titulo-lateral { flex-direction: row; align-items: center; gap: 10px; }
+
+/* leyenda del panel de Recursos abierto desde el badge (sólo los del capítulo) */
+.rec-filtro-leyenda {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0 0 12px;
+}
+.rec-filtro-leyenda b { font-family: var(--sans); font-size: 0.9rem; color: var(--ink); }
+.rec-filtro-leyenda span { font-family: var(--sans); font-size: 0.82rem; color: var(--ink-soft); }
+.rec-filtro-leyenda small { font-family: var(--sans); font-size: 0.75rem; color: var(--muted); }
+.rec-filtro-todos {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--accent-strong);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+  margin-top: 4px;
+  align-self: flex-start;
+}
+.rec-filtro-todos:hover { border-color: var(--accent); }
