@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Cabecera from "@/components/Cabecera";
 import { t } from "@/lib/i18n";
+import TiraMarquee from "@/components/TiraMarquee";
 
 /** Recursos que hoy ya sirven en el lector (2026-09-30). */
 const RECURSOS = [
@@ -20,6 +21,22 @@ const RECURSOS = [
     t: "Estudio conectado",
     d: "344.000 referencias cruzadas votadas, geografía de 1.335 lugares con mapa, sintaxis griega por palabra, notas y subrayados del lector, y búsqueda offline.",
   },
+];
+
+const TIRA = [
+  "Matthew Henry · completo en español, capítulo a capítulo",
+  "Keil y Delitzsch · el AT completo, 24.305 párrafos traducidos",
+  "Marvin Vincent · estudio de palabras griegas del NT",
+  "Jamieson-Fausset-Brown · 19.768 anclas de versículo",
+  "Albert Barnes · NT completo + Génesis, Job, Salmos, Isaías y Daniel",
+  "Juan de Valdés · 1556/1557, en su castellano original",
+  "Biblia del Oso 1569 · ortografía actualizada, 31.098 versos",
+  "344.000 referencias cruzadas votadas",
+  "1.335 lugares bíblicos con coordenadas y mapa",
+  "Sintaxis griega palabra por palabra (MACULA)",
+  "Nave's y TSK conectados a cada versículo",
+  "22.700 términos del léxico hebreo-griego en español",
+  "100% gratuita · sin cuentas · sin anuncios · funciona sin conexión",
 ];
 
 export default function Portada() {
@@ -46,6 +63,8 @@ export default function Portada() {
             {tr.heroNota}
           </p>
         </section>
+
+        <TiraMarquee items={TIRA} />
 
         <section className="dato-fila" aria-label="Estado del corpus">
           <div className="dato">
@@ -79,6 +98,20 @@ export default function Portada() {
           <Link href="/es/lector" className="btn btn-fantasma">
             Verlo en el lector →
           </Link>
+        </section>
+
+        <section className="portada-libre" aria-label="Gratuita y multiplataforma">
+          <div className="portada-libre-caja">
+            <b>100% gratuita, en cualquier dispositivo</b>
+            <p>
+              Sin cuentas, sin suscripciones y sin anuncios: úsala en tu móvil, tablet o PC,
+              instálala como aplicación y estudia incluso sin conexión.
+            </p>
+          </div>
+          <div className="portada-libre-caja en-camino">
+            <b>En camino: la app oficial para Android e iOS</b>
+            <p>Ya estamos trabajando en ella — la misma biblioteca de estudio, en tu bolsillo.</p>
+          </div>
         </section>
       </main>
       <footer className="pie">
