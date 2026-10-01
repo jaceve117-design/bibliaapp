@@ -1528,3 +1528,6 @@ Sustituye a la «baraja» en < 680 px. Cada panel es una carpeta con **lengüeta
 - **Secciones acentuadas**: banda de cifras con tinte dorado y separadores por borde (fuera las franjas laterales del fondo); «Lo que hay dentro» en banda borde a borde más profunda; bandas finales «100% gratuita, en cualquier dispositivo» (tinte dorado) y «En camino: app oficial Android e iOS» (borde punteado). Botón CTA centrado.
 - **Espacio superior reducido**: héroe de clamp(72-140px) a clamp(28-56px).
 - Verificado en navegador: tira animando (Δ~33px/s ≈ 0,6px/fotograma), móvil y PC con bandas ordenadas y sin cortes.
+
+## 2026-09-30 — Cuadros finales de la portada centrados (GLM, ajuste del usuario)
+- El par «100% gratuita» + «En camino: app oficial» estaba matemáticamente centrado pero estirado a 1.032px: no se PERCIBÍA centrado. Ahora el par va a 920px con aire claro a ambos lados (deploy `e9861b45`, verificado en navegador a 1.103px: márgenes iguales, alturas iguales).
